@@ -14,7 +14,7 @@
     "href": "chapters/01_classification.html",
     "title": "1  Classification",
     "section": "",
-    "text": "Code\n# Imports\nimport os\nimport xarray as xr\nimport numpy as np\nimport datetime as dt\nimport cmcrameri as cmc\nimport folium\nfrom dotenv import dotenv_values\n\nfrom eodag import EODataAccessGateway, SearchResult, setup_logging\nfrom rasterio.crs import CRS\n\n# Setup logging\nsetup_logging(0)",
+    "text": "Code\n# Imports\nimport os\nimport xarray as xr\nimport numpy as np\nimport datetime as dt\nimport cmcrameri as cmc\nimport folium\nfrom dotenv import dotenv_values\n\nfrom eodag import EODataAccessGateway, SearchResult, setup_logging\nfrom rasterio.crs import CRS\n\n# Setup logging\nsetup_logging(0)\n\n\nLorum ipsum",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Classification</span>"
     ]
