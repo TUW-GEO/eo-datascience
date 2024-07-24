@@ -6,7 +6,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Pikall Nikolas">
 
 <title>1&nbsp; Classification – notebooks4eo</title>
 <style>
@@ -55,7 +54,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -77,11 +96,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
-  "location": "sidebar",
+  "location": "navbar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "start",
-  "type": "textbox",
+  "panel-placement": "end",
+  "type": "overlay",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
@@ -103,17 +122,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<style>
+
+      .quarto-title-block .quarto-title-banner h1,
+      .quarto-title-block .quarto-title-banner h2,
+      .quarto-title-block .quarto-title-banner h3,
+      .quarto-title-block .quarto-title-banner h4,
+      .quarto-title-block .quarto-title-banner h5,
+      .quarto-title-block .quarto-title-banner h6
+      {
+        color: white;
+      }
+
+      .quarto-title-block .quarto-title-banner {
+        color: white;
+background: #006699;
+      }
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
-<body class="nav-sidebar floating">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="https://www.tuwien.at/index.php?eID=dumpFile&amp;t=f&amp;f=180458&amp;token=fe76daebeea536ee4be1650979e817f6fc0a2ea2" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">notebooks4eo</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
@@ -122,26 +202,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/01_classification.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Classification</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
-      </button>
     </div>
   </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Classification</span></h1>
+            <p class="subtitle lead">Finding forests with satelite imagery</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
-    <div class="sidebar-title mb-0 py-0">
-      <a href="../">notebooks4eo</a> 
-    </div>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="../index.html" class="sidebar-logo-link">
+      <img src="https://www.tuwien.at/index.php?eID=dumpFile&amp;t=f&amp;f=180458&amp;token=fe76daebeea536ee4be1650979e817f6fc0a2ea2" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
       </div>
-        <div class="mt-2 flex-shrink-0 align-items-center">
-        <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
-        </div>
-        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -200,35 +289,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Classification</span></h1>
-</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Pikall Nikolas </p>
-          </div>
-  </div>
-    
-  
-    
-  </div>
-  
 
 
-</header>
-
-
-<p>In this Notebook, we will use <code>Scikit learn</code> to classify an <code>Sentinel-2</code> Image. We will use two different classifiers and compare the results. To get started we need to import the following modules.</p>
-<div id="05c12f50" class="cell" data-execution_count="1">
+<section id="data-acquisition" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="data-acquisition"><span class="header-section-number">1.1</span> Data Acquisition</h2>
+<p>In this chapter, we will employ machine learning techniques to classify a scene using satellite imagery. Specifically, we will utilize <code>scikit-learn</code> to implement two distinct classifiers and subsequently compare their results. To begin, we need to import the following modules.</p>
+<div id="c407e996" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
@@ -261,13 +331,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> colors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<section id="data-acquisition" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="data-acquisition"><span class="header-section-number">1.1</span> Data Acquisition</h2>
-<p>Before we start, we need to load the data. We will use <code>odc-stac</code> to get data from Earth Search by Element 84. Here we define the area of interest and the time frame, aswell as the EPSG code and the resolution.</p>
+<p>Before we start, we need to load the data. We will use <code>odc-stac</code> to obtain data from Earth Search by Element 84. Here we define the area of interest and the time frame, aswell as the EPSG code and the resolution.</p>
 <section id="searching-catalog" class="level3" data-number="1.1.1">
 <h3 data-number="1.1.1" class="anchored" data-anchor-id="searching-catalog"><span class="header-section-number">1.1.1</span> Searching Catalog</h3>
-<p>The module <code>odc-stac</code> provides access to free, open source Sattelite data. To actually get to the data, we define some parameters, which specify where and when we want Satelite data from. Also we define what data collection we want to get the data from, since there are multiple to choose from. In this example we use <em>multispectral imagery</em> from the Sentinel-2 Satelite.</p>
-<div id="1e102459" class="cell" data-execution_count="2">
+<p>The module <code>odc-stac</code> provides access to free, open source satelite data. To retrieve the data, we must define several parameters that specify the location and time period for the satellite data. Additionally, we must specify the data collection we wish to access, as multiple collections are available. In this example, we will use multispectral imagery from the Sentinel-2 satellite.</p>
+<div id="7d821435" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> <span class="fl">0.0006</span>  <span class="co"># 60m resolution</span></span>
@@ -314,12 +382,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>10 scenes found</code></pre>
 </div>
 </div>
-<p>Here we will have a look at the area south-east of Vienna, where the Nationalpark <em>Donauauen</em> is located. The time we are interested in is the beginning of may of 2024. After passing these parameters to the <code>stac-catalog</code> We have now found <strong>10 scenes</strong> that we can use for our analysis.</p>
+<p>We will now focus on the area south-east of Vienna, where the Nationalpark <em>Donauauen</em> is situated. The time frame we are interested in is the beginning of May 2024. After passing these parameters to the <code>stac-catalog</code> we have found <strong>10 scenes</strong> that we can use for our analysis.</p>
 </section>
 <section id="loading-the-data" class="level3" data-number="1.1.2">
 <h3 data-number="1.1.2" class="anchored" data-anchor-id="loading-the-data"><span class="header-section-number">1.1.2</span> Loading the Data</h3>
-<p>Now we will load the data directly into an <code>xarray</code> dataset, which we can use to perform computations on the data.</p>
-<div id="cf0f0837" class="cell" data-execution_count="3">
+<p>Now we will load the data directly into an <code>xarray</code> dataset, which we can use to perform computations on the data. <code>xarray</code> is a powerful library for working with multi-dimensional arrays, making it well-suited for handling satellite data.</p>
+<p>Here’s how we can load the data using odc-stac and xarray:</p>
+<div id="fcffd043" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a geobox for my region</span></span>
@@ -339,21 +408,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    ds_odc.load()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[                                        ] | 0% Completed | 175.09 us[##                                      ] | 6% Completed | 103.15 ms[##                                      ] | 6% Completed | 203.85 ms[##                                      ] | 6% Completed | 304.69 ms[##                                      ] | 6% Completed | 405.25 ms[##                                      ] | 6% Completed | 505.75 ms[##                                      ] | 6% Completed | 606.34 ms</code></pre>
+<pre><code>[                                        ] | 0% Completed | 246.69 us[##                                      ] | 6% Completed | 103.52 ms[##                                      ] | 6% Completed | 204.42 ms[##                                      ] | 6% Completed | 305.24 ms[##                                      ] | 6% Completed | 406.16 ms[##                                      ] | 6% Completed | 506.90 ms[##                                      ] | 6% Completed | 607.88 ms</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>/usr/share/miniconda/envs/01_classification/lib/python3.10/site-packages/rasterio/warp.py:344: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix will be returned.
   _reproject(</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[##                                      ] | 6% Completed | 707.02 ms[##                                      ] | 6% Completed | 807.80 ms[##                                      ] | 6% Completed | 908.39 ms[##                                      ] | 6% Completed | 1.01 s[##                                      ] | 6% Completed | 1.11 s[##                                      ] | 6% Completed | 1.21 s[##                                      ] | 6% Completed | 1.31 s[##                                      ] | 6% Completed | 1.41 s[##                                      ] | 6% Completed | 1.51 s[##                                      ] | 6% Completed | 1.61 s[##                                      ] | 6% Completed | 1.71 s[##                                      ] | 6% Completed | 1.81 s[##                                      ] | 6% Completed | 1.91 s[###                                     ] | 8% Completed | 2.02 s[###                                     ] | 8% Completed | 2.12 s[###                                     ] | 8% Completed | 2.22 s[###                                     ] | 8% Completed | 2.32 s[###                                     ] | 8% Completed | 2.42 s[####                                    ] | 10% Completed | 2.52 s[####                                    ] | 10% Completed | 2.62 s[#####                                   ] | 14% Completed | 2.72 s[#####                                   ] | 14% Completed | 2.82 s[#####                                   ] | 14% Completed | 2.92 s[#####                                   ] | 14% Completed | 3.03 s[#####                                   ] | 14% Completed | 3.13 s[#####                                   ] | 14% Completed | 3.23 s[######                                  ] | 15% Completed | 3.34 s[######                                  ] | 15% Completed | 3.44 s[######                                  ] | 15% Completed | 3.54 s[#######                                 ] | 18% Completed | 3.64 s[########                                ] | 20% Completed | 3.74 s[########                                ] | 20% Completed | 3.84 s[########                                ] | 20% Completed | 3.94 s</code></pre>
+<pre><code>[##                                      ] | 6% Completed | 708.85 ms[##                                      ] | 6% Completed | 809.59 ms[##                                      ] | 6% Completed | 910.40 ms[##                                      ] | 6% Completed | 1.01 s[##                                      ] | 6% Completed | 1.11 s[##                                      ] | 6% Completed | 1.21 s[##                                      ] | 6% Completed | 1.32 s[##                                      ] | 6% Completed | 1.42 s[##                                      ] | 6% Completed | 1.52 s[###                                     ] | 8% Completed | 1.62 s</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>/usr/share/miniconda/envs/01_classification/lib/python3.10/site-packages/rasterio/warp.py:344: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix will be returned.
   _reproject(</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[########                                ] | 20% Completed | 4.04 s[########                                ] | 20% Completed | 4.14 s[########                                ] | 20% Completed | 4.24 s[########                                ] | 20% Completed | 4.34 s[########                                ] | 20% Completed | 4.44 s[########                                ] | 20% Completed | 4.54 s[########                                ] | 20% Completed | 4.65 s[########                                ] | 20% Completed | 4.75 s[##########                              ] | 25% Completed | 4.85 s[###########                             ] | 28% Completed | 4.95 s[############                            ] | 30% Completed | 5.05 s[############                            ] | 30% Completed | 5.15 s[############                            ] | 30% Completed | 5.25 s[############                            ] | 30% Completed | 5.35 s[############                            ] | 30% Completed | 5.45 s[############                            ] | 30% Completed | 5.55 s[############                            ] | 30% Completed | 5.65 s[############                            ] | 30% Completed | 5.75 s[############                            ] | 30% Completed | 5.86 s[############                            ] | 30% Completed | 5.96 s[############                            ] | 30% Completed | 6.06 s[##############                          ] | 36% Completed | 6.16 s[##############                          ] | 36% Completed | 6.26 s[##############                          ] | 36% Completed | 6.36 s[##############                          ] | 36% Completed | 6.46 s[##############                          ] | 36% Completed | 6.56 s[################                        ] | 40% Completed | 6.66 s[################                        ] | 40% Completed | 6.76 s[################                        ] | 40% Completed | 6.86 s[################                        ] | 40% Completed | 6.96 s[################                        ] | 40% Completed | 7.06 s[################                        ] | 40% Completed | 7.17 s[################                        ] | 41% Completed | 7.27 s[##################                      ] | 45% Completed | 7.37 s[##################                      ] | 45% Completed | 7.47 s[##################                      ] | 45% Completed | 7.57 s[##################                      ] | 45% Completed | 7.67 s[##################                      ] | 45% Completed | 7.77 s[##################                      ] | 45% Completed | 7.87 s[##################                      ] | 45% Completed | 7.97 s[##################                      ] | 45% Completed | 8.07 s[####################                    ] | 50% Completed | 8.17 s[####################                    ] | 50% Completed | 8.27 s[####################                    ] | 51% Completed | 8.38 s[####################                    ] | 51% Completed | 8.48 s[####################                    ] | 51% Completed | 8.58 s[#####################                   ] | 54% Completed | 8.68 s[######################                  ] | 55% Completed | 8.78 s[######################                  ] | 55% Completed | 8.88 s[######################                  ] | 55% Completed | 8.98 s[######################                  ] | 55% Completed | 9.08 s[######################                  ] | 55% Completed | 9.18 s[######################                  ] | 55% Completed | 9.28 s[######################                  ] | 55% Completed | 9.38 s[######################                  ] | 55% Completed | 9.48 s[######################                  ] | 55% Completed | 9.59 s[######################                  ] | 55% Completed | 9.69 s[######################                  ] | 55% Completed | 9.79 s[######################                  ] | 55% Completed | 9.89 s[########################                ] | 61% Completed | 9.99 s[########################                ] | 61% Completed | 10.09 s[########################                ] | 61% Completed | 10.19 s[########################                ] | 61% Completed | 10.30 s[########################                ] | 61% Completed | 10.40 s[#########################               ] | 64% Completed | 10.50 s[#########################               ] | 64% Completed | 10.60 s[#########################               ] | 64% Completed | 10.70 s[##########################              ] | 65% Completed | 10.80 s[##########################              ] | 65% Completed | 10.91 s[##########################              ] | 65% Completed | 11.01 s[##########################              ] | 65% Completed | 11.11 s[##########################              ] | 65% Completed | 11.21 s[##########################              ] | 65% Completed | 11.31 s[##########################              ] | 65% Completed | 11.41 s[##########################              ] | 65% Completed | 11.51 s[##########################              ] | 65% Completed | 11.62 s[############################            ] | 70% Completed | 11.72 s[############################            ] | 71% Completed | 11.82 s[############################            ] | 71% Completed | 11.92 s[##############################          ] | 75% Completed | 12.02 s[##############################          ] | 75% Completed | 12.13 s[##############################          ] | 75% Completed | 12.23 s[##############################          ] | 75% Completed | 12.33 s[##############################          ] | 75% Completed | 12.43 s[##############################          ] | 75% Completed | 12.53 s[##############################          ] | 75% Completed | 12.64 s[##############################          ] | 75% Completed | 12.74 s[##############################          ] | 75% Completed | 12.84 s[##############################          ] | 75% Completed | 12.94 s[##############################          ] | 75% Completed | 13.04 s[##############################          ] | 75% Completed | 13.14 s[##############################          ] | 75% Completed | 13.24 s[##############################          ] | 75% Completed | 13.34 s[################################        ] | 81% Completed | 13.44 s[################################        ] | 81% Completed | 13.54 s[################################        ] | 81% Completed | 13.64 s[################################        ] | 81% Completed | 13.74 s[################################        ] | 81% Completed | 13.85 s[################################        ] | 81% Completed | 13.95 s[##################################      ] | 85% Completed | 14.05 s[##################################      ] | 85% Completed | 14.15 s[##################################      ] | 85% Completed | 14.25 s[##################################      ] | 85% Completed | 14.35 s[##################################      ] | 85% Completed | 14.46 s[##################################      ] | 85% Completed | 14.56 s[##################################      ] | 85% Completed | 14.66 s[##################################      ] | 85% Completed | 14.76 s[##################################      ] | 85% Completed | 14.86 s[##################################      ] | 85% Completed | 14.96 s[##################################      ] | 85% Completed | 15.06 s[##################################      ] | 85% Completed | 15.16 s[####################################    ] | 90% Completed | 15.26 s[####################################    ] | 91% Completed | 15.36 s[#####################################   ] | 93% Completed | 15.46 s[#####################################   ] | 94% Completed | 15.56 s[######################################  ] | 95% Completed | 15.67 s[######################################  ] | 95% Completed | 15.77 s[######################################  ] | 95% Completed | 15.87 s[######################################  ] | 95% Completed | 15.97 s[######################################  ] | 95% Completed | 16.07 s[######################################  ] | 95% Completed | 16.17 s[######################################  ] | 95% Completed | 16.27 s[######################################  ] | 96% Completed | 16.37 s[######################################  ] | 96% Completed | 16.48 s[####################################### ] | 97% Completed | 16.58 s[####################################### ] | 97% Completed | 16.68 s[####################################### ] | 98% Completed | 16.78 s[########################################] | 100% Completed | 16.88 s</code></pre>
+<pre><code>[###                                     ] | 8% Completed | 1.72 s[###                                     ] | 8% Completed | 1.82 s[###                                     ] | 8% Completed | 1.92 s[###                                     ] | 8% Completed | 2.02 s[###                                     ] | 8% Completed | 2.13 s[###                                     ] | 8% Completed | 2.23 s[###                                     ] | 8% Completed | 2.33 s[#####                                   ] | 14% Completed | 2.43 s[#####                                   ] | 14% Completed | 2.53 s[#####                                   ] | 14% Completed | 2.63 s[######                                  ] | 16% Completed | 2.73 s[########                                ] | 20% Completed | 2.83 s[########                                ] | 20% Completed | 2.93 s[########                                ] | 20% Completed | 3.04 s[########                                ] | 20% Completed | 3.14 s[########                                ] | 20% Completed | 3.24 s[########                                ] | 20% Completed | 3.34 s[########                                ] | 20% Completed | 3.44 s[########                                ] | 20% Completed | 3.54 s[########                                ] | 20% Completed | 3.64 s[########                                ] | 20% Completed | 3.74 s[#########                               ] | 24% Completed | 3.85 s[#########                               ] | 24% Completed | 3.95 s[#########                               ] | 24% Completed | 4.05 s[##########                              ] | 25% Completed | 4.15 s[############                            ] | 31% Completed | 4.25 s[############                            ] | 31% Completed | 4.35 s[############                            ] | 31% Completed | 4.45 s[############                            ] | 31% Completed | 4.55 s[############                            ] | 31% Completed | 4.65 s[############                            ] | 31% Completed | 4.75 s[############                            ] | 31% Completed | 4.85 s[############                            ] | 31% Completed | 4.95 s[############                            ] | 31% Completed | 5.05 s[#############                           ] | 34% Completed | 5.16 s[#############                           ] | 34% Completed | 5.26 s[##############                          ] | 35% Completed | 5.36 s[##############                          ] | 35% Completed | 5.46 s[##############                          ] | 35% Completed | 5.56 s[##############                          ] | 35% Completed | 5.66 s[##############                          ] | 35% Completed | 5.76 s[################                        ] | 41% Completed | 5.86 s[################                        ] | 41% Completed | 5.96 s[################                        ] | 41% Completed | 6.07 s[################                        ] | 41% Completed | 6.19 s[################                        ] | 41% Completed | 6.30 s[################                        ] | 41% Completed | 6.40 s[################                        ] | 41% Completed | 6.50 s[##################                      ] | 45% Completed | 6.60 s[##################                      ] | 45% Completed | 6.70 s[##################                      ] | 45% Completed | 6.80 s[##################                      ] | 45% Completed | 6.90 s[##################                      ] | 45% Completed | 7.00 s[###################                     ] | 47% Completed | 7.10 s[####################                    ] | 51% Completed | 7.20 s[####################                    ] | 51% Completed | 7.30 s[####################                    ] | 51% Completed | 7.41 s[####################                    ] | 51% Completed | 7.51 s[####################                    ] | 51% Completed | 7.61 s[####################                    ] | 51% Completed | 7.71 s[#####################                   ] | 54% Completed | 7.81 s[######################                  ] | 55% Completed | 7.91 s[######################                  ] | 55% Completed | 8.01 s[######################                  ] | 55% Completed | 8.11 s[######################                  ] | 55% Completed | 8.21 s[######################                  ] | 55% Completed | 8.32 s[######################                  ] | 55% Completed | 8.42 s[######################                  ] | 55% Completed | 8.52 s[######################                  ] | 55% Completed | 8.62 s[######################                  ] | 55% Completed | 8.72 s[########################                ] | 61% Completed | 8.82 s[########################                ] | 61% Completed | 8.92 s[########################                ] | 61% Completed | 9.02 s[########################                ] | 61% Completed | 9.13 s[########################                ] | 61% Completed | 9.23 s[##########################              ] | 65% Completed | 9.33 s[##########################              ] | 65% Completed | 9.43 s[##########################              ] | 65% Completed | 9.53 s[##########################              ] | 65% Completed | 9.63 s[##########################              ] | 65% Completed | 9.73 s[##########################              ] | 65% Completed | 9.84 s[##########################              ] | 65% Completed | 9.94 s[##########################              ] | 65% Completed | 10.04 s[##########################              ] | 65% Completed | 10.15 s[##########################              ] | 65% Completed | 10.25 s[############################            ] | 71% Completed | 10.35 s[############################            ] | 71% Completed | 10.45 s[############################            ] | 71% Completed | 10.55 s[############################            ] | 71% Completed | 10.65 s[############################            ] | 71% Completed | 10.75 s[############################            ] | 71% Completed | 10.86 s[##############################          ] | 75% Completed | 10.96 s[##############################          ] | 75% Completed | 11.06 s[##############################          ] | 75% Completed | 11.16 s[##############################          ] | 75% Completed | 11.26 s[##############################          ] | 75% Completed | 11.36 s[##############################          ] | 75% Completed | 11.46 s[##############################          ] | 75% Completed | 11.56 s[##############################          ] | 75% Completed | 11.66 s[##############################          ] | 75% Completed | 11.77 s[################################        ] | 81% Completed | 11.87 s[################################        ] | 81% Completed | 11.97 s[################################        ] | 81% Completed | 12.07 s[################################        ] | 81% Completed | 12.17 s[################################        ] | 81% Completed | 12.27 s[################################        ] | 81% Completed | 12.37 s[#################################       ] | 84% Completed | 12.47 s[#################################       ] | 84% Completed | 12.57 s[#################################       ] | 84% Completed | 12.67 s[##################################      ] | 85% Completed | 12.78 s[##################################      ] | 85% Completed | 12.88 s[##################################      ] | 85% Completed | 12.99 s[##################################      ] | 85% Completed | 13.09 s[##################################      ] | 85% Completed | 13.19 s[##################################      ] | 85% Completed | 13.29 s[##################################      ] | 85% Completed | 13.39 s[##################################      ] | 85% Completed | 13.49 s[####################################    ] | 91% Completed | 13.59 s[####################################    ] | 91% Completed | 13.70 s[####################################    ] | 91% Completed | 13.80 s[######################################  ] | 95% Completed | 13.90 s[######################################  ] | 95% Completed | 14.00 s[######################################  ] | 95% Completed | 14.10 s[######################################  ] | 95% Completed | 14.20 s[######################################  ] | 95% Completed | 14.32 s[######################################  ] | 95% Completed | 14.42 s[######################################  ] | 95% Completed | 14.52 s[######################################  ] | 95% Completed | 14.62 s[######################################  ] | 96% Completed | 14.72 s[######################################  ] | 96% Completed | 14.82 s[####################################### ] | 97% Completed | 14.92 s[########################################] | 100% Completed | 15.02 s</code></pre>
 </div>
 </div>
 </section>
@@ -362,8 +431,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="1.2" class="anchored" data-anchor-id="data-visualization"><span class="header-section-number">1.2</span> Data Visualization</h2>
 <section id="rgb-image" class="level3" data-number="1.2.1">
 <h3 data-number="1.2.1" class="anchored" data-anchor-id="rgb-image"><span class="header-section-number">1.2.1</span> RGB Image</h3>
-<p>As we are now in posession of the image data, we can start with the computations and visualizations. First we define a mask to filter out the clouds and the areas with no data and then we can plot a composite median image of the data, which is just an image where each pixel value is the median value of all the scences we have found. This is necessary to get rid of clouds and outliers, which some images may have.</p>
-<div id="96293d2d" class="cell" data-execution_count="4">
+<p>With the image data now in our possession, we can proceed with computations and visualizations.</p>
+<p>First, we define a mask to exclude cloud cover and areas with missing data. Subsequently, we create a composite median image, where each pixel value represents the median value across all the scenes we have identified. This approach helps to eliminate clouds and outliers present in some of the images, thereby providing a clearer and more representative visualization of the scene.</p>
+<div id="5d9c5290" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a mask for valid pixels (non-cloud)</span></span>
@@ -405,14 +475,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="ndvi-image" class="level3" data-number="1.2.2">
 <h3 data-number="1.2.2" class="anchored" data-anchor-id="ndvi-image"><span class="header-section-number">1.2.2</span> NDVI Image</h3>
-<p>To get an first impression of the data, we can calculate the NDVI (Normalized Difference Vegetation Index) and plot it. This gives us a good overview of the vegetation in the area. The values can range from -1 to 1 where the following meanings are associated with these values:</p>
+<p>To get an first impression of the data, we can calculate the NDVI (Normalized Difference Vegetation Index) and plot it. The NDVI is calculated by useing the following formula. <span class="citation" data-cites="rouse1974monitoring">(<a href="references.html#ref-rouse1974monitoring" role="doc-biblioref">Rouse et al. 1974</a>)</span></p>
+<p><span class="math display">\[
+NDVI = \frac{NIR - Red}{NIR + Red}
+\]</span></p>
+<p>This gives us a good overview of the vegetation in the area. The values can range from -1 to 1 where the following meanings are associated with these values:</p>
 <ul>
 <li>-1 to 0 indicate dead plants or inanimate objects</li>
 <li>0 to 0.33 are unhealthy plants</li>
 <li>0.33 to 0.66 are moderatly healthy plants</li>
 <li>0.66 to 1 are very healthy plants</li>
 </ul>
-<div id="a7dc79cb" class="cell" data-execution_count="5">
+<div id="580a22a4" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalized Difference Vegetation Index (NDVI)</span></span>
@@ -438,7 +512,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="regions-of-interest" class="level3" data-number="1.3.1">
 <h3 data-number="1.3.1" class="anchored" data-anchor-id="regions-of-interest"><span class="header-section-number">1.3.1</span> Regions of Interest</h3>
 <p>Since this is a supervised classification, we need to have some training data. Therefore we need to define areas or regions, which we are certain represent the feature which we are classifiying. In this case we are looking for forested areas and areas that are definitly not forested. We will use these to train our classifiers.</p>
-<div id="04e5fe52" class="cell" data-execution_count="6">
+<div id="c5779591" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Polygons</span></span>
@@ -490,7 +564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="data-preparation" class="level3" data-number="1.3.2">
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">1.3.2</span> Data Preparation</h3>
 <p>Additionally to the Regions of Interest we will extract the bands that we want to use for the classification from the loaded Dataset. With that we will create a Training and Testing Dataset, which we will train the classifier on.</p>
-<div id="3a550924" class="cell" data-execution_count="7">
+<div id="ef22becf" class="cell" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Classifiying dataset (only necessary bands)</span></span>
@@ -537,7 +611,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>Now that we have the training and testing data, we create an Image array of the actual scene which we want to classify.</p>
-<div id="3f51f9b3" class="cell" data-execution_count="8">
+<div id="d0b8037f" class="cell" data-execution_count="8">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>image_data <span class="op">=</span> ds_class[bands].to_array(dim<span class="op">=</span><span class="st">'band'</span>).transpose(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'band'</span>)</span>
@@ -553,7 +627,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="1.3.3" class="anchored" data-anchor-id="classifiying-with-naive-bayes"><span class="header-section-number">1.3.3</span> Classifiying with Naive Bayes</h3>
 <p>Now that we have prepared all the needed data, we can start to classify the image.</p>
 <p>We will start with a <em>Naive Bayes</em> classificator. We train the classificator on our Training data and apply it on the actual image.</p>
-<div id="e4243d43" class="cell" data-execution_count="9">
+<div id="6450551f" class="cell" data-execution_count="9">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive Bayes initialization and training</span></span>
@@ -570,7 +644,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 <p>To see how well the classification has worked we plot the image that has been predicted by the classifier. Furthermore we can have a look at the <code>Classification Report</code> and the <code>Confusion Matrix</code>.</p>
-<div id="7926fe68" class="cell" data-execution_count="10">
+<div id="10d64b9a" class="cell" data-execution_count="10">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Naive Bayes</span></span>
@@ -644,7 +718,7 @@ weighted avg       0.89      0.88      0.88     12105
 <section id="classifiying-with-random-forest" class="level3" data-number="1.3.4">
 <h3 data-number="1.3.4" class="anchored" data-anchor-id="classifiying-with-random-forest"><span class="header-section-number">1.3.4</span> Classifiying with Random Forest</h3>
 <p>To not only rely on one classificator lets have a look at another one. Here we use the <em>Random Forest</em> Classificator. The Procedure useing it is the same as before.</p>
-<div id="7b8432a8" class="cell" data-execution_count="11">
+<div id="dd152769" class="cell" data-execution_count="11">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest initialization and training</span></span>
@@ -708,13 +782,13 @@ weighted avg       0.95      0.95      0.95     12105
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Actual Negative</td>
-<td>6303</td>
-<td>315</td>
+<td>6290</td>
+<td>328</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Actual Positive</td>
-<td>280</td>
-<td>5207</td>
+<td>265</td>
+<td>5222</td>
 </tr>
 </tbody>
 </table>
@@ -727,7 +801,7 @@ weighted avg       0.95      0.95      0.95     12105
 <section id="comparison-of-the-classificators" class="level3" data-number="1.3.5">
 <h3 data-number="1.3.5" class="anchored" data-anchor-id="comparison-of-the-classificators"><span class="header-section-number">1.3.5</span> Comparison of the Classificators</h3>
 <p>To have a more in depth look at the performance of the classificators, we can compare them. Lets see what areas both classificators agree upon, and which areas then don’t agree upon.</p>
-<div id="a60c5907" class="cell" data-execution_count="12">
+<div id="18806886" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>cmap_trio <span class="op">=</span> colors.ListedColormap([<span class="st">'whitesmoke'</span> ,<span class="st">'indianred'</span>, <span class="st">'goldenrod'</span>, <span class="st">'darkgreen'</span>])</span>
@@ -754,7 +828,7 @@ weighted avg       0.95      0.95      0.95     12105
 </div>
 </div>
 <p>The areas that both agree upon are the bigger forests, like the <em>Nationalpark Donauauen</em> and the <em>Leithagebirge</em> also the urban areas of vienna have both rightfully not been classified.</p>
-<div id="991b5c87" class="cell" data-execution_count="13">
+<div id="46fc16d7" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot only one class, either None (0), Naive Bayes (1), Random Forest (2), or Both (3)</span></span>
@@ -779,7 +853,7 @@ weighted avg       0.95      0.95      0.95     12105
 </div>
 </div>
 <p>When plotting the areas, where classification has happend, individually we can see that the <em>random forest</em> classifiyer falsly predicted the river <em>danube</em> as a forest. On the other hand has the <em>naive bayes</em> classifyer identified a lot of cropland as forest. Finally we can have a look at how big the percentage of forested areas in the scene are. We can see here that around 18% are forest and about 66% are not forest. The remaining areas are not so clear to define, as waterbodies and cropland are both in the remaining categories.</p>
-<div id="15e27153" class="cell" data-execution_count="14">
+<div id="6a28e9cf" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> {}</span>
@@ -806,6 +880,11 @@ weighted avg       0.95      0.95      0.95     12105
 </div>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-rouse1974monitoring" class="csl-entry" role="listitem">
+Rouse, John Wilson, Rüdiger H Haas, John A Schell, Donald W Deering, et al. 1974. <span>“Monitoring Vegetation Systems in the Great Plains with ERTS.”</span> <em>NASA Spec. Publ</em> 351 (1): 309.
+</div>
+</div>
 </section>
 </section>
 
