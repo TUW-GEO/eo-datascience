@@ -97,7 +97,8 @@ jobs:
       - name: Commit Files Pythia Book
         if: github.ref == 'refs/heads/main' 
         run: |
-          python src/render_sfinx_toc.py
+          python src/eo_datascience/render_sfinx_toc.py
+          python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
           cp -R ./notebooks/. ./pythia/notebooks/
@@ -120,7 +121,8 @@ jobs:
       - name: Commit Files Pythia Book Branch dev
         if: github.ref == 'refs/heads/dev'
         run: |
-          python src/render_sfinx_toc.py
+          python src/eo_datascience/render_sfinx_toc.py
+          python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
           cp -R ./notebooks/. ./pythia/notebooks/

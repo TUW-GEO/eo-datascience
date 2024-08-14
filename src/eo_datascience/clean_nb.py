@@ -55,6 +55,7 @@ def find_ipynb(dir):
 
 def main():
     clean_up_frontmatter()
+    convert_refs()
 
 if __name__ == '__main__':
     main()
