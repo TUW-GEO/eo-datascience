@@ -40,7 +40,8 @@ def convert_refs(dir="./notebooks", save=True):
         nb = nbformat.read(nb_path, as_version=4)
         for i in range(len(nb.cells)):
             if i != 0:
-                nb.cells[i].source = nb.cells[i].source.replace(r"[@", r"{cite}`").replace(r"]", r"`")
+                if nb.cells[i]["cell_type"] == "markdown":
+                    nb.cells[i].source = nb.cells[i].source.replace(r"[@", r"{cite}`").replace(r"]", r"`")
         
         # Save the notebook
         if save:
