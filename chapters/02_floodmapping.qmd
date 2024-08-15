@@ -10,6 +10,15 @@ jupyter:
 
 ![Image from [wikipedia](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)
 
+```{eval-rst}
+.. note::
+
+   A note written in reStructuredText.
+
+.. include:: ./include-rst.rst
+```
+
+
 ```{python}
 %matplotlib widget
 
