@@ -101,6 +101,7 @@ jobs:
           python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
+          cp ./chapters/references.bib ./pythia/notebooks/
           cp -R ./notebooks/. ./pythia/notebooks/
           cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
@@ -125,6 +126,7 @@ jobs:
           python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
+          cp ./chapters/references.bib ./pythia/notebooks/
           cp -R ./notebooks/. ./pythia/notebooks/
           cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
