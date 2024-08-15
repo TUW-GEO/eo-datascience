@@ -10,13 +10,9 @@ jupyter:
 
 ![Image from [wikipedia](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)
 
-```{eval-rst}
-.. note::
-
-   A note written in reStructuredText.
-
-.. include:: ./include-rst.rst
-```
+::: {.callout-note}
+This notebooks contains interactive element. These interactive element can only be viewed on Binder by clicking on the Binder badge or 🚀 button.
+:::
 
 
 ```{python}
