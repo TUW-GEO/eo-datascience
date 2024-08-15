@@ -42,6 +42,7 @@ def convert_refs(dir="./notebooks", save=True):
         for i in range(len(nb.cells)):
             if i != 0:
                 if nb.cells[i]["cell_type"] == "markdown":
+                    nb.cells[i].source = quarto_ref_figure_replace(nb.cells[i].source)
                     nb.cells[i].source = quarto_ref_person_replace(nb.cells[i].source)
                     nb.cells[i].source = quarto_ref_time_replace(nb.cells[i].source)
 
@@ -50,6 +51,12 @@ def convert_refs(dir="./notebooks", save=True):
             nbformat.write(nb, nb_path)
         else:
             return nb
+
+def quarto_ref_figure_replace(quarto):
+    bibs = re.findall(r"(?<=\(\@)[^\)]+", quarto)
+    for i in bibs:
+        quarto = re.sub(r"\(\@" + i + "\)", r"", quarto)
+    return quarto
 
 def quarto_ref_person_replace(quarto):
     bibs = re.findall(r"(?<=\[\@)[^\]]+", quarto)
