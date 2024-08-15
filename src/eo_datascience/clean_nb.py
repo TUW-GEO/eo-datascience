@@ -24,7 +24,7 @@ def clean_up_frontmatter(dir = './notebooks', save=True):
                     subtitle = line.split(': ')[1]
             
             # Update the cell
-            nb.cells[0].source = f'# {title}\n{subtitle}\n'
+            nb.cells[0].source = f'# {title}\n**{subtitle}**\n'
             
             # Save the notebook
             if save:
