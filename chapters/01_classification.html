@@ -300,7 +300,7 @@ window.Quarto = {
 <section id="data-acquisition" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="data-acquisition"><span class="header-section-number">1.1</span> Data Acquisition</h2>
 <p>In this chapter, we will employ machine learning techniques to classify a scene using satellite imagery. Specifically, we will utilize <code>scikit-learn</code> to implement two distinct classifiers and subsequently compare their results. To begin, we need to import the following modules.</p>
-<div id="b4d00a05" class="cell" data-execution_count="1">
+<div id="44479a62" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
@@ -337,7 +337,7 @@ window.Quarto = {
 <section id="searching-in-the-catalog" class="level3" data-number="1.1.1">
 <h3 data-number="1.1.1" class="anchored" data-anchor-id="searching-in-the-catalog"><span class="header-section-number">1.1.1</span> Searching in the Catalog</h3>
 <p>The module <code>odc-stac</code> provides access to free, open source satelite data. To retrieve the data, we must define several parameters that specify the location and time period for the satellite data. Additionally, we must specify the data collection we wish to access, as multiple collections are available. In this example, we will use multispectral imagery from the Sentinel-2 satellite.</p>
-<div id="85b83366" class="cell" data-execution_count="2">
+<div id="7b7e5f7a" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> <span class="fl">0.0006</span>  <span class="co"># 60m resolution</span></span>
@@ -390,7 +390,7 @@ window.Quarto = {
 <h3 data-number="1.1.2" class="anchored" data-anchor-id="loading-the-data"><span class="header-section-number">1.1.2</span> Loading the Data</h3>
 <p>Now we will load the data directly into an <code>xarray</code> dataset, which we can use to perform computations on the data. <code>xarray</code> is a powerful library for working with multi-dimensional arrays, making it well-suited for handling satellite data.</p>
 <p>Here’s how we can load the data using odc-stac and xarray:</p>
-<div id="c976f5d5" class="cell" data-execution_count="3">
+<div id="37c19e48" class="cell" data-execution_count="3">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a geobox for my region</span></span>
@@ -417,7 +417,7 @@ window.Quarto = {
 <h3 data-number="1.2.1" class="anchored" data-anchor-id="rgb-image"><span class="header-section-number">1.2.1</span> RGB Image</h3>
 <p>With the image data now in our possession, we can proceed with computations and visualizations.</p>
 <p>First, we define a mask to exclude cloud cover and areas with missing data. Subsequently, we create a composite median image, where each pixel value represents the median value across all the scenes we have identified. This approach helps to eliminate clouds and outliers present in some of the images, thereby providing a clearer and more representative visualization of the scene.</p>
-<div id="a768bf57" class="cell" data-execution_count="4">
+<div id="f7968f41" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a mask for valid pixels (non-cloud)</span></span>
@@ -460,7 +460,7 @@ window.Quarto = {
 <section id="false-color-image" class="level3" data-number="1.2.2">
 <h3 data-number="1.2.2" class="anchored" data-anchor-id="false-color-image"><span class="header-section-number">1.2.2</span> False Color Image</h3>
 <p>In addition to the regular RGB Image, we can swap any of the bands from the visible spectrum with any other bands. In this specific case the red band has been changed to the near infrared band. This allows us to see vegetated areas more clearly, since they now appear in a bright red color. This is due to the fact that plants absorb regular red light while reflecting near infrared light <span class="citation" data-cites="nasa2020">(<a href="references.html#ref-nasa2020" role="doc-biblioref">NASA 2020</a>)</span>.</p>
-<div id="eeaf716a" class="cell" data-execution_count="5">
+<div id="df9d8dcd" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute the false color image</span></span>
@@ -502,7 +502,7 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <li>0.33 to 0.66 are moderatly healthy plants</li>
 <li>0.66 to 1 are very healthy plants</li>
 </ul>
-<div id="6898843d" class="cell" data-execution_count="6">
+<div id="156c9246" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalized Difference Vegetation Index (NDVI)</span></span>
@@ -529,7 +529,7 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <section id="regions-of-interest" class="level3" data-number="1.3.1">
 <h3 data-number="1.3.1" class="anchored" data-anchor-id="regions-of-interest"><span class="header-section-number">1.3.1</span> Regions of Interest</h3>
 <p>Since this is a supervised classification, we need to have some training data. Therefore we need to define areas or regions, which we are certain represent the feature which we are classifiying. In this case we are interested in forested areas and regions that are definitly not forested. These regions will be used to train our classifiers.</p>
-<div id="46d67a2d" class="cell" data-execution_count="7">
+<div id="7fb669c0" class="cell" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Polygons</span></span>
@@ -581,7 +581,7 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <section id="data-preparation" class="level3" data-number="1.3.2">
 <h3 data-number="1.3.2" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">1.3.2</span> Data Preparation</h3>
 <p>In addition to the Regions of Interest we will extract the specific bands from the loaded dataset that we intend to use for the classification, which are the <code>red, green, blue</code> and <code>near-infrared</code> bands, although other bands can also be utilized. Using these bands, we will create both a training and a testing dataset. The training dataset will be used to train the classifier, while the testing dataset will be employed to evaluate its performance.</p>
-<div id="5ade371d" class="cell" data-execution_count="8">
+<div id="f5332594" class="cell" data-execution_count="8">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Classifiying dataset (only necessary bands)</span></span>
@@ -628,7 +628,7 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 </details>
 </div>
 <p>Now that we have prepared the training and testing data, we will create an image array of the actual scene that we intend to classify. This array will serve as the input for our classification algorithms, allowing us to apply the trained classifiers to the entire scene and identify the forested and non-forested areas accurately.</p>
-<div id="d03fb830" class="cell" data-execution_count="9">
+<div id="8b2a3d7b" class="cell" data-execution_count="9">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>image_data <span class="op">=</span> ds_class[bands].to_array(dim<span class="op">=</span><span class="st">'band'</span>).transpose(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'band'</span>)</span>
@@ -644,7 +644,7 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <h3 data-number="1.3.3" class="anchored" data-anchor-id="classifiying-with-naive-bayes"><span class="header-section-number">1.3.3</span> Classifiying with Naive Bayes</h3>
 <p>Now that we have prepared all the needed data, we can begin the actual classification process.</p>
 <p>We will start with a <em>Naive Bayes</em> classifier. First, we will train the classifier using our training dataset. Once trained, we will apply the classifier to the actual image to identify the forested and non-forested areas.</p>
-<div id="fef89e0b" class="cell" data-execution_count="10">
+<div id="39898a6d" class="cell" data-execution_count="10">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive Bayes initialization and training</span></span>
@@ -661,7 +661,7 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 </details>
 </div>
 <p>To evaluate the effectiveness of the classification, we will plot the image predicted by the classifier. Additionally, we will examine the <code>Classification Report</code> and the <code>Confusion Matrix</code> to gain further insights into the classifier’s performance.</p>
-<div id="74c02214" class="cell" data-execution_count="11">
+<div id="3add4d61" class="cell" data-execution_count="11">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Naive Bayes</span></span>
@@ -735,7 +735,7 @@ weighted avg       0.89      0.88      0.88     12105
 <section id="classifiying-with-random-forest" class="level3" data-number="1.3.4">
 <h3 data-number="1.3.4" class="anchored" data-anchor-id="classifiying-with-random-forest"><span class="header-section-number">1.3.4</span> Classifiying with Random Forest</h3>
 <p>To ensure our results are robust, we will explore an additional classifier. In this section, we will use the Random Forest classifier. The procedure for using this classifier is the same as before: we will train the classifier using our training dataset and then apply it to the actual image to classify the scene.</p>
-<div id="90aa2acc" class="cell" data-execution_count="12">
+<div id="ab400c44" class="cell" data-execution_count="12">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest initialization and training</span></span>
@@ -776,7 +776,7 @@ weighted avg       0.89      0.88      0.88     12105
 <pre><code>RANDOM FOREST: 
                precision    recall  f1-score   support
 
-         0.0       0.96      0.95      0.96      6618
+         0.0       0.96      0.95      0.95      6618
          1.0       0.94      0.95      0.95      5487
 
     accuracy                           0.95     12105
@@ -799,13 +799,13 @@ weighted avg       0.95      0.95      0.95     12105
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Actual Negative</td>
-<td>6298</td>
-<td>320</td>
+<td>6301</td>
+<td>317</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Actual Positive</td>
-<td>273</td>
-<td>5214</td>
+<td>280</td>
+<td>5207</td>
 </tr>
 </tbody>
 </table>
@@ -818,7 +818,7 @@ weighted avg       0.95      0.95      0.95     12105
 <section id="comparison-of-the-classificators" class="level3" data-number="1.3.5">
 <h3 data-number="1.3.5" class="anchored" data-anchor-id="comparison-of-the-classificators"><span class="header-section-number">1.3.5</span> Comparison of the Classificators</h3>
 <p>To gain a more in-depth understanding of the classifiers’ performance, we will compare their results. Specifically, we will identify the areas where both classifiers agree and the areas where they disagree. This comparison will provide valuable insights into the strengths and weaknesses of each classifier, allowing us to better assess their effectiveness in identifying forested and non-forested regions.</p>
-<div id="9390be23" class="cell" data-execution_count="13">
+<div id="00b36a0c" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>cmap_trio <span class="op">=</span> colors.ListedColormap([<span class="st">'whitesmoke'</span> ,<span class="st">'indianred'</span>, <span class="st">'goldenrod'</span>, <span class="st">'darkgreen'</span>])</span>
@@ -845,7 +845,7 @@ weighted avg       0.95      0.95      0.95     12105
 </div>
 </div>
 <p>The areas where both classifiers agree include the larger forested regions, such as the <em>Nationalpark Donau-Auen</em> and the <em>Leithagebirge</em>. Additionally, both classifiers accurately identified the urban areas of Vienna and correctly excluded them from being classified as forested.</p>
-<div id="e470b416" class="cell" data-execution_count="14">
+<div id="794d16a3" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot only one class, either None (0), Naive Bayes (1), Random Forest (2), or Both (3)</span></span>
@@ -872,7 +872,7 @@ weighted avg       0.95      0.95      0.95     12105
 <p>When plotting the classified areas individually, we observe that the Random Forest classifier mistakenly identified the Danube River as a forested area. Conversely, the Naive Bayes classifier erroneously classified a significant amount of cropland as forest.</p>
 <p>Finally, by analyzing the proportion of forested areas within the scene, we find that approximately 18% of the area is classified as forest, while around 66% is classified as non-forest. The remaining areas, which include water bodies and cropland, fall into less clearly defined categories.</p>
 <p>The accompanying bar chart illustrates the distribution of these classifications, highlighting the percentage of forested areas, non-forested areas, and regions classified by only one of the two classifiers. This visual representation helps to quantify the areas of agreement and disagreement between the classifiers, providing a clearer picture of their performance.</p>
-<div id="29b5096a" class="cell" data-execution_count="15">
+<div id="3c4c7061" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> {}</span>
