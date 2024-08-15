@@ -1,6 +1,7 @@
 import os
 import nbformat
 from pathlib import Path
+import re
 
 def clean_up_frontmatter(dir = './notebooks', save=False):
     # Define the path to the notebooks
@@ -41,13 +42,26 @@ def convert_refs(dir="./notebooks", save=True):
         for i in range(len(nb.cells)):
             if i != 0:
                 if nb.cells[i]["cell_type"] == "markdown":
-                    nb.cells[i].source = nb.cells[i].source.replace(r"[@", r"{cite}`").replace(r"]", r"`")
-        
+                    nb.cells[i].source = quarto_ref_person_replace(nb.cells[i].source)
+                    nb.cells[i].source = quarto_ref_time_replace(nb.cells[i].source)
+
         # Save the notebook
         if save:
             nbformat.write(nb, nb_path)
         else:
             return nb
+
+def quarto_ref_person_replace(quarto):
+    bibs = re.findall(r"(?<=\[\@)[^\]]+", quarto)
+    for i in bibs:
+        quarto = re.sub(r"\[\@" + i + "\]", r"{cite:p}`" + i + "`", quarto)
+    return quarto
+
+def quarto_ref_time_replace(quarto):
+    bibs = re.findall(r"(?<=\@)[^\s]+", quarto)
+    for i in bibs:
+        quarto = re.sub(r"\@" + i, r"{cite:t}`" + i + "`", quarto)
+    return quarto
 
 def find_ipynb(dir):
     root = Path(dir).resolve()
