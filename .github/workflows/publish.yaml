@@ -102,7 +102,6 @@ jobs:
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
           cp -R ./notebooks/. ./pythia/notebooks/
-          rm -f ./notebooks/references.ipynb
           cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
@@ -127,7 +126,6 @@ jobs:
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
           cp -R ./notebooks/. ./pythia/notebooks/
-          rm -f ./notebooks/references.ipynb
           cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"

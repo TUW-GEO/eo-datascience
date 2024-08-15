@@ -32,6 +32,19 @@ def clean_up_frontmatter(dir = './notebooks', save=True):
             else:
                 return nb
 
+def convert_bibliography(nb_path="./notebooks/references.ipynb", save=True):
+    nb = nbformat.read(nb_path, as_version=4)
+    nb.cells[0].source = """# References
+
+```{bibliography}
+```
+"""
+     # Save the notebook
+    if save:
+        nbformat.write(nb, nb_path)
+    else:
+        return nb
+
 def convert_refs(dir="./notebooks", save=True):
     nb_paths = find_ipynb(dir)
     
@@ -78,6 +91,7 @@ def find_ipynb(dir):
 def main():
     clean_up_frontmatter()
     convert_refs()
+    convert_bibliography()
 
 if __name__ == '__main__':
     main()
