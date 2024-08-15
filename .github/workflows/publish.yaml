@@ -125,7 +125,7 @@ jobs:
           python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
           cp ./Makefile ./pythia/
-          cp -R ./notebooks/. ./pythia/notebooks/
+          cp -R !(./notebooks/references.ipynb) ./pythia/notebooks/
           cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"

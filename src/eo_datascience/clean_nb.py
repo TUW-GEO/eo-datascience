@@ -3,7 +3,7 @@ import nbformat
 from pathlib import Path
 import re
 
-def clean_up_frontmatter(dir = './notebooks', save=False):
+def clean_up_frontmatter(dir = './notebooks', save=True):
     # Define the path to the notebooks
     nb_paths = find_ipynb(dir)
 
