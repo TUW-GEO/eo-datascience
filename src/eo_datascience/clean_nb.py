@@ -53,9 +53,9 @@ def convert_callout_notes(dir="./notebooks", save=True):
         # Load the notebook
         nb = nbformat.read(nb_path, as_version=4)
         for i in range(len(nb.cells)):
-            if i != 0:
-                if nb.cells[i]["cell_type"] == "markdown":
-                    nb.cells[i].source = quarto_note_replace(nb.cells[i].source)
+
+            if nb.cells[i]["cell_type"] == "markdown":
+                nb.cells[i].source = quarto_note_replace(nb.cells[i].source)
 
      # Save the notebook
     if save:
@@ -119,8 +119,8 @@ def find_ipynb(dir):
     return nb_paths
 
 def main():
-    clean_up_frontmatter()
     convert_callout_notes()
+    clean_up_frontmatter()
     convert_refs()
     convert_bibliography()
 
