@@ -70,9 +70,9 @@ def quarto_note_replace(quarto):
     note_rst_end = """.. include:: ./include-rst.rst
 ```
 """
-    nts = re.findall(r"(?<=::: \{.callout-note\}\n)[^:::\n]+", quarto)
+    nts = re.findall(r"(?<=:::\s\{\.callout\-note\})[^:::]+", quarto)
     for i in nts:
-        quarto = re.sub(r"::: \{.callout-note\}\n" + i + r":::\n", note_rst_start + i + note_rst_end, quarto)
+        quarto = re.sub(r":::\s\{\.callout\-note\}" + re.escape(i) + r":::", note_rst_start + i + note_rst_end, quarto)
     return quarto
 
 def convert_refs(dir="./notebooks", save=True):
