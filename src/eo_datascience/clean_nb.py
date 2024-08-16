@@ -45,6 +45,36 @@ def convert_bibliography(nb_path="./notebooks/references.ipynb", save=True):
     else:
         return nb
 
+def convert_callout_notes(dir="./notebooks", save=True):
+    nb_paths = find_ipynb(dir)
+
+    # Iterate over the notebooks
+    for nb_path in nb_paths:
+        # Load the notebook
+        nb = nbformat.read(nb_path, as_version=4)
+        for i in range(len(nb.cells)):
+            if i != 0:
+                if nb.cells[i]["cell_type"] == "markdown":
+                    nb.cells[i].source = quarto_note_replace(nb.cells[i].source)
+
+     # Save the notebook
+    if save:
+        nbformat.write(nb, nb_path)
+    else:
+        return nb
+    
+def quarto_note_replace(quarto):
+    note_rst_start = """```{eval-rst}
+.. note::
+"""
+    note_rst_end = """.. include:: ./include-rst.rst
+```
+"""
+    nts = re.findall(r"(?<=::: \{.callout-note\}\n)[^:::\n]+", quarto)
+    for i in nts:
+        quarto = re.sub(r"::: \{.callout-note\}\n" + i + r":::\n", note_rst_start + i + note_rst_end, quarto)
+    return quarto
+
 def convert_refs(dir="./notebooks", save=True):
     nb_paths = find_ipynb(dir)
     
@@ -90,6 +120,7 @@ def find_ipynb(dir):
 
 def main():
     clean_up_frontmatter()
+    convert_callout_notes()
     convert_refs()
     convert_bibliography()
 
