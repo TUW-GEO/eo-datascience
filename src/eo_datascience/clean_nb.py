@@ -123,10 +123,11 @@ def find_ipynb(dir):
     return nb_paths
 
 def main():
+    clean_up_frontmatter()
     convert_callout_notes()
     convert_refs()
     convert_bibliography()
-    clean_up_frontmatter()
+
 
 if __name__ == '__main__':
     main()
