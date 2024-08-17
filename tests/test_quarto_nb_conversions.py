@@ -5,7 +5,7 @@ from eo_datascience.clean_nb import clean_up_frontmatter, convert_refs, quarto_r
     convert_callout_notes, quarto_note_replace
 
 def test_remove_front_matter():
-    assert clean_up_frontmatter("./tests", False)["cells"][0]["source"] == '# This a mock Jupyter file\n**We use it for testing**\n'
+    assert clean_up_frontmatter("./tests", False)["cells"][0]["source"] == '# This a mock Jupyter file\n**We use it for testing**\n\nSome other text, which should not be deleted!\n'
 
 def test_conversion_of_refs():
     quarto = [r"lorem ipsum [@anon2024] and [@anon2025]", r"lorem ipsum @anon2024 and @anon2025"]
