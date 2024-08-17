@@ -99,6 +99,7 @@ jobs:
         run: |
           cd ./pythia
           pip install .
+          cd ./pythia
           python src/eo_datascience/render_sfinx_toc.py
           python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
@@ -125,6 +126,7 @@ jobs:
         run: |
           cd ./pythia
           pip install .
+          cd ./pythia
           python src/eo_datascience/render_sfinx_toc.py
           python src/eo_datascience/clean_nb.py
           cp ./_toc.yml ./pythia/
