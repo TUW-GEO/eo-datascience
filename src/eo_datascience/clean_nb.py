@@ -28,8 +28,8 @@ def clean_up_frontmatter(dir = './notebooks', save=True):
                 i += 1
                 line = fm[i]
 
-        new_text + fm[i+1:]
-        nb.cells[0].source = "\n".join(new_text) + "\n"
+            new_text + fm[i+1:]
+            nb.cells[0].source = "\n".join(new_text) + "\n"
         # Save notebook
         if save:
             nbformat.write(nb, nb_path)
