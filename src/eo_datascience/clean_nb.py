@@ -15,22 +15,26 @@ def clean_up_frontmatter(dir = './notebooks', save=True):
             #Load frontmatter
             fm = nb.cells[0].source.split('\n')
 
-            # Extract the title and the subtitle
-            title, subtitle = '', ''
-            for line in fm:
+            # Extract the title and the subtitle and convert
+            i = 1
+            line = fm[i]
+            new_text = []
+            while not line.startswith("---"):
                 if line.startswith('title'):
-                    title = line.split(': ')[1]
+                    new_text.append(f"# {line.split(': ')[1]}")
                 if line.startswith('subtitle'):
-                    subtitle = line.split(': ')[1]
-            
-            # Update the cell
-            nb.cells[0].source = f'# {title}\n**{subtitle}**\n'
-            
-            # Save the notebook
-            if save:
-                nbformat.write(nb, nb_path)
-            else:
-                return nb
+                    new_text.append(f"**{line.split(': ')[1]}**")
+
+                i += 1
+                line = fm[i]
+
+        new_text + fm[i+1:]
+        nb.cells[0].source = "\n".join(new_text) + "\n"
+        # Save notebook
+        if save:
+            nbformat.write(nb, nb_path)
+        else:
+            return nb
 
 def convert_bibliography(nb_path="./notebooks/references.ipynb", save=True):
     nb = nbformat.read(nb_path, as_version=4)
