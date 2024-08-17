@@ -124,9 +124,9 @@ def find_ipynb(dir):
 
 def main():
     convert_callout_notes()
-    clean_up_frontmatter()
     convert_refs()
     convert_bibliography()
+    clean_up_frontmatter()
 
 if __name__ == '__main__':
     main()
