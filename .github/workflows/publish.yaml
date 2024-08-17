@@ -97,7 +97,6 @@ jobs:
       - name: Commit Files Pythia Book
         if: github.ref == 'refs/heads/main' 
         run: |
-          cd ./pythia
           pip install .
           cd ./pythia
           python src/eo_datascience/render_sfinx_toc.py
@@ -124,7 +123,6 @@ jobs:
       - name: Commit Files Pythia Book Branch dev
         if: github.ref == 'refs/heads/dev'
         run: |
-          cd ./pythia
           pip install .
           cd ./pythia
           python src/eo_datascience/render_sfinx_toc.py
