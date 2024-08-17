@@ -97,6 +97,7 @@ jobs:
       - name: Commit Files Pythia Book
         if: github.ref == 'refs/heads/main' 
         run: |
+          cd ./pythia
           pip install .
           python src/eo_datascience/render_sfinx_toc.py
           python src/eo_datascience/clean_nb.py
@@ -104,7 +105,6 @@ jobs:
           cp ./Makefile ./pythia/
           cp ./chapters/references.bib ./pythia/notebooks/
           cp -R ./notebooks/. ./pythia/notebooks/
-          cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add .
@@ -123,6 +123,7 @@ jobs:
       - name: Commit Files Pythia Book Branch dev
         if: github.ref == 'refs/heads/dev'
         run: |
+          cd ./pythia
           pip install .
           python src/eo_datascience/render_sfinx_toc.py
           python src/eo_datascience/clean_nb.py
@@ -130,7 +131,6 @@ jobs:
           cp ./Makefile ./pythia/
           cp ./chapters/references.bib ./pythia/notebooks/
           cp -R ./notebooks/. ./pythia/notebooks/
-          cd ./pythia
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add .
