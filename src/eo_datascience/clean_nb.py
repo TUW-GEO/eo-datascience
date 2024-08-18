@@ -68,12 +68,8 @@ def convert_callout_notes(dir="./notebooks", save=True):
         return nb
     
 def quarto_note_replace(quarto):
-    note_rst_start = """```{eval-rst}
-.. note::
-"""
-    note_rst_end = """.. include:: ./include-rst.rst
-```
-"""
+    note_rst_start = r":::{note}"
+    note_rst_end = r":::"
     nts = re.findall(r"(?<=:::\s\{\.callout\-note\})[^:::]+", quarto)
     for i in nts:
         quarto = re.sub(r":::\s\{\.callout\-note\}" + re.escape(i) + r":::", note_rst_start + i + note_rst_end, quarto)

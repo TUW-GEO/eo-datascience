@@ -15,6 +15,6 @@ def test_conversion_of_refs():
     assert convert_refs("./tests", False)["cells"][2]["source"] == r"lorem ipsum {cite:p}`anon2024` and {cite:p}`anon2025` and lorem ipsum {cite:t}`anon2024` and {cite:t}`anon2025`"
 
 def test_conversion_of_callout_notes():
-    rst = '```{eval-rst}\n.. note::\n\nThis a callout note.\n.. include:: ./include-rst.rst\n```\n'
+    rst = ':::{note}\nThis a callout note.\n:::'
     assert quarto_note_replace(r"::: {.callout-note}\nThis a callout note.\n:::") == rst
     assert convert_callout_notes("./tests", False)["cells"][1]["source"]  == rst
