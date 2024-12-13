@@ -210,7 +210,7 @@ window.Quarto = {
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/Classification.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../chapters/Classification.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Classification of Sentinel-2 imagery</span></a></li></ol></nav>
       <h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Classification of Sentinel-2 imagery</span></h1>
-            <p class="subtitle lead">Finding forests with satelite imagery</p>
+            <p class="subtitle lead">Finding forests with satellite imagery</p>
                       </div>
   </div>
     
@@ -339,41 +339,35 @@ window.Quarto = {
 <section id="data-acquisition" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="data-acquisition"><span class="header-section-number">2.1</span> Data Acquisition</h2>
 <p>In this chapter, we will employ machine learning techniques to classify a scene using satellite imagery. Specifically, we will utilize <code>scikit-learn</code> to implement two distinct classifiers and subsequently compare their results. To begin, we need to import the following modules.</p>
-<div id="3ddf0dca" class="cell" data-execution_count="1">
+<div id="c0e15a99" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pystac_client</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> stackstac</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> odc.stac</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rioxarray</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> odc.geo.geobox <span class="im">import</span> GeoBox</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dask.diagnostics <span class="im">import</span> ProgressBar</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> rasterio.enums <span class="im">import</span> Resampling</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> Polygon, mapping</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cmcrameri <span class="im">as</span> cmc</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Scikit Learn</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> GaussianNB</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> colors</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> odc.stac</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rioxarray  <span class="co"># noqa: F401</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> odc.geo.geobox <span class="im">import</span> GeoBox</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> Polygon</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cmcrameri <span class="im">as</span> cmc  <span class="co"># noqa: F401</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> colors</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Scikit Learn</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> GaussianNB</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Before we start, we need to load the data. We will use <code>odc-stac</code> to obtain data from Earth Search by Element 84. Here we define the area of interest and the time frame, aswell as the EPSG code and the resolution.</p>
 <section id="searching-in-the-catalog" class="level3" data-number="2.1.1">
 <h3 data-number="2.1.1" class="anchored" data-anchor-id="searching-in-the-catalog"><span class="header-section-number">2.1.1</span> Searching in the Catalog</h3>
 <p>The module <code>odc-stac</code> provides access to free, open source satelite data. To retrieve the data, we must define several parameters that specify the location and time period for the satellite data. Additionally, we must specify the data collection we wish to access, as multiple collections are available. In this example, we will use multispectral imagery from the Sentinel-2 satellite.</p>
-<div id="765b98e6" class="cell" data-execution_count="2">
+<div id="836fadf7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dx <span class="op">=</span> <span class="fl">0.0006</span>  <span class="co"># 60m resolution</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>epsg <span class="op">=</span> <span class="dv">4326</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -381,38 +375,25 @@ window.Quarto = {
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>latmin, latmax <span class="op">=</span> <span class="fl">47.86</span>, <span class="fl">48.407</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>lonmin, lonmax <span class="op">=</span> <span class="fl">16.32</span>, <span class="fl">16.9</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>bounds <span class="op">=</span> (lonmin, latmin, lonmax, latmax)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>minx, miny, maxx, maxy <span class="op">=</span> bounds</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>geom <span class="op">=</span> {</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'type'</span>: <span class="st">'Polygon'</span>,</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'coordinates'</span>: [[</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>       [minx, miny],</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>       [minx, maxy],</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>       [maxx, maxy],</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>       [maxx, miny],</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>       [minx, miny]</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    ]]</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Set Temporal extent</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>year <span class="op">=</span> <span class="dv">2024</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>month <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>day <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>delta <span class="op">=</span> <span class="dv">10</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>start_date <span class="op">=</span> datetime(year, month, day)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>end_date <span class="op">=</span> start_date <span class="op">+</span> timedelta(days<span class="op">=</span>delta)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>date_query <span class="op">=</span> start_date.strftime(<span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>) <span class="op">+</span> <span class="st">"/"</span> <span class="op">+</span> end_date.strftime(<span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span>)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for Sentinel-2 data</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> pystac_client.Client.<span class="bu">open</span>(</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://earth-search.aws.element84.com/v1"</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>).search(</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    intersects<span class="op">=</span>geom,</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    collections<span class="op">=</span>[<span class="st">"sentinel-2-l2a"</span>],</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    datetime<span class="op">=</span>date_query,</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    limit<span class="op">=</span><span class="dv">100</span>,</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>).item_collection()</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(items), <span class="st">'scenes found'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Set Temporal extent</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>start_date <span class="op">=</span> datetime(year<span class="op">=</span><span class="dv">2024</span>, month<span class="op">=</span><span class="dv">5</span>, day<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>end_date <span class="op">=</span> start_date <span class="op">+</span> timedelta(days<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>time_format <span class="op">=</span> <span class="st">"%Y-%m-</span><span class="sc">%d</span><span class="st">"</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>date_query <span class="op">=</span> start_date.strftime(time_format) <span class="op">+</span> <span class="st">"/"</span> <span class="op">+</span> end_date.strftime(time_format)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for Sentinel-2 data</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> pystac_client.Client.<span class="bu">open</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://earth-search.aws.element84.com/v1"</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>).search(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    bbox<span class="op">=</span>bounds,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    collections<span class="op">=</span>[<span class="st">"sentinel-2-l2a"</span>],</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    datetime<span class="op">=</span>date_query,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    limit<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>).item_collection()</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(items), <span class="st">'scenes found'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>10 scenes found</code></pre>
 </div>
@@ -423,21 +404,647 @@ window.Quarto = {
 <h3 data-number="2.1.2" class="anchored" data-anchor-id="loading-the-data"><span class="header-section-number">2.1.2</span> Loading the Data</h3>
 <p>Now we will load the data directly into an <code>xarray</code> dataset, which we can use to perform computations on the data. <code>xarray</code> is a powerful library for working with multi-dimensional arrays, making it well-suited for handling satellite data.</p>
 <p>Here’s how we can load the data using odc-stac and xarray:</p>
-<div id="f1fc2a67" class="cell" data-execution_count="3">
+<div id="80bfe605" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a geobox for my region</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>geobox <span class="op">=</span> GeoBox.from_bbox(bounds, crs<span class="op">=</span><span class="ss">f"epsg:</span><span class="sc">{</span>epsg<span class="sc">}</span><span class="ss">"</span>, resolution<span class="op">=</span>dx)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lazily combine items</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ds_odc <span class="op">=</span> odc.stac.load(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lazily combine items into a datacube</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>dc <span class="op">=</span> odc.stac.load(</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    items,</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    bands<span class="op">=</span>[<span class="st">"scl"</span>, <span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>, <span class="st">"nir"</span>],</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    chunks<span class="op">=</span>{<span class="st">'time'</span>: <span class="dv">5</span>, <span class="st">'x'</span>: <span class="dv">600</span>, <span class="st">'y'</span>: <span class="dv">600</span>},</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    geobox<span class="op">=</span>geobox,</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    resampling<span class="op">=</span><span class="st">"bilinear"</span>,</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># actually load it</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>ds_odc.load()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>dc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewbox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewbox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1f1f1f;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block !important;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: inline-block;
+  opacity: 0;
+  height: 0;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:focus + label {
+  border: 2px solid var(--xr-font-color0);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: "►";
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: "▼";
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: "(";
+}
+
+.xr-dim-list:after {
+  content: ")";
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ",";
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-index-preview {
+  grid-column: 2 / 5;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data,
+.xr-index-data-in:checked ~ .xr-index-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-index-name div,
+.xr-index-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data,
+.xr-index-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2,
+.xr-no-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class="xr-text-repr-fallback">&lt;xarray.Dataset&gt; Size: 79MB
+Dimensions:      (latitude: 913, longitude: 967, time: 10)
+Coordinates:
+  * latitude     (latitude) float64 7kB 48.41 48.41 48.41 ... 47.86 47.86 47.86
+  * longitude    (longitude) float64 8kB 16.32 16.32 16.32 ... 16.9 16.9 16.9
+    spatial_ref  int32 4B 4326
+  * time         (time) datetime64[ns] 80B 2024-05-01T09:57:21.858000 ... 202...
+Data variables:
+    scl          (time, latitude, longitude) uint8 9MB dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;
+    red          (time, latitude, longitude) uint16 18MB dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;
+    green        (time, latitude, longitude) uint16 18MB dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;
+    blue         (time, latitude, longitude) uint16 18MB dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;
+    nir          (time, latitude, longitude) uint16 18MB dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.Dataset</div></div><ul class="xr-sections"><li class="xr-section-item"><input id="section-c8d3d8ce-3187-4fd3-85b4-f97a168bf949" class="xr-section-summary-in" type="checkbox" disabled=""><label for="section-c8d3d8ce-3187-4fd3-85b4-f97a168bf949" class="xr-section-summary" title="Expand/collapse section">Dimensions:</label><div class="xr-section-inline-details"><ul class="xr-dim-list"><li><span class="xr-has-index">latitude</span>: 913</li><li><span class="xr-has-index">longitude</span>: 967</li><li><span class="xr-has-index">time</span>: 10</li></ul></div><div class="xr-section-details"></div></li><li class="xr-section-item"><input id="section-6edf3226-bc48-4229-a54f-1b78c0a4f359" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-6edf3226-bc48-4229-a54f-1b78c0a4f359" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">latitude</span></div><div class="xr-var-dims">(latitude)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">48.41 48.41 48.41 ... 47.86 47.86</div><input id="attrs-6da970ff-e760-4e52-9db0-b7ba83264344" class="xr-var-attrs-in" type="checkbox"><label for="attrs-6da970ff-e760-4e52-9db0-b7ba83264344" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-50362082-bc69-4c2a-b355-601a9ad7bf67" class="xr-var-data-in" type="checkbox"><label for="data-50362082-bc69-4c2a-b355-601a9ad7bf67" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>degrees_north</dd><dt><span>resolution :</span></dt><dd>-0.0006</dd><dt><span>crs :</span></dt><dd>EPSG:4326</dd></dl></div><div class="xr-var-data"><pre>array([48.4071, 48.4065, 48.4059, ..., 47.8611, 47.8605, 47.8599], shape=(913,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">longitude</span></div><div class="xr-var-dims">(longitude)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">16.32 16.32 16.32 ... 16.9 16.9</div><input id="attrs-d5d84f59-c088-45c6-bf9f-7852b3edbee4" class="xr-var-attrs-in" type="checkbox"><label for="attrs-d5d84f59-c088-45c6-bf9f-7852b3edbee4" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-6eebf680-8f14-4fc0-95eb-5a7a494c3172" class="xr-var-data-in" type="checkbox"><label for="data-6eebf680-8f14-4fc0-95eb-5a7a494c3172" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>degrees_east</dd><dt><span>resolution :</span></dt><dd>0.0006</dd><dt><span>crs :</span></dt><dd>EPSG:4326</dd></dl></div><div class="xr-var-data"><pre>array([16.3203, 16.3209, 16.3215, ..., 16.8987, 16.8993, 16.8999], shape=(967,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">4326</div><input id="attrs-6d40ea4a-2fe5-4c76-a4b8-8d6ea97cff33" class="xr-var-attrs-in" type="checkbox"><label for="attrs-6d40ea4a-2fe5-4c76-a4b8-8d6ea97cff33" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-26b1e8a9-ff52-4d0b-abd4-a04f0d1b6fe3" class="xr-var-data-in" type="checkbox"><label for="data-26b1e8a9-ff52-4d0b-abd4-a04f0d1b6fe3" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]</dd><dt><span>crs_wkt :</span></dt><dd>GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984 ensemble</dd><dt><span>grid_mapping_name :</span></dt><dd>latitude_longitude</dd><dt><span>GeoTransform :</span></dt><dd>16.320000000000000284217094 0.000599999999999999947438 0 48.407399999999995543475961 0 -0.000599999999999999947438</dd></dl></div><div class="xr-var-data"><pre>array(4326, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2024-05-01T09:57:21.858000 ... 2...</div><input id="attrs-d0bc8a2c-f43c-498c-9fef-23c5ca78f648" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-d0bc8a2c-f43c-498c-9fef-23c5ca78f648" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-f58d04ed-2952-4ac8-bd06-bbf524d752ed" class="xr-var-data-in" type="checkbox"><label for="data-f58d04ed-2952-4ac8-bd06-bbf524d752ed" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2024-05-01T09:57:21.858000000', '2024-05-01T09:57:24.892000000',
+       '2024-05-04T10:07:18.103000000', '2024-05-04T10:07:22.389000000',
+       '2024-05-06T09:57:19.789000000', '2024-05-06T09:57:22.823000000',
+       '2024-05-09T10:07:16.090000000', '2024-05-09T10:07:20.373000000',
+       '2024-05-11T09:57:22.239000000', '2024-05-11T09:57:25.274000000'],
+      dtype='datetime64[ns]')</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-329e31e3-12b0-40ea-9eb6-6d75f25ca401" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-329e31e3-12b0-40ea-9eb6-6d75f25ca401" class="xr-section-summary">Data variables: <span>(5)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span>scl</span></div><div class="xr-var-dims">(time, latitude, longitude)</div><div class="xr-var-dtype">uint8</div><div class="xr-var-preview xr-preview">dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;</div><input id="attrs-7ed113b1-511e-4a80-af46-9f2c01012e8d" class="xr-var-attrs-in" type="checkbox"><label for="attrs-7ed113b1-511e-4a80-af46-9f2c01012e8d" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-f16ba695-f932-46eb-bc5e-72dcd16ad415" class="xr-var-data-in" type="checkbox"><label for="data-f16ba695-f932-46eb-bc5e-72dcd16ad415" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>0</dd></dl></div><div class="xr-var-data">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th></th>
+<th data-quarto-table-cell-role="th">Array</th>
+<th data-quarto-table-cell-role="th">Chunk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bytes</td>
+<td>8.42 MiB</td>
+<td>1.72 MiB</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shape</td>
+<td>(10, 913, 967)</td>
+<td>(5, 600, 600)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dask graph</td>
+<td colspan="2">8 chunks in 3 graph layers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Data type</td>
+<td colspan="2">uint8 numpy.ndarray</td>
+</tr>
+</tbody>
+</table></td>
+<td><svg width="195" height="178" style="stroke:rgb(0,0,0);stroke-width:1">
+<!-- Horizontal lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="10" y1="74" x2="25" y2="89"></line> <line x1="10" y1="113" x2="25" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="10" y2="113" style="stroke-width:2"></line> <line x1="17" y1="7" x2="17" y2="120"></line> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 25.043531621977266,15.043531621977266 25.043531621977266,128.34239408319752 10.0,113.29886246122027" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2"></line> <line x1="17" y1="7" x2="137" y2="7"></line> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="84" y1="0" x2="99" y2="15"></line> <line x1="130" y1="0" x2="145" y2="15" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 130.0,0.0 145.04353162197725,15.043531621977266 25.043531621977266,15.043531621977266" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <line x1="25" y1="89" x2="145" y2="89"></line> <line x1="25" y1="128" x2="145" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <line x1="99" y1="15" x2="99" y2="128"></line> <line x1="145" y1="15" x2="145" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="25.043531621977266,15.043531621977266 145.04353162197725,15.043531621977266 145.04353162197725,128.34239408319752 25.043531621977266,128.34239408319752" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Text --> <text x="85.043532" y="148.342394" font-size="1.0rem" font-weight="100" text-anchor="middle">967</text> <text x="165.043532" y="71.692963" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,165.043532,71.692963)">913</text> <text x="7.521766" y="140.820628" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,7.521766,140.820628)">10</text>
+</svg></td>
+</tr>
+</tbody>
+</table>
+</div></li><li class="xr-var-item"><div class="xr-var-name"><span>red</span></div><div class="xr-var-dims">(time, latitude, longitude)</div><div class="xr-var-dtype">uint16</div><div class="xr-var-preview xr-preview">dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;</div><input id="attrs-c1d7d8ee-87d5-427f-8291-cdfb73295bbd" class="xr-var-attrs-in" type="checkbox"><label for="attrs-c1d7d8ee-87d5-427f-8291-cdfb73295bbd" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-265632e2-977e-4963-b22a-6d436cf0e2d2" class="xr-var-data-in" type="checkbox"><label for="data-265632e2-977e-4963-b22a-6d436cf0e2d2" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>0</dd></dl></div><div class="xr-var-data">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th></th>
+<th data-quarto-table-cell-role="th">Array</th>
+<th data-quarto-table-cell-role="th">Chunk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bytes</td>
+<td>16.84 MiB</td>
+<td>3.43 MiB</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shape</td>
+<td>(10, 913, 967)</td>
+<td>(5, 600, 600)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dask graph</td>
+<td colspan="2">8 chunks in 3 graph layers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Data type</td>
+<td colspan="2">uint16 numpy.ndarray</td>
+</tr>
+</tbody>
+</table></td>
+<td><svg width="195" height="178" style="stroke:rgb(0,0,0);stroke-width:1">
+<!-- Horizontal lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="10" y1="74" x2="25" y2="89"></line> <line x1="10" y1="113" x2="25" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="10" y2="113" style="stroke-width:2"></line> <line x1="17" y1="7" x2="17" y2="120"></line> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 25.043531621977266,15.043531621977266 25.043531621977266,128.34239408319752 10.0,113.29886246122027" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2"></line> <line x1="17" y1="7" x2="137" y2="7"></line> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="84" y1="0" x2="99" y2="15"></line> <line x1="130" y1="0" x2="145" y2="15" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 130.0,0.0 145.04353162197725,15.043531621977266 25.043531621977266,15.043531621977266" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <line x1="25" y1="89" x2="145" y2="89"></line> <line x1="25" y1="128" x2="145" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <line x1="99" y1="15" x2="99" y2="128"></line> <line x1="145" y1="15" x2="145" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="25.043531621977266,15.043531621977266 145.04353162197725,15.043531621977266 145.04353162197725,128.34239408319752 25.043531621977266,128.34239408319752" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Text --> <text x="85.043532" y="148.342394" font-size="1.0rem" font-weight="100" text-anchor="middle">967</text> <text x="165.043532" y="71.692963" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,165.043532,71.692963)">913</text> <text x="7.521766" y="140.820628" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,7.521766,140.820628)">10</text>
+</svg></td>
+</tr>
+</tbody>
+</table>
+</div></li><li class="xr-var-item"><div class="xr-var-name"><span>green</span></div><div class="xr-var-dims">(time, latitude, longitude)</div><div class="xr-var-dtype">uint16</div><div class="xr-var-preview xr-preview">dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;</div><input id="attrs-8f2b7f69-61ff-4526-aae1-a79da495fc0d" class="xr-var-attrs-in" type="checkbox"><label for="attrs-8f2b7f69-61ff-4526-aae1-a79da495fc0d" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-0d6d4432-64f1-4cc5-b109-faeae5e0be44" class="xr-var-data-in" type="checkbox"><label for="data-0d6d4432-64f1-4cc5-b109-faeae5e0be44" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>0</dd></dl></div><div class="xr-var-data">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th></th>
+<th data-quarto-table-cell-role="th">Array</th>
+<th data-quarto-table-cell-role="th">Chunk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bytes</td>
+<td>16.84 MiB</td>
+<td>3.43 MiB</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shape</td>
+<td>(10, 913, 967)</td>
+<td>(5, 600, 600)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dask graph</td>
+<td colspan="2">8 chunks in 3 graph layers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Data type</td>
+<td colspan="2">uint16 numpy.ndarray</td>
+</tr>
+</tbody>
+</table></td>
+<td><svg width="195" height="178" style="stroke:rgb(0,0,0);stroke-width:1">
+<!-- Horizontal lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="10" y1="74" x2="25" y2="89"></line> <line x1="10" y1="113" x2="25" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="10" y2="113" style="stroke-width:2"></line> <line x1="17" y1="7" x2="17" y2="120"></line> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 25.043531621977266,15.043531621977266 25.043531621977266,128.34239408319752 10.0,113.29886246122027" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2"></line> <line x1="17" y1="7" x2="137" y2="7"></line> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="84" y1="0" x2="99" y2="15"></line> <line x1="130" y1="0" x2="145" y2="15" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 130.0,0.0 145.04353162197725,15.043531621977266 25.043531621977266,15.043531621977266" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <line x1="25" y1="89" x2="145" y2="89"></line> <line x1="25" y1="128" x2="145" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <line x1="99" y1="15" x2="99" y2="128"></line> <line x1="145" y1="15" x2="145" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="25.043531621977266,15.043531621977266 145.04353162197725,15.043531621977266 145.04353162197725,128.34239408319752 25.043531621977266,128.34239408319752" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Text --> <text x="85.043532" y="148.342394" font-size="1.0rem" font-weight="100" text-anchor="middle">967</text> <text x="165.043532" y="71.692963" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,165.043532,71.692963)">913</text> <text x="7.521766" y="140.820628" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,7.521766,140.820628)">10</text>
+</svg></td>
+</tr>
+</tbody>
+</table>
+</div></li><li class="xr-var-item"><div class="xr-var-name"><span>blue</span></div><div class="xr-var-dims">(time, latitude, longitude)</div><div class="xr-var-dtype">uint16</div><div class="xr-var-preview xr-preview">dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;</div><input id="attrs-bcdcec93-c8c5-49ef-943e-53505dcdf8cf" class="xr-var-attrs-in" type="checkbox"><label for="attrs-bcdcec93-c8c5-49ef-943e-53505dcdf8cf" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-fcb576b6-0ef2-4f8d-8025-9065165e5793" class="xr-var-data-in" type="checkbox"><label for="data-fcb576b6-0ef2-4f8d-8025-9065165e5793" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>0</dd></dl></div><div class="xr-var-data">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th></th>
+<th data-quarto-table-cell-role="th">Array</th>
+<th data-quarto-table-cell-role="th">Chunk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bytes</td>
+<td>16.84 MiB</td>
+<td>3.43 MiB</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shape</td>
+<td>(10, 913, 967)</td>
+<td>(5, 600, 600)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dask graph</td>
+<td colspan="2">8 chunks in 3 graph layers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Data type</td>
+<td colspan="2">uint16 numpy.ndarray</td>
+</tr>
+</tbody>
+</table></td>
+<td><svg width="195" height="178" style="stroke:rgb(0,0,0);stroke-width:1">
+<!-- Horizontal lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="10" y1="74" x2="25" y2="89"></line> <line x1="10" y1="113" x2="25" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="10" y2="113" style="stroke-width:2"></line> <line x1="17" y1="7" x2="17" y2="120"></line> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 25.043531621977266,15.043531621977266 25.043531621977266,128.34239408319752 10.0,113.29886246122027" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2"></line> <line x1="17" y1="7" x2="137" y2="7"></line> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="84" y1="0" x2="99" y2="15"></line> <line x1="130" y1="0" x2="145" y2="15" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 130.0,0.0 145.04353162197725,15.043531621977266 25.043531621977266,15.043531621977266" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <line x1="25" y1="89" x2="145" y2="89"></line> <line x1="25" y1="128" x2="145" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <line x1="99" y1="15" x2="99" y2="128"></line> <line x1="145" y1="15" x2="145" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="25.043531621977266,15.043531621977266 145.04353162197725,15.043531621977266 145.04353162197725,128.34239408319752 25.043531621977266,128.34239408319752" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Text --> <text x="85.043532" y="148.342394" font-size="1.0rem" font-weight="100" text-anchor="middle">967</text> <text x="165.043532" y="71.692963" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,165.043532,71.692963)">913</text> <text x="7.521766" y="140.820628" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,7.521766,140.820628)">10</text>
+</svg></td>
+</tr>
+</tbody>
+</table>
+</div></li><li class="xr-var-item"><div class="xr-var-name"><span>nir</span></div><div class="xr-var-dims">(time, latitude, longitude)</div><div class="xr-var-dtype">uint16</div><div class="xr-var-preview xr-preview">dask.array&lt;chunksize=(5, 600, 600), meta=np.ndarray&gt;</div><input id="attrs-f5410708-48bd-4274-b6ee-a180f37bebbf" class="xr-var-attrs-in" type="checkbox"><label for="attrs-f5410708-48bd-4274-b6ee-a180f37bebbf" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-47881736-ed97-4a61-946e-0a89f5277e3a" class="xr-var-data-in" type="checkbox"><label for="data-47881736-ed97-4a61-946e-0a89f5277e3a" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>0</dd></dl></div><div class="xr-var-data">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th></th>
+<th data-quarto-table-cell-role="th">Array</th>
+<th data-quarto-table-cell-role="th">Chunk</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Bytes</td>
+<td>16.84 MiB</td>
+<td>3.43 MiB</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Shape</td>
+<td>(10, 913, 967)</td>
+<td>(5, 600, 600)</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dask graph</td>
+<td colspan="2">8 chunks in 3 graph layers</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Data type</td>
+<td colspan="2">uint16 numpy.ndarray</td>
+</tr>
+</tbody>
+</table></td>
+<td><svg width="195" height="178" style="stroke:rgb(0,0,0);stroke-width:1">
+<!-- Horizontal lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="10" y1="74" x2="25" y2="89"></line> <line x1="10" y1="113" x2="25" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="10" y2="113" style="stroke-width:2"></line> <line x1="17" y1="7" x2="17" y2="120"></line> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 25.043531621977266,15.043531621977266 25.043531621977266,128.34239408319752 10.0,113.29886246122027" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2"></line> <line x1="17" y1="7" x2="137" y2="7"></line> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="10" y1="0" x2="25" y2="15" style="stroke-width:2"></line> <line x1="84" y1="0" x2="99" y2="15"></line> <line x1="130" y1="0" x2="145" y2="15" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="10.0,0.0 130.0,0.0 145.04353162197725,15.043531621977266 25.043531621977266,15.043531621977266" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Horizontal lines --> <line x1="25" y1="15" x2="145" y2="15" style="stroke-width:2"></line> <line x1="25" y1="89" x2="145" y2="89"></line> <line x1="25" y1="128" x2="145" y2="128" style="stroke-width:2"></line> <!-- Vertical lines --> <line x1="25" y1="15" x2="25" y2="128" style="stroke-width:2"></line> <line x1="99" y1="15" x2="99" y2="128"></line> <line x1="145" y1="15" x2="145" y2="128" style="stroke-width:2"></line> <!-- Colored Rectangle --> <polygon points="25.043531621977266,15.043531621977266 145.04353162197725,15.043531621977266 145.04353162197725,128.34239408319752 25.043531621977266,128.34239408319752" style="fill:#ECB172A0;stroke-width:0"></polygon> <!-- Text --> <text x="85.043532" y="148.342394" font-size="1.0rem" font-weight="100" text-anchor="middle">967</text> <text x="165.043532" y="71.692963" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,165.043532,71.692963)">913</text> <text x="7.521766" y="140.820628" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,7.521766,140.820628)">10</text>
+</svg></td>
+</tr>
+</tbody>
+</table>
+</div></li></ul></div></li><li class="xr-section-item"><input id="section-756aa92a-5cf7-4e52-b852-e7171f595910" class="xr-section-summary-in" type="checkbox"><label for="section-756aa92a-5cf7-4e52-b852-e7171f595910" class="xr-section-summary">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>latitude</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-a27c8701-7658-4416-9c9a-98546655346b" class="xr-index-data-in" type="checkbox"><label for="index-a27c8701-7658-4416-9c9a-98546655346b" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([ 48.40709999999999, 48.406499999999994, 48.405899999999995,
+        48.40529999999999,  48.40469999999999,  48.40409999999999,
+       48.403499999999994, 48.402899999999995,  48.40229999999999,
+        48.40169999999999,
+       ...
+        47.86529999999999,  47.86469999999999,  47.86409999999999,
+       47.863499999999995, 47.862899999999996,  47.86229999999999,
+        47.86169999999999,  47.86109999999999, 47.860499999999995,
+       47.859899999999996],
+      dtype='float64', name='latitude', length=913))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>longitude</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-5fc59368-4f30-4491-9790-9861c00ddf5d" class="xr-index-data-in" type="checkbox"><label for="index-5fc59368-4f30-4491-9790-9861c00ddf5d" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([           16.3203, 16.320899999999998,            16.3215,
+                  16.3221,            16.3227,            16.3233,
+                  16.3239,            16.3245,            16.3251,
+                  16.3257,
+       ...
+                  16.8945,            16.8951, 16.895699999999998,
+                  16.8963,            16.8969,            16.8975,
+                  16.8981, 16.898699999999998,            16.8993,
+                  16.8999],
+      dtype='float64', name='longitude', length=967))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>time</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-64a3e537-356a-406c-b42c-ac1465f738b6" class="xr-index-data-in" type="checkbox"><label for="index-64a3e537-356a-406c-b42c-ac1465f738b6" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(DatetimeIndex(['2024-05-01 09:57:21.858000', '2024-05-01 09:57:24.892000',
+               '2024-05-04 10:07:18.103000', '2024-05-04 10:07:22.389000',
+               '2024-05-06 09:57:19.789000', '2024-05-06 09:57:22.823000',
+               '2024-05-09 10:07:16.090000', '2024-05-09 10:07:20.373000',
+               '2024-05-11 09:57:22.239000', '2024-05-11 09:57:25.274000'],
+              dtype='datetime64[ns]', name='time', freq=None))</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-8679e812-3457-4b67-9f59-7b0d2491eea7" class="xr-section-summary-in" type="checkbox" disabled=""><label for="section-8679e812-3457-4b67-9f59-7b0d2491eea7" class="xr-section-summary" title="Expand/collapse section">Attributes: <span>(0)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"></dl></div></li></ul></div></div>
+</div>
 </div>
 </section>
 </section>
@@ -447,38 +1054,39 @@ window.Quarto = {
 <h3 data-number="2.2.1" class="anchored" data-anchor-id="rgb-image"><span class="header-section-number">2.2.1</span> RGB Image</h3>
 <p>With the image data now in our possession, we can proceed with computations and visualizations.</p>
 <p>First, we define a mask to exclude cloud cover and areas with missing data. Subsequently, we create a composite median image, where each pixel value represents the median value across all the scenes we have identified. This approach helps to eliminate clouds and outliers present in some of the images, thereby providing a clearer and more representative visualization of the scene.</p>
-<div id="5707168a" class="cell" data-execution_count="4">
+<div id="86c39266" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># define a mask for valid pixels (non-cloud)</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> is_valid_pixel(data):</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># include only vegetated, not_vegitated, water, and snow</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ((data <span class="op">&gt;</span> <span class="dv">3</span>) <span class="op">&amp;</span> (data <span class="op">&lt;</span> <span class="dv">7</span>)) <span class="op">|</span> (data<span class="op">==</span><span class="dv">11</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ((data <span class="op">&gt;</span> <span class="dv">3</span>) <span class="op">&amp;</span> (data <span class="op">&lt;</span> <span class="dv">7</span>)) <span class="op">|</span> (data <span class="op">==</span> <span class="dv">11</span>)</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ds_odc[<span class="st">'valid'</span>] <span class="op">=</span> is_valid_pixel(ds_odc.scl)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#ds_odc.valid.sum("time").plot()</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>dc[<span class="st">"valid"</span>] <span class="op">=</span> is_valid_pixel(dc.scl)</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> avg(ds):</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (ds <span class="op">/</span> ds.<span class="bu">max</span>() <span class="op">*</span> <span class="dv">2</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># compute the masked median</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>rgb_median <span class="op">=</span> (</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    ds_odc[[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>]]</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    .where(ds_odc.valid)</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    .to_dataarray(dim<span class="op">=</span><span class="st">"band"</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    .transpose(..., <span class="st">"band"</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    .median(dim<span class="op">=</span><span class="st">"time"</span>)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="bu">int</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>rgb_comp <span class="op">=</span> avg(rgb_median)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> rgb_comp.plot.imshow(rgb<span class="op">=</span><span class="st">"band"</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>plot.axes.set_title(<span class="ss">f"RGB - Median Composite</span><span class="ch">\n</span><span class="sc">{</span>start_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>end_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># compute the masked median</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>rgb_median <span class="op">=</span> (</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    dc[[<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>]]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    .where(dc.valid)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    .to_dataarray(dim<span class="op">=</span><span class="st">"band"</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    .median(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="bu">int</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the median composite</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>title_rgb <span class="op">=</span> (</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RGB - Median Composite"</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span>start_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>end_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>rgb_median.plot.imshow(robust<span class="op">=</span><span class="va">True</span>).axes.set_title(title_rgb)</span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-2593019971002186.0..2.0].</code></pre>
+<pre><code>/usr/share/miniconda/envs/Classification/lib/python3.12/site-packages/rasterio/warp.py:387: NotGeoreferencedWarning: Dataset has no geotransform, gcps, or rpcs. The identity matrix will be returned.
+  dest = _reproject(</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-5-output-2.png" width="686" height="689" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-5-output-2.png" width="612" height="467" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -487,27 +1095,28 @@ window.Quarto = {
 <section id="false-color-image" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="false-color-image"><span class="header-section-number">2.2.2</span> False Color Image</h3>
 <p>In addition to the regular RGB Image, we can swap any of the bands from the visible spectrum with any other bands. In this specific case the red band has been changed to the near infrared band. This allows us to see vegetated areas more clearly, since they now appear in a bright red color. This is due to the fact that plants absorb regular red light while reflecting near infrared light <span class="citation" data-cites="nasa2020">(<a href="references.html#ref-nasa2020" role="doc-biblioref">NASA 2020</a>)</span>.</p>
-<div id="84f06d5d" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute the false color image</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fc_median <span class="op">=</span> (</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    ds_odc[[<span class="st">'nir'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>]]</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    .where(ds_odc.valid)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    .to_dataarray(dim<span class="op">=</span><span class="st">"band"</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    .transpose(..., <span class="st">"band"</span>)</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    .median(dim<span class="op">=</span><span class="st">"time"</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="bu">int</span>)</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>fc_comp <span class="op">=</span> avg(fc_median)</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> fc_comp.plot.imshow(rgb<span class="op">=</span><span class="st">"band"</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>plot.axes.set_title(<span class="ss">f"False Color - Median Composite</span><span class="ch">\n</span><span class="sc">{</span>start_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>end_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-2368915381239187.5..2.0].</code></pre>
-</div>
+<div id="4f371e3f" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute a false color image</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># near infrared instead of red</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>fc_median <span class="op">=</span> (</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    dc[[<span class="st">'nir'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>]]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    .where(dc.valid)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    .to_dataarray(dim<span class="op">=</span><span class="st">"band"</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    .transpose(..., <span class="st">"band"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    .median(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    .astype(<span class="bu">int</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>title_fc <span class="op">=</span> (</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"False color - Median Composite"</span><span class="op">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span>start_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss"> - </span><span class="sc">{</span>end_date<span class="sc">.</span>strftime(<span class="st">'</span><span class="sc">%d</span><span class="st">.%m.%Y'</span>)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>fc_median.plot.imshow(robust<span class="op">=</span><span class="va">True</span>).axes.set_title(title_fc)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-6-output-2.png" width="686" height="689" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-6-output-1.png" width="612" height="467" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -526,14 +1135,17 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <li>0.33 to 0.66 are moderatly healthy plants</li>
 <li>0.66 to 1 are very healthy plants</li>
 </ul>
-<div id="2a4f85e9" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalized Difference Vegetation Index (NDVI)</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalized_difference(a, b):</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (a <span class="op">-</span> b<span class="op">*</span><span class="fl">1.</span>) <span class="op">/</span> (a <span class="op">+</span> b)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ndvi <span class="op">=</span> normalized_difference(ds_odc.nir, ds_odc.red)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>ndvi.median(dim<span class="op">=</span><span class="st">"time"</span>).plot.imshow(cmap<span class="op">=</span><span class="st">'cmc.cork'</span>, vmin<span class="op">=-</span><span class="dv">1</span>, vmax<span class="op">=</span><span class="dv">1</span>).axes.set_title(<span class="st">'NDVI'</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="377a4cce" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalized Difference Vegetation Index (NDVI)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> normalized_difference(a, b):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (a <span class="op">-</span> b <span class="op">*</span> <span class="fl">1.0</span>) <span class="op">/</span> (a <span class="op">+</span> b)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>ndvi <span class="op">=</span> normalized_difference(dc.nir, dc.red)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>ndvi.median(dim<span class="op">=</span><span class="st">"time"</span>).plot.imshow(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"cmc.cork"</span>, vmin<span class="op">=-</span><span class="dv">1</span>, vmax<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>).axes.set_title(<span class="st">"NDVI"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -550,47 +1162,50 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <section id="regions-of-interest" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="regions-of-interest"><span class="header-section-number">2.3.1</span> Regions of Interest</h3>
 <p>Since this is a supervised classification, we need to have some training data. Therefore we need to define areas or regions, which we are certain represent the feature which we are classifiying. In this case we are interested in forested areas and regions that are definitly not forested. These regions will be used to train our classifiers.</p>
-<div id="2a31a6ec" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Polygons</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>forest_areas <span class="op">=</span> {</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: [Polygon([(<span class="fl">16.482772</span>, <span class="fl">47.901753</span>), (<span class="fl">16.465133</span>, <span class="fl">47.870124</span>), (<span class="fl">16.510142</span>, <span class="fl">47.874382</span>), (<span class="fl">16.482772</span>, <span class="fl">47.901753</span>)])],</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: [Polygon([(<span class="fl">16.594079</span>, <span class="fl">47.938855</span>), (<span class="fl">16.581914</span>, <span class="fl">47.894454</span>), (<span class="fl">16.620233</span>, <span class="fl">47.910268</span>), (<span class="fl">16.594079</span>, <span class="fl">47.938855</span>)])],</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>: [Polygon([(<span class="fl">16.67984</span>, <span class="fl">47.978998</span>), (<span class="fl">16.637263</span>, <span class="fl">47.971091</span>), (<span class="fl">16.660376</span>, <span class="fl">47.929123</span>), (<span class="fl">16.67984</span>, <span class="fl">47.978998</span>)])],</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>: [Polygon([(<span class="fl">16.756477</span>, <span class="fl">48.000286</span>), (<span class="fl">16.723024</span>, <span class="fl">47.983256</span>), (<span class="fl">16.739446</span>, <span class="fl">47.972916</span>), (<span class="fl">16.756477</span>, <span class="fl">48.000286</span>)])],</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4</span>: [Polygon([(<span class="fl">16.80696</span>, <span class="fl">48.135923</span>), (<span class="fl">16.780806</span>, <span class="fl">48.125583</span>), (<span class="fl">16.798445</span>, <span class="fl">48.115243</span>), (<span class="fl">16.80696</span>, <span class="fl">48.135923</span>)])],</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">5</span>: [Polygon([(<span class="fl">16.684097</span>, <span class="fl">48.144438</span>), (<span class="fl">16.664634</span>, <span class="fl">48.124366</span>), (<span class="fl">16.690788</span>, <span class="fl">48.118892</span>), (<span class="fl">16.684097</span>, <span class="fl">48.144438</span>)])],</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">6</span>: [Polygon([(<span class="fl">16.550894</span>, <span class="fl">48.169984</span>), (<span class="fl">16.530822</span>, <span class="fl">48.165118</span>), (<span class="fl">16.558801</span>, <span class="fl">48.137139</span>), (<span class="fl">16.550894</span>, <span class="fl">48.169984</span>)])],</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="dv">7</span>: [Polygon([(<span class="fl">16.588604</span>, <span class="fl">48.402329</span>), (<span class="fl">16.556976</span>, <span class="fl">48.401112</span>), (<span class="fl">16.580697</span>, <span class="fl">48.382865</span>), (<span class="fl">16.588604</span>, <span class="fl">48.402329</span>)])],</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>nonforest_areas <span class="op">=</span> {</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: [Polygon([(<span class="fl">16.674974</span>, <span class="fl">48.269126</span>), (<span class="fl">16.623882</span>, <span class="fl">48.236281</span>), (<span class="fl">16.682272</span>, <span class="fl">48.213168</span>), (<span class="fl">16.674974</span>, <span class="fl">48.269126</span>)])],</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: [Polygon([(<span class="fl">16.375723</span>, <span class="fl">48.228374</span>), (<span class="fl">16.357476</span>, <span class="fl">48.188839</span>), (<span class="fl">16.399444</span>, <span class="fl">48.185798</span>), (<span class="fl">16.375723</span>, <span class="fl">48.228374</span>)])],</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>: [Polygon([(<span class="fl">16.457834</span>, <span class="fl">48.26426</span>), (<span class="fl">16.418907</span>, <span class="fl">48.267301</span>), (<span class="fl">16.440804</span>, <span class="fl">48.23324</span>), (<span class="fl">16.457834</span>, <span class="fl">48.26426</span>)])],</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>: [Polygon([(<span class="fl">16.519266</span>, <span class="fl">48.101861</span>), (<span class="fl">16.470607</span>, <span class="fl">48.100645</span>), (<span class="fl">16.500411</span>, <span class="fl">48.07145</span>), (<span class="fl">16.519266</span>, <span class="fl">48.101861</span>)])],</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4</span>: [Polygon([(<span class="fl">16.453577</span>, <span class="fl">48.051986</span>), (<span class="fl">16.412217</span>, <span class="fl">48.067192</span>), (<span class="fl">16.425598</span>, <span class="fl">48.012451</span>), (<span class="fl">16.453577</span>, <span class="fl">48.051986</span>)])],</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Geoppandas Dataframe from Polygons</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>forest_df <span class="op">=</span> gpd.GeoDataFrame({<span class="st">'geometry'</span>: [poly[<span class="dv">0</span>] <span class="cf">for</span> poly <span class="kw">in</span> forest_areas.values()]}, crs<span class="op">=</span><span class="st">"EPSG:4326"</span>)</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>nonforest_df <span class="op">=</span> gpd.GeoDataFrame({<span class="st">'geometry'</span>: [poly[<span class="dv">0</span>] <span class="cf">for</span> poly <span class="kw">in</span> nonforest_areas.values()]}, crs<span class="op">=</span><span class="st">"EPSG:4326"</span>)</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting Regions of Interest</span></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>rgb_comp.plot.imshow(ax<span class="op">=</span>ax)</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>forest_df.plot(ax<span class="op">=</span>ax, ec<span class="op">=</span><span class="st">'C0'</span>, fc<span class="op">=</span><span class="st">'none'</span>)</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>nonforest_df.plot(ax<span class="op">=</span>ax, ec<span class="op">=</span><span class="st">'C1'</span>, fc<span class="op">=</span><span class="st">'none'</span>)</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Regions of Interest'</span>)</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="st">'equal'</span>)</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers). Got range [-2593019971002186.0..2.0].</code></pre>
+<div id="e782915a" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define Polygons</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>forest_areas <span class="op">=</span> {</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: [Polygon([(<span class="fl">16.482772</span>, <span class="fl">47.901753</span>), (<span class="fl">16.465133</span>, <span class="fl">47.870124</span>), (<span class="fl">16.510142</span>, <span class="fl">47.874382</span>), (<span class="fl">16.482772</span>, <span class="fl">47.901753</span>)])],</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: [Polygon([(<span class="fl">16.594079</span>, <span class="fl">47.938855</span>), (<span class="fl">16.581914</span>, <span class="fl">47.894454</span>), (<span class="fl">16.620233</span>, <span class="fl">47.910268</span>), (<span class="fl">16.594079</span>, <span class="fl">47.938855</span>)])],</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>: [Polygon([(<span class="fl">16.67984</span>, <span class="fl">47.978998</span>), (<span class="fl">16.637263</span>, <span class="fl">47.971091</span>), (<span class="fl">16.660376</span>, <span class="fl">47.929123</span>), (<span class="fl">16.67984</span>, <span class="fl">47.978998</span>)])],</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>: [Polygon([(<span class="fl">16.756477</span>, <span class="fl">48.000286</span>), (<span class="fl">16.723024</span>, <span class="fl">47.983256</span>), (<span class="fl">16.739446</span>, <span class="fl">47.972916</span>), (<span class="fl">16.756477</span>, <span class="fl">48.000286</span>)])],</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4</span>: [Polygon([(<span class="fl">16.80696</span>, <span class="fl">48.135923</span>), (<span class="fl">16.780806</span>, <span class="fl">48.125583</span>), (<span class="fl">16.798445</span>, <span class="fl">48.115243</span>), (<span class="fl">16.80696</span>, <span class="fl">48.135923</span>)])],</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">5</span>: [Polygon([(<span class="fl">16.684097</span>, <span class="fl">48.144438</span>), (<span class="fl">16.664634</span>, <span class="fl">48.124366</span>), (<span class="fl">16.690788</span>, <span class="fl">48.118892</span>), (<span class="fl">16.684097</span>, <span class="fl">48.144438</span>)])],</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">6</span>: [Polygon([(<span class="fl">16.550894</span>, <span class="fl">48.169984</span>), (<span class="fl">16.530822</span>, <span class="fl">48.165118</span>), (<span class="fl">16.558801</span>, <span class="fl">48.137139</span>), (<span class="fl">16.550894</span>, <span class="fl">48.169984</span>)])],</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="dv">7</span>: [Polygon([(<span class="fl">16.588604</span>, <span class="fl">48.402329</span>), (<span class="fl">16.556976</span>, <span class="fl">48.401112</span>), (<span class="fl">16.580697</span>, <span class="fl">48.382865</span>), (<span class="fl">16.588604</span>, <span class="fl">48.402329</span>)])],</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>nonforest_areas <span class="op">=</span> {</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: [Polygon([(<span class="fl">16.674974</span>, <span class="fl">48.269126</span>), (<span class="fl">16.623882</span>, <span class="fl">48.236281</span>), (<span class="fl">16.682272</span>, <span class="fl">48.213168</span>), (<span class="fl">16.674974</span>, <span class="fl">48.269126</span>)])],</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: [Polygon([(<span class="fl">16.375723</span>, <span class="fl">48.228374</span>), (<span class="fl">16.357476</span>, <span class="fl">48.188839</span>), (<span class="fl">16.399444</span>, <span class="fl">48.185798</span>), (<span class="fl">16.375723</span>, <span class="fl">48.228374</span>)])],</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>: [Polygon([(<span class="fl">16.457834</span>, <span class="fl">48.26426</span>), (<span class="fl">16.418907</span>, <span class="fl">48.267301</span>), (<span class="fl">16.440804</span>, <span class="fl">48.23324</span>), (<span class="fl">16.457834</span>, <span class="fl">48.26426</span>)])],</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>: [Polygon([(<span class="fl">16.519266</span>, <span class="fl">48.101861</span>), (<span class="fl">16.470607</span>, <span class="fl">48.100645</span>), (<span class="fl">16.500411</span>, <span class="fl">48.07145</span>), (<span class="fl">16.519266</span>, <span class="fl">48.101861</span>)])],</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4</span>: [Polygon([(<span class="fl">16.453577</span>, <span class="fl">48.051986</span>), (<span class="fl">16.412217</span>, <span class="fl">48.067192</span>), (<span class="fl">16.425598</span>, <span class="fl">48.012451</span>), (<span class="fl">16.453577</span>, <span class="fl">48.051986</span>)])],</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div id="ee296619" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Geoppandas Dataframe from Polygons</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>forest_df <span class="op">=</span> gpd.GeoDataFrame(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"geometry"</span>: [poly[<span class="dv">0</span>] <span class="cf">for</span> poly <span class="kw">in</span> forest_areas.values()]}, crs<span class="op">=</span><span class="st">"EPSG:4326"</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>nonforest_df <span class="op">=</span> gpd.GeoDataFrame(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"geometry"</span>: [poly[<span class="dv">0</span>] <span class="cf">for</span> poly <span class="kw">in</span> nonforest_areas.values()]},</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    crs<span class="op">=</span><span class="st">"EPSG:4326"</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting Regions of Interest</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>rgb_median.plot.imshow(ax<span class="op">=</span>ax, robust<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>forest_df.plot(ax<span class="op">=</span>ax, ec<span class="op">=</span><span class="st">"C0"</span>, fc<span class="op">=</span><span class="st">"none"</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>nonforest_df.plot(ax<span class="op">=</span>ax, ec<span class="op">=</span><span class="st">"C1"</span>, fc<span class="op">=</span><span class="st">"none"</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Regions of Interest"</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="st">"equal"</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-8-output-2.png" width="483" height="449" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-9-output-1.png" width="483" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -599,100 +1214,129 @@ NDVI = \frac{NIR - Red}{NIR + Red}
 <section id="data-preparation" class="level3" data-number="2.3.2">
 <h3 data-number="2.3.2" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">2.3.2</span> Data Preparation</h3>
 <p>In addition to the Regions of Interest we will extract the specific bands from the loaded dataset that we intend to use for the classification, which are the <code>red, green, blue</code> and <code>near-infrared</code> bands, although other bands can also be utilized. Using these bands, we will create both a training and a testing dataset. The training dataset will be used to train the classifier, while the testing dataset will be employed to evaluate its performance.</p>
-<div id="1e9ae39f" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Classifiying dataset (only necessary bands)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>bands <span class="op">=</span> [<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>, <span class="st">'nir'</span>]</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>ds_class <span class="op">=</span> (</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    ds_odc[bands]</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    .where(ds_odc.valid)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    .median(dim<span class="op">=</span><span class="st">"time"</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>ds_class <span class="op">=</span> avg(ds_class)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>ds_class <span class="op">=</span> ds_class.fillna(<span class="dv">0</span>)</span>
+<div id="201976ea" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Classifiying dataset (only necessary bands)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>bands <span class="op">=</span> [<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>, <span class="st">"nir"</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ds_class <span class="op">=</span> dc[bands].where(dc.valid).median(dim<span class="op">=</span><span class="st">"time"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ds_class <span class="op">=</span> ds_class.fillna(<span class="dv">0</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clip_array(ds: xr.Dataset, polygons):</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    clipped <span class="op">=</span> ds.rio.clip(polygons, invert<span class="op">=</span><span class="va">False</span>, all_touched<span class="op">=</span><span class="va">False</span>, drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    clipped_nan <span class="op">=</span> clipped.where(clipped <span class="op">==</span> ds)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> clipped_nan</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Dictionaries with Dataarrays, each clipped by a Polygon</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>data_dict_feat <span class="op">=</span> {</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    idx: clip_array(ds_class, polygon) <span class="cf">for</span> idx, polygon <span class="kw">in</span> forest_areas.items()</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>data_dict_nonfeat <span class="op">=</span> {</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    idx: clip_array(ds_class, polygon)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> idx, polygon <span class="kw">in</span> nonforest_areas.items()</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="60850d95" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape the polygon dataarrays to get a tuple (one value per band) of pixel values</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>feat_data <span class="op">=</span> [</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    xarray.to_array().values.reshape(<span class="bu">len</span>(bands), <span class="op">-</span><span class="dv">1</span>).T</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xarray <span class="kw">in</span> data_dict_feat.values()</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>]  <span class="co"># replaced median_data_dict_feat with data_dict_feat</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>nonfeat_data <span class="op">=</span> [</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    xarray.to_array().values.reshape(<span class="bu">len</span>(bands), <span class="op">-</span><span class="dv">1</span>).T</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xarray <span class="kw">in</span> data_dict_nonfeat.values()</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>]  <span class="co"># replaced median_data_dict_feat with data_dict_feat</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clip_array(ds:xr.Dataset, polygons):</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    clipped <span class="op">=</span> ds.rio.clip(polygons, invert<span class="op">=</span><span class="va">False</span>, all_touched<span class="op">=</span><span class="va">False</span>, drop<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    clipped_nan <span class="op">=</span> clipped.where(clipped <span class="op">==</span> ds)</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> clipped_nan</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Dictionaries with Dataarrays, each clipped by a Polygon</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>data_dict_feat <span class="op">=</span> {idx: clip_array(ds_class, polygon) <span class="cf">for</span> idx, polygon <span class="kw">in</span> forest_areas.items()}</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>data_dict_nonfeat <span class="op">=</span> {idx: clip_array(ds_class, polygon)  <span class="cf">for</span> idx, polygon <span class="kw">in</span> nonforest_areas.items()}</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape the polygon dataarrays to get a tuple (one value per band) of pixel values</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>feat_data <span class="op">=</span> [xarray.to_array().values.reshape(<span class="bu">len</span>(bands),<span class="op">-</span><span class="dv">1</span>).T <span class="cf">for</span> xarray <span class="kw">in</span> data_dict_feat.values()] <span class="co"># replaced median_data_dict_feat with data_dict_feat</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>nonfeat_data <span class="op">=</span> [xarray.to_array().values.reshape(<span class="bu">len</span>(bands),<span class="op">-</span><span class="dv">1</span>).T <span class="cf">for</span> xarray <span class="kw">in</span> data_dict_nonfeat.values()] <span class="co"># replaced median_data_dict_feat with data_dict_feat</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co"># The rows of the different polygons are concatenated to a single array for further processing</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>feat_values <span class="op">=</span> np.concatenate(feat_data)</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>nonfeat_values <span class="op">=</span> np.concatenate(nonfeat_data)</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop Nan Values</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>X_feat_data <span class="op">=</span> feat_values[<span class="op">~</span>np.isnan(feat_values).<span class="bu">any</span>(axis<span class="op">=</span><span class="dv">1</span>)]</span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>X_nonfeat_data <span class="op">=</span> nonfeat_values[<span class="op">~</span>np.isnan(nonfeat_values).<span class="bu">any</span>(axis<span class="op">=</span><span class="dv">1</span>)]</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Output Vector (1 for pixel is features; 0 for pixel is not feature)</span></span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>y_feat_data <span class="op">=</span> np.ones(X_feat_data.shape[<span class="dv">0</span>])</span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>y_nonfeat_data <span class="op">=</span> np.zeros(X_nonfeat_data.shape[<span class="dv">0</span>])</span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Concatnate all Classes for training </span></span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.concatenate([X_feat_data, X_nonfeat_data])</span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.concatenate([y_feat_data, y_nonfeat_data])</span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Split into Training and Testing Data.</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.5</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co"># The rows of the different polygons are concatenated to a single array for further processing</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>feat_values <span class="op">=</span> np.concatenate(feat_data)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>nonfeat_values <span class="op">=</span> np.concatenate(nonfeat_data)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop Nan Values</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>X_feat_data <span class="op">=</span> feat_values[<span class="op">~</span>np.isnan(feat_values).<span class="bu">any</span>(axis<span class="op">=</span><span class="dv">1</span>)]</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>X_nonfeat_data <span class="op">=</span> nonfeat_values[<span class="op">~</span>np.isnan(nonfeat_values).<span class="bu">any</span>(axis<span class="op">=</span><span class="dv">1</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8820e2c3" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating Output Vector (1 for pixel is features; 0 for pixel is not feature)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>y_feat_data <span class="op">=</span> np.ones(X_feat_data.shape[<span class="dv">0</span>])</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>y_nonfeat_data <span class="op">=</span> np.zeros(X_nonfeat_data.shape[<span class="dv">0</span>])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Concatenate all Classes for training</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.concatenate([X_feat_data, X_nonfeat_data])</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.concatenate([y_feat_data, y_nonfeat_data])</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Split into Training and Testing Data.</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    X, y, test_size<span class="op">=</span><span class="fl">0.5</span>, random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now that we have prepared the training and testing data, we will create an image array of the actual scene that we intend to classify. This array will serve as the input for our classification algorithms, allowing us to apply the trained classifiers to the entire scene and identify the forested and non-forested areas accurately.</p>
-<div id="cc16d666" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>image_data <span class="op">=</span> ds_class[bands].to_array(dim<span class="op">=</span><span class="st">'band'</span>).transpose(<span class="st">'latitude'</span>, <span class="st">'longitude'</span>, <span class="st">'band'</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape the image data</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>num_of_pixels <span class="op">=</span> ds_class.sizes[<span class="st">'longitude'</span>] <span class="op">*</span> ds_class.sizes[<span class="st">'latitude'</span>]</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>num_of_bands <span class="op">=</span> <span class="bu">len</span>(bands)</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>X_image_data <span class="op">=</span> image_data.values.reshape(num_of_pixels, num_of_bands)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e13e07ac" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>image_data <span class="op">=</span> (</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    ds_class[bands]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    .to_array(dim<span class="op">=</span><span class="st">"band"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    .transpose(<span class="st">"latitude"</span>, <span class="st">"longitude"</span>, <span class="st">"band"</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Reshape the image data</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>num_of_pixels <span class="op">=</span> ds_class.sizes[<span class="st">"longitude"</span>] <span class="op">*</span> ds_class.sizes[<span class="st">"latitude"</span>]</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>num_of_bands <span class="op">=</span> <span class="bu">len</span>(bands)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>X_image_data <span class="op">=</span> image_data.values.reshape(num_of_pixels, num_of_bands)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="classifiying-with-naive-bayes" class="level3" data-number="2.3.3">
 <h3 data-number="2.3.3" class="anchored" data-anchor-id="classifiying-with-naive-bayes"><span class="header-section-number">2.3.3</span> Classifiying with Naive Bayes</h3>
 <p>Now that we have prepared all the needed data, we can begin the actual classification process.</p>
 <p>We will start with a <em>Naive Bayes</em> classifier. First, we will train the classifier using our training dataset. Once trained, we will apply the classifier to the actual image to identify the forested and non-forested areas.</p>
-<div id="71e120ef" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive Bayes initialization and training</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> GaussianNB()</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>nb_test <span class="op">=</span> nb.fit(X_train, y_train)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>nb_predict <span class="op">=</span> nb.predict(X_test)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction on image</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>nb_predict_img <span class="op">=</span> nb.predict(X_image_data)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>nb_predict_img <span class="op">=</span> nb_predict_img.reshape(ds_class.sizes[<span class="st">'latitude'</span>], ds_class.sizes[<span class="st">'longitude'</span>])</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding the Naive Bayes Prediction to the dataset</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>ds_class[<span class="st">'NB-forest'</span>] <span class="op">=</span> xr.DataArray(nb_predict_img, dims<span class="op">=</span>[<span class="st">'latitude'</span>, <span class="st">'longitude'</span>], coords<span class="op">=</span>{<span class="st">'longitude'</span>: ds_class[<span class="st">'longitude'</span>], <span class="st">'latitude'</span>: ds_class[<span class="st">'latitude'</span>]})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="bcf777bf" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive Bayes initialization and training</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>nb <span class="op">=</span> GaussianNB()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>nb_test <span class="op">=</span> nb.fit(X_train, y_train)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>nb_predict <span class="op">=</span> nb.predict(X_test)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction on image</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>nb_predict_img <span class="op">=</span> nb.predict(X_image_data)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>nb_predict_img <span class="op">=</span> nb_predict_img.reshape(</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    ds_class.sizes[<span class="st">"latitude"</span>], ds_class.sizes[<span class="st">"longitude"</span>]</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding the Naive Bayes Prediction to the dataset</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>ds_class[<span class="st">"NB-forest"</span>] <span class="op">=</span> xr.DataArray(</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    nb_predict_img,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    dims<span class="op">=</span>[<span class="st">"latitude"</span>, <span class="st">"longitude"</span>],</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    coords<span class="op">=</span>{</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"longitude"</span>: ds_class[<span class="st">"longitude"</span>],</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"latitude"</span>: ds_class[<span class="st">"latitude"</span>],</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To evaluate the effectiveness of the classification, we will plot the image predicted by the classifier. Additionally, we will examine the <code>Classification Report</code> and the <code>Confusion Matrix</code> to gain further insights into the classifier’s performance.</p>
-<div id="3531bc48" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Naive Bayes</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="dv">1</span>   </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>cmap_green <span class="op">=</span> colors.ListedColormap([(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, alpha), <span class="st">'green'</span>])</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ds_class[<span class="st">'NB-forest'</span>].plot.imshow(cmap<span class="op">=</span>cmap_green, cbar_kwargs<span class="op">=</span>{<span class="st">'ticks'</span>: [<span class="fl">0.25</span>,<span class="fl">0.75</span>]})</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plot.colorbar</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>cbar.set_ticklabels([<span class="st">'non-forest'</span>, <span class="st">'forest'</span>])</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plot.axes.set_title(<span class="st">'Naive Bayes Classification'</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the Classification report</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NAIVE BAYES: </span><span class="ch">\n</span><span class="st"> "</span><span class="op">+</span> classification_report(y_test, nb_predict))</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the confusion matrix</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>con_mat_nb <span class="op">=</span> pd.DataFrame(confusion_matrix(y_test, nb_predict), </span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                  index<span class="op">=</span>[<span class="st">'Actual Negative'</span>, <span class="st">'Actual Positive'</span>], </span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                  columns<span class="op">=</span>[<span class="st">'Predicted Negative'</span>, <span class="st">'Predicted Positive'</span>])</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>display(con_mat_nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f7fbdf7b" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Naive Bayes</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>alpha <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>cmap_green <span class="op">=</span> colors.ListedColormap([(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, alpha), <span class="st">"green"</span>])</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ds_class[<span class="st">"NB-forest"</span>].plot.imshow(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span>cmap_green, cbar_kwargs<span class="op">=</span>{<span class="st">"ticks"</span>: [<span class="fl">0.25</span>, <span class="fl">0.75</span>]}</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plot.colorbar</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>cbar.set_ticklabels([<span class="st">"non-forest"</span>, <span class="st">"forest"</span>])</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>plot.axes.set_title(<span class="st">"Naive Bayes Classification"</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the Classification report</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"NAIVE BAYES: </span><span class="ch">\n</span><span class="st"> "</span> <span class="op">+</span> classification_report(y_test, nb_predict))</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the confusion matrix</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>con_mat_nb <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    confusion_matrix(y_test, nb_predict),</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"Actual Negative"</span>, <span class="st">"Actual Positive"</span>],</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"Predicted Negative"</span>, <span class="st">"Predicted Positive"</span>],</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>display(con_mat_nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-12-output-1.png" width="634" height="449" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-15-output-1.png" width="634" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -741,37 +1385,50 @@ weighted avg       0.89      0.88      0.88     12105
 <section id="classifiying-with-random-forest" class="level3" data-number="2.3.4">
 <h3 data-number="2.3.4" class="anchored" data-anchor-id="classifiying-with-random-forest"><span class="header-section-number">2.3.4</span> Classifiying with Random Forest</h3>
 <p>To ensure our results are robust, we will explore an additional classifier. In this section, we will use the Random Forest classifier. The procedure for using this classifier is the same as before: we will train the classifier using our training dataset and then apply it to the actual image to classify the scene.</p>
-<div id="c4b64ce3" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest initialization and training</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestClassifier(n_estimators<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>rf_test <span class="op">=</span> rf.fit(X_train, y_train)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>rf_predict <span class="op">=</span> rf.predict(X_test)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction on image</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>rf_predict_img <span class="op">=</span> rf.predict(X_image_data)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>rf_predict_img <span class="op">=</span> rf_predict_img.reshape(ds_class.sizes[<span class="st">'latitude'</span>], ds_class.sizes[<span class="st">'longitude'</span>])</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding the Random Forest Prediction to the dataset</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>ds_class[<span class="st">'RF-forest'</span>] <span class="op">=</span> xr.DataArray(rf_predict_img, dims<span class="op">=</span>[<span class="st">'latitude'</span>, <span class="st">'longitude'</span>], coords<span class="op">=</span>{<span class="st">'longitude'</span>: ds_class[<span class="st">'longitude'</span>], <span class="st">'latitude'</span>: ds_class[<span class="st">'latitude'</span>]})</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ds_class[<span class="st">'RF-forest'</span>].plot.imshow(cmap<span class="op">=</span>cmap_green, cbar_kwargs<span class="op">=</span>{<span class="st">'ticks'</span>: [<span class="fl">0.25</span>,<span class="fl">0.75</span>]})</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plot.colorbar</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>cbar.set_ticklabels([<span class="st">'non-forest'</span>, <span class="st">'forest'</span>])</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>plot.axes.set_title(<span class="st">'Random Forest Classification'</span>)</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the Classification report</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RANDOM FOREST: </span><span class="ch">\n</span><span class="st"> "</span><span class="op">+</span> classification_report(y_test, rf_predict))</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the confusion matrix</span></span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>con_mat_rf <span class="op">=</span> pd.DataFrame(confusion_matrix(y_test, rf_predict), </span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>                  index<span class="op">=</span>[<span class="st">'Actual Negative'</span>, <span class="st">'Actual Positive'</span>], </span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>                  columns<span class="op">=</span>[<span class="st">'Predicted Negative'</span>, <span class="st">'Predicted Positive'</span>])</span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>display(con_mat_rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7967af7a" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest initialization and training</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestClassifier(n_estimators<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>rf_test <span class="op">=</span> rf.fit(X_train, y_train)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>rf_predict <span class="op">=</span> rf.predict(X_test)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Prediction on image</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>rf_predict_img <span class="op">=</span> rf.predict(X_image_data)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>rf_predict_img <span class="op">=</span> rf_predict_img.reshape(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    ds_class.sizes[<span class="st">"latitude"</span>], ds_class.sizes[<span class="st">"longitude"</span>]</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Adding the Random Forest Prediction to the dataset</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>ds_class[<span class="st">"RF-forest"</span>] <span class="op">=</span> xr.DataArray(</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    rf_predict_img,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    dims<span class="op">=</span>[<span class="st">"latitude"</span>, <span class="st">"longitude"</span>],</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    coords<span class="op">=</span>{</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"longitude"</span>: ds_class[<span class="st">"longitude"</span>],</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"latitude"</span>: ds_class[<span class="st">"latitude"</span>],</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>plot <span class="op">=</span> ds_class[<span class="st">"RF-forest"</span>].plot.imshow(</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span>cmap_green, cbar_kwargs<span class="op">=</span>{<span class="st">"ticks"</span>: [<span class="fl">0.25</span>, <span class="fl">0.75</span>]}</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> plot.colorbar</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>cbar.set_ticklabels([<span class="st">"non-forest"</span>, <span class="st">"forest"</span>])</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>plot.axes.set_title(<span class="st">"Random Forest Classification"</span>)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the Classification report</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RANDOM FOREST: </span><span class="ch">\n</span><span class="st"> "</span> <span class="op">+</span> classification_report(y_test, rf_predict))</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the confusion matrix</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>con_mat_rf <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    confusion_matrix(y_test, rf_predict),</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"Actual Negative"</span>, <span class="st">"Actual Positive"</span>],</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"Predicted Negative"</span>, <span class="st">"Predicted Positive"</span>],</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>display(con_mat_rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-13-output-1.png" width="634" height="449" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-16-output-1.png" width="634" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -779,7 +1436,7 @@ weighted avg       0.89      0.88      0.88     12105
 <pre><code>RANDOM FOREST: 
                precision    recall  f1-score   support
 
-         0.0       0.96      0.95      0.96      6618
+         0.0       0.96      0.95      0.95      6618
          1.0       0.94      0.95      0.95      5487
 
     accuracy                           0.95     12105
@@ -802,13 +1459,13 @@ weighted avg       0.95      0.95      0.95     12105
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">Actual Negative</td>
-<td>6298</td>
-<td>320</td>
+<td>6297</td>
+<td>321</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">Actual Positive</td>
-<td>271</td>
-<td>5216</td>
+<td>282</td>
+<td>5205</td>
 </tr>
 </tbody>
 </table>
@@ -821,53 +1478,60 @@ weighted avg       0.95      0.95      0.95     12105
 <section id="comparison-of-the-classificators" class="level3" data-number="2.3.5">
 <h3 data-number="2.3.5" class="anchored" data-anchor-id="comparison-of-the-classificators"><span class="header-section-number">2.3.5</span> Comparison of the Classificators</h3>
 <p>To gain a more in-depth understanding of the classifiers’ performance, we will compare their results. Specifically, we will identify the areas where both classifiers agree and the areas where they disagree. This comparison will provide valuable insights into the strengths and weaknesses of each classifier, allowing us to better assess their effectiveness in identifying forested and non-forested regions.</p>
-<div id="3149cb5c" class="cell" data-execution_count="13">
+<div id="08237619" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>cmap_trio <span class="op">=</span> colors.ListedColormap([<span class="st">'whitesmoke'</span> ,<span class="st">'indianred'</span>, <span class="st">'goldenrod'</span>, <span class="st">'darkgreen'</span>])</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>double_clf <span class="op">=</span> (ds_class[<span class="st">'NB-forest'</span>] <span class="op">+</span> <span class="dv">2</span><span class="op">*</span>ds_class[<span class="st">'RF-forest'</span>])</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>cax <span class="op">=</span> ax.imshow(double_clf, cmap<span class="op">=</span>cmap_trio, interpolation<span class="op">=</span><span class="st">'none'</span>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a colorbar with custom tick labels</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> fig.colorbar(cax, ticks<span class="op">=</span>[<span class="dv">1</span><span class="op">*</span><span class="fl">0.375</span>, <span class="dv">3</span><span class="op">*</span><span class="fl">0.375</span>, <span class="dv">5</span><span class="op">*</span><span class="fl">0.375</span>, <span class="dv">7</span><span class="op">*</span><span class="fl">0.375</span>])</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>cbar.ax.set_yticklabels([<span class="st">'None'</span>, <span class="st">'Naive Bayes'</span>, <span class="st">'Random Forest'</span>, <span class="st">'Both'</span>])</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Classification Comparisson'</span>)</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>cmap_trio <span class="op">=</span> colors.ListedColormap(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"whitesmoke"</span>, <span class="st">"indianred"</span>, <span class="st">"goldenrod"</span>, <span class="st">"darkgreen"</span>]</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>double_clf <span class="op">=</span> ds_class[<span class="st">"NB-forest"</span>] <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> ds_class[<span class="st">"RF-forest"</span>]</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>cax <span class="op">=</span> ax.imshow(double_clf, cmap<span class="op">=</span>cmap_trio, interpolation<span class="op">=</span><span class="st">"none"</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add a colorbar with custom tick labels</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>cbar <span class="op">=</span> fig.colorbar(cax, ticks<span class="op">=</span>[<span class="dv">1</span> <span class="op">*</span> <span class="fl">0.375</span>, <span class="dv">3</span> <span class="op">*</span> <span class="fl">0.375</span>, <span class="dv">5</span> <span class="op">*</span> <span class="fl">0.375</span>, <span class="dv">7</span> <span class="op">*</span> <span class="fl">0.375</span>])</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>cbar.ax.set_yticklabels([<span class="st">"None"</span>, <span class="st">"Naive Bayes"</span>, <span class="st">"Random Forest"</span>, <span class="st">"Both"</span>])</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Classification Comparisson"</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-14-output-1.png" width="565" height="409" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-17-output-1.png" width="565" height="409" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>The areas where both classifiers agree include the larger forested regions, such as the <em>Nationalpark Donau-Auen</em> and the <em>Leithagebirge</em>. Additionally, both classifiers accurately identified the urban areas of Vienna and correctly excluded them from being classified as forested.</p>
-<div id="2362e0c5" class="cell" data-execution_count="14">
+<div id="b19bc4a9" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot only one class, either None (0), Naive Bayes (1), Random Forest (2), or Both (3)</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">8</span>))</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> axs.ravel()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    ax[i].imshow(double_clf<span class="op">==</span>i, cmap<span class="op">=</span><span class="st">'cmc.oleron_r'</span>, interpolation<span class="op">=</span><span class="st">'none'</span>)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    category <span class="op">=</span> [<span class="st">'by None'</span>, <span class="st">'only by Naive Bayes'</span>, <span class="st">'only by Random Forest'</span>, <span class="st">'by Both'</span>][i]</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="st">'Areas classified '</span> <span class="op">+</span> category</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    ax[i].set_title(title)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    ax[i].set_axis_off()</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot only one class, either None (0), Naive Bayes (1), Random Forest (2), or Both (3)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">8</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> axs.ravel()</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    ax[i].imshow(double_clf <span class="op">==</span> i, cmap<span class="op">=</span><span class="st">"cmc.oleron_r"</span>, interpolation<span class="op">=</span><span class="st">"none"</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    category <span class="op">=</span> [</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"by None"</span>,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"only by Naive Bayes"</span>,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"only by Random Forest"</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"by Both"</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    ][i]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> <span class="st">"Areas classified "</span> <span class="op">+</span> category</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    ax[i].set_title(title)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    ax[i].set_axis_off()</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-15-output-1.png" width="758" height="755" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-18-output-1.png" width="758" height="755" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -875,27 +1539,44 @@ weighted avg       0.95      0.95      0.95     12105
 <p>When plotting the classified areas individually, we observe that the Random Forest classifier mistakenly identified the Danube River as a forested area. Conversely, the Naive Bayes classifier erroneously classified a significant amount of cropland as forest.</p>
 <p>Finally, by analyzing the proportion of forested areas within the scene, we find that approximately 18% of the area is classified as forest, while around 66% is classified as non-forest. The remaining areas, which include water bodies and cropland, fall into less clearly defined categories.</p>
 <p>The accompanying bar chart illustrates the distribution of these classifications, highlighting the percentage of forested areas, non-forested areas, and regions classified by only one of the two classifiers. This visual representation helps to quantify the areas of agreement and disagreement between the classifiers, providing a clearer picture of their performance.</p>
-<div id="010f1a67" class="cell" data-execution_count="15">
+<div id="c590dc67" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> {}</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> num <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,<span class="dv">4</span>):</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    num_2_class <span class="op">=</span> {<span class="dv">0</span>: <span class="st">'None'</span>, <span class="dv">1</span>: <span class="st">'Naive Bayes'</span>, <span class="dv">2</span>: <span class="st">'Random Forest'</span>, <span class="dv">3</span>: <span class="st">'Both'</span>}</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    counts[num_2_class[num]] <span class="op">=</span> <span class="bu">int</span>((double_clf <span class="op">==</span> num).<span class="bu">sum</span>().values)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>class_counts_df <span class="op">=</span> pd.DataFrame(<span class="bu">list</span>(counts.items()), columns<span class="op">=</span>[<span class="st">'Class'</span>, <span class="st">'Count'</span>])</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>class_counts_df[<span class="st">'Percentage'</span>] <span class="op">=</span> (class_counts_df[<span class="st">'Count'</span>] <span class="op">/</span> class_counts_df[<span class="st">'Count'</span>].<span class="bu">sum</span>())<span class="op">*</span><span class="dv">100</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> class_counts_df.plot.bar(x<span class="op">=</span><span class="st">'Class'</span>, y<span class="op">=</span><span class="st">'Percentage'</span>, rot<span class="op">=</span><span class="dv">0</span>, color<span class="op">=</span><span class="st">'darkgreen'</span>, ylim<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">100</span>), title<span class="op">=</span><span class="st">'Classified Areas per Classificator (%)'</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Annotate the bars with the percentage values</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> ax.patches:</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    ax.annotate(<span class="ss">f'</span><span class="sc">{</span>p<span class="sc">.</span>get_height()<span class="sc">:.1f}</span><span class="ss">%'</span>, (p.get_x() <span class="op">+</span> p.get_width() <span class="op">/</span> <span class="fl">2.</span>, p.get_height()), </span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>                ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'center'</span>, xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">9</span>), textcoords<span class="op">=</span><span class="st">'offset points'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> {}</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> num <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">4</span>):</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    num_2_class <span class="op">=</span> {<span class="dv">0</span>: <span class="st">"None"</span>, <span class="dv">1</span>: <span class="st">"Naive Bayes"</span>, <span class="dv">2</span>: <span class="st">"Random Forest"</span>, <span class="dv">3</span>: <span class="st">"Both"</span>}</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    counts[num_2_class[num]] <span class="op">=</span> <span class="bu">int</span>((double_clf <span class="op">==</span> num).<span class="bu">sum</span>().values)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>class_counts_df <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">list</span>(counts.items()), columns<span class="op">=</span>[<span class="st">"Class"</span>, <span class="st">"Count"</span>]</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>class_counts_df[<span class="st">"Percentage"</span>] <span class="op">=</span> (</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    class_counts_df[<span class="st">"Count"</span>] <span class="op">/</span> class_counts_df[<span class="st">"Count"</span>].<span class="bu">sum</span>()</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> class_counts_df.plot.bar(</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"Class"</span>,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Percentage"</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    rot<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"darkgreen"</span>,</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    ylim<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">100</span>),</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Classified Areas per Classificator (%)"</span>,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Annotate the bars with the percentage values</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> ax.patches:</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    ax.annotate(</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>p<span class="sc">.</span>get_height()<span class="sc">:.1f}</span><span class="ss">%"</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>        (p.get_x() <span class="op">+</span> p.get_width() <span class="op">/</span> <span class="fl">2.0</span>, p.get_height()),</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>        ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>        va<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>        xytext<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">9</span>),</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>        textcoords<span class="op">=</span><span class="st">"offset points"</span>,</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Classification_files/figure-html/cell-16-output-1.png" width="575" height="449" class="figure-img"></p>
+<p><img src="Classification_files/figure-html/cell-19-output-1.png" width="575" height="449" class="figure-img"></p>
 </figure>
 </div>
 </div>
