@@ -1,0 +1,23 @@
+name: logarithmic-domain
+channels:
+  - conda-forge
+dependencies:
+  - cmcrameri
+  - dask
+  - ipywidgets
+  - ipympl
+  - jupyter
+  - mamba
+  - matplotlib
+  - numpy
+  - odc-stac
+  - pip
+  - pystac-client
+  - python=3.11
+  - rioxarray
+  - scipy
+  - seaborn
+  - xarray
+  - zarr
+  - pip:
+    - graphviz

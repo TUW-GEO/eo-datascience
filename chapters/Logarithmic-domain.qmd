@@ -1,0 +1,207 @@
+---
+title: The logarithmic domain
+# subtitle: How an 275 year old idea helps map the extent of floods
+jupyter:
+  kernelspec:
+    name: "classification"
+    language: "python"
+    display_name: "logarithmic-domain"
+---
+
+In this notebook, we are going to have a look at the conversion of units. Sentinel-1 data, and most other SAR data, is usually provided in decibels (dB). In this notebook, we will discover the advantages of displaying SAR data in decibels and why we need to convert the data to a linear scale in order to make meaningful calculations. Let's start with importing some libraries.
+
+\begin{align}
+    \text{logarithmic} &\longleftrightarrow \text{linear} \\
+    [\text{dB}] &\longleftrightarrow [\text{m}^2 \cdot \text{m}^{-2}]
+\end{align}
+
+
+```{python}
+import numpy as np
+import pystac_client
+import odc.stac
+import matplotlib.pyplot as plt
+import xarray as xr
+import rioxarray  # noqa
+```
+
+## Exploring the Data
+
+Let's start by loading some sample data, in order to demonstrate why this conversion is important.
+Here we will have a look at some SAR data from the Sentinel-1. The data is provided in decibels (dB).
+In the following example, we will:
+
+- load data from Sentinel-1
+- visualize the data in logarithmic scale
+- compare the data with linear scale
+
+## Search for some Data
+Now, we start by loading Sentinel-1 data from the `EODC` STAC Catalogue.
+
+```{python}
+# Define the spatial extent
+latmin, latmax = 48, 48.1
+lonmin, lonmax = 16.9, 17
+bounds = (lonmin, latmin, lonmax, latmax)
+
+# Define the temporal extent
+time_range = "2022-07-01/2022-07-07"
+
+# Search EODC Catalog
+items = (
+    pystac_client.Client.open("https://stac.eodc.eu/api/v1")
+    .search(
+        bbox=bounds,
+        collections=["SENTINEL1_SIG0_20M"],
+        datetime=time_range,
+        limit=100,
+    )
+    .item_collection()
+)
+print(len(items), "scenes found")
+```
+
+After we have found some scenes, lets load them into an xarray dataarray, inorder to work with it.
+
+```{python}
+bands = "VV"
+crs = "EPSG:27704"  # Coordinate Reference System: EQUI7 Grid of Europe
+res = 20  # 20 meter
+
+# Load Data into an xarray datacube
+sig0_dc = odc.stac.stac_load(
+    items,
+    bands=bands,
+    bbox=bounds,
+    chunks={"time": 5, "x": 600, "y": 600},
+)
+
+# Load metadata for the preprocessing
+nodata = items[0].assets["VV"].extra_fields["raster:bands"][0]["nodata"]
+scale = items[0].assets["VV"].extra_fields["raster:bands"][0]["scale"]
+
+# Preprocess the datacube
+sig0_dc = (sig0_dc.where(sig0_dc != nodata) / scale).VV
+sig0_dc
+```
+
+## Comparison of the Data in dB and Linear Scale
+
+In the next two cells we will select a subset of the data. This is done to reduce the amount of data we are working with. The precice workflow is not important for now, since the theory is explained after the cells. They are just here to show the data we are working with.
+
+```{python}
+# Select only an area of interest (aoi)
+aoi = sig0_dc.isel(time=4, x=slice(0, 500), y=slice(0, 500))
+
+# Convert data into linear domain
+aoi_lin = 10 ** (aoi / 10)
+
+# Plot the data/differences
+fig, ax = plt.subplots(2, 3, figsize=(11, 7))
+titles = [
+    (r"$\sigma^0$ [$dB$] (robust plot)", True, aoi, "imshow"),
+    (r"$\sigma^0$ [$dB$] (not robust plot)", False, aoi, "imshow"),
+    (r"$\sigma^0$ [$dB$] distribution", None, aoi, "hist"),
+    (r"$\sigma^0$ [$m^2 \cdot m^{-2}$] (robust plot)", True, aoi_lin, "imshow"),
+    (r"$\sigma^0$ [$m^2 \cdot m^{-2}$] (not robust plot)", False, aoi_lin, "imshow"),
+    (r"$\sigma^0$ [$m^2 \cdot m^{-2}$] distribution", None, aoi_lin, "hist"),
+]
+
+for ax_, (title, robust, data, plot_type) in zip(ax.ravel(), titles):
+    if plot_type == "imshow":
+        data.plot.imshow(robust=robust, ax=ax_, cmap="Greys_r")
+        ax_.set_aspect("equal")
+        ax_.axis("off")
+    else:
+        data.plot.hist(bins=50, ax=ax_, edgecolor="black")
+        ax_.set_ylabel("n (number of pixels)")
+        ax_.set_xlabel(title.split("[", 1)[0])
+    ax_.set_title(title)
+
+fig.suptitle(r"Sentinel-1 backscatter $\sigma^0$ comparison in linear and logarithmic domain")
+plt.tight_layout()
+plt.show()
+```
+
+*Figure 1: Visually comparing $\sigma^0$ on a logarithmic and linear scale (left column). In addition, the benefit of using the robust plotting method is shown (middle column). The robust argument uses the 2^nd^ and 98^th^ percentiles of the data to compute the color limits to eliminate washing out the plot due to data outliers.*
+
+In the plot above you can see the difference between the two scales. The values in dB are more evenly distributed and are therefore easier to plot. The values in linear scale are more spread out and are therefore harder to interpret.
+This is why we use the dB scale for plotting/visualization.
+
+While the logarithmic scale facilitates visual interpretation, it has implications for mathematical operations. In the following, we'll have a closer look at this. But first, let's see how we can convert between the linear and the logarithmic domains.
+
+
+## Conversion Formulas
+
+The decibel (dB) is a logarithmic unit used to express the ratio of two values of a physical quantity, often power or intensity. In the case of SAR data, the backscatter coefficient is often expressed in dB to facilitate visualization.
+
+In order to convert the data from dB to linear scale, we use the following formula.
+Let $D$ be the original value (dB) and $I$ the converted value ($m^2m^{-2}$). The conversion of units can be expressed as:
+$$
+D =  10  \cdot \log_{10} (I) = 10 \cdot \log_{10} (e) \cdot \ln (I)\longrightarrow [dB]
+$$
+Similarly, the conversion back to the original unit can be expressed as:
+$$
+I = e^{\frac{D}{10\cdot \log_{10}(e)}} = 10^{\frac{D}{10}} \longrightarrow [m^2m^{-2}]
+$$
+
+Now let's implement the conversion in Python.
+
+```{python}
+def lin2db(val: float | int) -> float:
+    """
+    Converts value from linear to dB units.
+
+    :param val: Value in linear units.
+    :type val: float|int
+    :return: Value in dB.
+    :rtype: float
+    """
+    return 10 * np.log10(val)
+
+
+def db2lin(val: float | int) -> float:
+    """
+    Converts value from dB to linear units.
+
+    :param val: Value in dB.
+    :type val: float|int
+    :return: Value in linear units.
+    :rtype: float
+    """
+    return 10 ** (val / 10)
+```
+
+When performing mathematical operations with SAR data it is important to be aware, that adding values in the logarithmic scale doesn't work in the same way as adding regular (linear) values. This is because in the logarithmic scale, each unit step represents an equal multiplication. This means that an addition of two values in the logarithmic scale equals a multiplication of the values in the linear scale. Vice versa, a subtraction in a logarithmic scale equals a division in a linear scale. Let's have a look at an example, where we add two values, once without the conversion to linear scale and once with the conversion to linear scale.
+
+```{python}
+# Logarithmic addition
+# Values in linear and decibel units
+val1_db, val2_db = 10, 12
+
+# Logarithmic addition
+sum_db = val1_db + val2_db
+print("\tLogarithmic Addition:")
+print(f"\tLogarithmic values: \t{val1_db: <5}, {val2_db: <5} [dB]")
+print(f"\tLogarithmic sum: \t\t{val1_db} + {val2_db} = {sum_db: <5} [dB]")
+
+# Linear addition
+val1_lin, val2_lin = db2lin(val1_db), db2lin(val2_db)
+sum_lin = val1_lin + val2_lin
+print("\n\tLinear Addition:")
+print(f"""\tLinear values: \t\t\t{val1_lin: <5}, {val2_lin: <5.2f} [lin]
+      \t\t\t\t\t\t(converted from dB)""")
+print(f"\tLinear sum: \t\t\t{val1_lin} + {val2_lin: .2f} = {sum_lin: .2f} [lin]")
+print(f"\t\t\t\t\t\t\t= {lin2db(sum_lin): .2f} [dB]")
+```
+
+As you can see, the values in dB and in linear scale differ quite a bit. In the example above, the values differ by a factor of around 6 when looked at in linear scale.
+
+This also becomes clear when you start considering the following addition in the logarthmic scale:
+\begin{align}
+  D_1 + D_2 &= 10 \cdot \log_{10}(I_1) + 10 \cdot \log_{10}(I_2) \\
+  &= 10 \cdot (\log_{10}(I_1) + \log_{10}(I_2))\\
+  &= 10 \cdot \log_{10}(I_1 \cdot I_2)
+\end{align}
+
+We can see that an **addition** in the logarithmic domain translates to a **multiplication**. Likewise a **subtraction** therefore translates to a **division**. This is of utmost importance to consider whenever you are handling SAR data, because often in earth observation we want to compute a mean or do other computations on the data, as this can lead to nonsensical data values.
