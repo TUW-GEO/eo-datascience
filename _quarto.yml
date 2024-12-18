@@ -13,6 +13,7 @@ book:
     - part: "Courses"
       chapters:
         - chapters/Placeholder.qmd
+        - chapters/Logarithmic-domain.qmd
     - part: "Tutorials"
       chapters:
         - chapters/Classification.qmd
