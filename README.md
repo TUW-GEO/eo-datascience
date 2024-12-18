@@ -58,6 +58,9 @@ pre-commit install
 The pre configured hooks check for: - trailing whitspaces - large
 files - private keys - and renders the README file
 
+The file `.pre-commin-config.yaml` hereby specifies what hooks should be
+run.
+
 The `git workflow` essentialy converts the quarto files in `chapters`
 into jupyter notebooks, generates a file for the table of contents and
 pushes these files together with the **Makefile** and the
