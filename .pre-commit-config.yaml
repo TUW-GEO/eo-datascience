@@ -11,3 +11,11 @@ repos:
     rev: 0.7.1
     hooks:
       - id: nbstripout
+
+  - repo: local
+    hooks:
+      - id: render-readme
+        name: render README
+        entry: .hooks/render-readme.sh
+        language: system
+        files: ^README\.qmd$
