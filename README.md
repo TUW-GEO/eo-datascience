@@ -55,8 +55,12 @@ pip install pre-commit
 pre-commit install
 ```
 
-The pre configured hooks check for: - trailing whitspaces - large
-files - private keys - and renders the README file
+The pre configured hooks check for:
+
+-   trailing whitspaces
+-   large files
+-   private keys
+-   and renders the README file
 
 The file `.pre-commin-config.yaml` hereby specifies what hooks should be
 run.
