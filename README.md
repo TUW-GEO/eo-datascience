@@ -1,5 +1,7 @@
-# Earth Observation Datascience
-
+---
+title: Earth Observation Datascience
+toc-title: Table of contents
+---
 
 This is a book on Earth Observation Datascience, consisting of common
 workflows in Python at the Department of Geodesy and Geoinformation at
@@ -36,7 +38,7 @@ following steps:
     `_quarto.yml` file
 4)  Add references to `chapter/references.bib`
 
-Don’t worry if your original file is an Jupyter Notebook. Jupyter
+Don't worry if your original file is an Jupyter Notebook. Jupyter
 notebooks can be easily converted to quarto files by using:
 
 ``` {bash}
@@ -52,6 +54,9 @@ This can be achieved, like so:
 pip install pre-commit
 pre-commit install
 ```
+
+The pre configured hooks check for: - trailing whitspaces - large
+files - private keys - and renders the README file
 
 The `git workflow` essentialy converts the quarto files in `chapters`
 into jupyter notebooks, generates a file for the table of contents and
