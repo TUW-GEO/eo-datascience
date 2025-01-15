@@ -33,7 +33,8 @@ book:
   appendices:
     - part: "Templates"
       chapters:
-        - chapters/templates/classification.qmd
+        - chapters/templates/ml-classification.qmd
+        - chapters/templates/index-classification.qmd
     - part: "Tutorials"
       chapters:
         - chapters/tutorials/floodmapping.qmd

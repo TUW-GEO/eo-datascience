@@ -1,0 +1,332 @@
+---
+title: Alpine Snow Mapping
+subtitle: Snow Classification with NDVI and NDSI
+jupyter:
+  kernelspec:
+    name: "classification"
+    language: "python"
+    display_name: "classification"
+---
+
+In this chapter we are gonna deploy a threshold based landcover classifier,
+which is based on the Normalized Difference Vegetation Index (NDVI) and
+the Normalized Difference Snow Index (NDSI). The classifier will be able to
+distinguish between snow, vegetation and other landcover types.
+
+## Data Acquisition
+First lets start by importing the necessary libraries.
+
+```{python}
+from datetime import datetime, timedelta
+
+import xarray as xr
+import pystac_client
+import odc.stac
+import rioxarray  # noqa: F401
+from odc.geo.geobox import GeoBox
+
+import cmcrameri as cmc  # noqa: F401
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import numpy as np
+import folium
+from shapely.geometry import box
+import seaborn as sns
+```
+
+We are gonna start of by loading some data from sentinel-2 MSI. The study area
+is located in the in the center of austria, in the alps. This location has been
+choosen, since there is a lot of snow in the winter and a lot of vegetation
+in the summer.
+
+```{python}
+dx = 0.0006  # 0.0006 = 60m resolution
+epsg = 4326
+
+# Set Spatial extent
+latmin, latmax = 47.3, 47.7
+lonmin, lonmax = 13.4, 13.9
+bounds = (lonmin, latmin, lonmax, latmax)
+
+
+# Set Temporal extent
+start_date = datetime(year=2024, month=1, day=1)
+end_date = start_date + timedelta(days=30)
+
+time_format = "%Y-%m-%d"
+date_query = start_date.strftime(time_format) + "/" + end_date.strftime(time_format)
+
+# Search for Sentinel-2 data
+items = pystac_client.Client.open(
+    "https://earth-search.aws.element84.com/v1"
+).search(
+    bbox=bounds,
+    collections=["sentinel-2-l2a"],
+    datetime=date_query,
+    limit=100,
+).item_collection()
+print(len(items), 'scenes found')
+```
+
+```{python}
+# define a geobox for my region
+geobox = GeoBox.from_bbox(bounds, crs=f"epsg:{epsg}", resolution=dx)
+
+# lazily combine items into a datacube
+dc = odc.stac.load(
+    items,
+    bands=["scl", "red", "green", "blue", "nir", "swir16"],
+    chunks={'time': 5, 'x': 600, 'y': 600},
+    geobox=geobox,
+    resampling="bilinear",
+)
+dc
+```
+
+Now that we have loaded the data into the notebook, lets have a look at the
+map, where the study area is situated.
+
+```{python}
+bbox = box(*dc.rio.transform_bounds("EPSG:4326"))
+zoom = 10
+
+fmap = folium.Map(
+    location=[bbox.centroid.y, bbox.centroid.x],
+    zoom_start=zoom,
+    min_zoom=zoom,
+    max_zoom=zoom,
+    zoom_control=False,
+)
+folium.Rectangle(
+    [[latmin, lonmin], [latmax, lonmax]], color="red", fill=True
+).add_to(fmap)
+fmap
+```
+
+## Preprocessing
+
+```{python}
+# define a mask for valid pixels (non-cloud)
+def is_valid_pixel(data):
+    # include only vegetated, not_vegitated, water, and snow
+    return ((data > 3) & (data < 7)) | (data == 11)
+
+# Preprocess the data
+dc["valid"] = is_valid_pixel(dc.scl)
+dc = dc.where(dc != 0) # remove zeros
+```
+
+```{python}
+# Resample the data to daily
+dc = dc.resample(time="1D").median()
+dc = dc.dropna(dim="time", how="all",subset=["valid"])
+```
+
+As we are mostly interested in the winter months, we select the data from
+a single date in the winter. But keep in mind that we do not want to have any
+clouds in the image, since itis gona mess with the classification.
+
+So lets have a look at the data from the 10th of January 2024.
+
+```{python}
+# Select a time instance and plot the RGB image
+# Tip: use the following command for an easier selection:
+# dc.red.plot.imshow(col='time', col_wrap=5, robust=True)
+
+# calculate the image aspect ratio
+size = 6
+aspect_ratio = dc.sizes["latitude"] / dc.sizes["longitude"]
+
+date = "2024-01-10"
+
+
+fig, ax = plt.subplots(figsize=(size, size // aspect_ratio))
+rgb = (
+    dc[["red", "green", "blue"]]  # select bands
+    .sel(time=date, method="nearest") # select a time instance
+    .to_array() # convert to single array
+    .plot.imshow(robust=True, ax=ax) # remove outliers and plot
+).axes.set_title("Study Area - Dachstein")
+
+plt.show()
+```
+
+At this point we have done all the preparation work and can start with the
+actual classification. Therefore we are gonna calculate the NDVI and NDSI.
+Additionally the brightness is also calculated, since it we can utilize it in
+a future step, to evaluate where the thresholds should be set.
+
+```{python}
+# NDSI and NDVI
+def normalized_difference(a, b):
+    return (a - b * 1.0) / (a + b)
+
+
+dc['ndvi'] = normalized_difference(dc.nir, dc.red)
+dc['ndsi'] = normalized_difference(dc.green, dc.swir16)
+
+dc['brightness'] = (dc.red * 0.2126 + dc.green * 0.7152 + dc.blue * 0.0722)
+
+subset = dc.sel(time=date, method="nearest")
+```
+
+```{python}
+fig, ax = plt.subplots(1, 2, figsize=(14,6))
+
+subset["ndsi"].plot.imshow(
+    vmin=-1,
+    vmax=1,
+    cmap="RdYlBu",
+    ax=ax[0],
+).axes.set_title("NDSI")
+
+subset["ndvi"].plot.imshow(
+    vmin=-1,
+    vmax=1,
+    cmap="RdYlGn",
+    ax=ax[1],
+).axes.set_title("NDVI")
+
+plt.tight_layout()
+plt.show()
+```
+
+In order to get a better understanding of the data, we are gonna plot each
+pixel in a scatter plot, where the x-axis is the NDVI and the y-axis is the
+NDSI. This can be useful to understand the distribution of the data.
+
+```{python}
+# scatter plot of NDSI and NDVI colored by brightness
+subset.plot.scatter(
+    x="ndvi",
+    y="ndsi",
+    ec='none',
+    hue="brightness",
+    alpha=0.07,
+    xlim=(-1, 1),
+    ylim=(-1, 1),
+)
+```
+
+As we can see in the scatter plot, the data is clustered together, which
+would make it hard to intuitively set the thresholds. Therefore we are gonna
+have a look at some literature. In there we find, that typical NDVI values
+for snow are between -0.1 and 0.1 and for vegetation between 0.2 and 0.9.
+NDSI values for snow are typically higher then 0.4.
+
+```{python}
+ndvi_vals = subset.ndvi.values.flatten()
+ndsi_vals = subset.ndsi.values.flatten()
+
+sns.jointplot(x=ndvi_vals, y=ndsi_vals, kind='hist')
+plt.grid()
+plt.show()
+```
+
+## Classify
+
+Based on these informations lets define some thresholds. For the classification
+a mask is created, which is then applied to the data.
+
+```{python}
+# setting the thresholds
+# https://custom-scripts.sentinel-hub.com/custom-scripts/sentinel-2/snow_classifier/
+# https://www.usgs.gov/special-topics/remote-sensing-phenology/science/ndvi-foundation-remote-sensing-phenology
+
+# snow: NDSI > 0.6 and -0.1 < NDVI < 0.1
+# partial snow: NDSI > 0.25 and -0.1 < NDVI < 0.1
+# healthy vegetation: NDVI > 0.45
+# vegetation: 0.1 < NDVI < 0.45
+# unclassified: everything else
+
+ndvi_vital_vegetation_threshold = 0.45
+ndvi_vegetation_threshold = 0.3
+ndvi_snow_threshold = 0.1
+ndsi_complete_snow_threshold = 0.6
+ndsi_incomplete_snow_threshold = 0.25
+
+
+classification = xr.zeros_like(subset.ndvi)
+classification = classification.rename("classification")
+
+classification = classification.where(
+    ~((subset.ndvi >= -ndvi_snow_threshold) & (subset.ndvi <= ndvi_snow_threshold) & (subset.ndsi >= 0.6)),
+    other=1,
+)  # Snow-Covered Areas
+classification = classification.where(
+    ~(
+        (subset.ndvi >= -ndvi_snow_threshold)
+        & (subset.ndvi <= ndvi_snow_threshold)
+        & (ndsi_incomplete_snow_threshold <= subset.ndsi)
+        & (subset.ndsi <= ndsi_complete_snow_threshold)
+    ),
+    other=2,
+)  # Partly Snow-Covered Areas
+classification = classification.where(
+    ~((ndvi_snow_threshold < subset.ndvi) & (subset.ndvi <= ndvi_vegetation_threshold)),
+    other=3,
+)  # non-Vegetated Areas
+classification = classification.where(
+    ~((ndvi_vegetation_threshold < subset.ndvi) & (subset.ndvi <= ndvi_vital_vegetation_threshold)),
+    other=4,
+)  # Vegetated Areas
+classification = classification.where(
+    ~(subset.ndvi > ndvi_vital_vegetation_threshold), other=5
+)  # healthy Vegetated Areas
+classification = classification.where(
+    classification != 0, other=6
+)  # Uncertain Areas
+
+subset['classification'] = classification
+```
+
+Now most of the _magic_ is done and all that is left to do is to plot the
+classified image.
+
+```{python}
+ccmap = mcolors.ListedColormap(['aliceblue', 'lightblue', 'burlywood', 'lightgreen', 'green', 'black'])
+num_classes = len(ccmap.colors)
+
+bounds = np.linspace(0.5,num_classes + 0.5 ,num_classes+1)
+norm = mcolors.BoundaryNorm(bounds, ccmap.N)
+labels = ["complete snow coverage", "incomplete snowcover", "dead vegetation", "vegetation", "vital vegetation", "uncertain"]
+tick_location = np.linspace(1,num_classes,num_classes)
+
+fig, ax = plt.subplots(1,2,figsize=(12,5))
+
+rgb = (
+    dc[["red", "green", "blue"]]  # select bands
+    .sel(time=date, method="nearest") # select a time instance
+    .to_array() # convert to single array
+    .plot.imshow(robust=True, ax=ax[0]) # remove outliers and plot
+).axes.set_title("Study Area - Dachstein")
+
+im = classification.plot.imshow(ax=ax[1], cmap=ccmap, norm=norm, cbar_kwargs={'ticks':tick_location})
+cbar = im.colorbar
+cbar.set_ticklabels(labels)
+ax[1].set_title("Land Cover Classification")
+plt.tight_layout()
+plt.show()
+```
+
+Lastly we can revisit the scatter plot and color the points by the
+classification. This will give us a better understanding of how the
+classificator is working.
+
+```{python}
+im = subset.plot.scatter(
+    x="ndvi",
+    y="ndsi",
+    ec='none',
+    hue="classification",
+    cmap=ccmap,
+    norm=norm,
+    xlim=(-1, 1),
+    ylim=(-1, 1),
+    cbar_kwargs={'ticks':tick_location}
+)
+cbar = im.colorbar
+cbar.set_ticklabels(labels)
+```
+
+
