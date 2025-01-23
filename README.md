@@ -1,5 +1,7 @@
-# Earth Observation Datascience
-
+---
+title: Earth Observation Datascience
+toc-title: Table of contents
+---
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/tuw-geo/eo-datascience/main)
 
@@ -38,7 +40,7 @@ following steps:
     `_quarto.yml` file
 4)  Add references to `chapter/references.bib`
 
-Don’t worry if your original file is an Jupyter Notebook. Jupyter
+Don't worry if your original file is an Jupyter Notebook. Jupyter
 notebooks can be easily converted to quarto files by using:
 
 ``` {bash}
@@ -54,6 +56,16 @@ This can be achieved, like so:
 pip install pre-commit
 pre-commit install
 ```
+
+The pre configured hooks check for:
+
+-   trailing whitspaces
+-   large files
+-   private keys
+-   and renders the README file
+
+The file `.pre-commin-config.yaml` hereby specifies what hooks should be
+run.
 
 The `git workflow` essentialy converts the quarto files in `chapters`
 into jupyter notebooks, generates a file for the table of contents and
