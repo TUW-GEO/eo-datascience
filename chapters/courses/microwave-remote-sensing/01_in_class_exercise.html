@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../site_libs/bootstrap/bootstrap-78faf54a06e50be45dc6d83ab59297a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-72c93205fb41c15e2e398b4f9a505ee2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -328,14 +328,14 @@ background: #006699;
 
 
 <p>This notebook demonstrates how to access radar data in a SpatioTemporal Asset Catalog (STAC) Catalogue using the <code>pystac</code> library. In this example, we use Sentinel-1 data from the EODC (earth observation data and high performance computing service provider based in Vienna) STAC catalog. In the further process, we will learn how to query a STAC catalog, select specific items, and display the metadata and the actual image.</p>
-<div id="2027e19d" class="cell" data-execution_count="2">
+<div id="ee4184b2" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pystac_client</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> folium</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> odc <span class="im">import</span> stac <span class="im">as</span> odc_stac</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="data-discovery" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="data-discovery"><span class="header-section-number">1.1</span> Data Discovery</h2>
-<div id="e7ead5ba" class="cell" data-execution_count="3">
+<div id="35722d55" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>eodc_catalog <span class="op">=</span> pystac_client.Client.<span class="bu">open</span>(<span class="st">"https://stac.eodc.eu/api/v1"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>eodc_catalog</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -398,7 +398,7 @@ background: #006699;
                     
         <li class="pystac-row">
             <span class="pystac-k">stac_version</span>
-            <span class="pystac-v">"1.0.0"</span>
+            <span class="pystac-v">"1.1.0"</span>
         </li>
     
                 
@@ -3548,7 +3548,7 @@ background: #006699;
 </div>
 <p>The URL <code>https://stac.eodc.eu/api/v1</code>, served over Hypertext Transfer Protocol (HTTP), is a STAC-compliant API endpoint (specific URL address where an API service is available) that leads to the EODC Catalogue. Besides EODC’s, other catalogues can be found on <a href="https://stacindex.org/catalogs">STAC Index</a>, such as United States Geological Survey (USGS) Landsat imagery, Sentinel Hub, Copernicus Data Space Ecosystem, and so on. Briefly spoken, STAC can be used to search, discover, and access metadata of these datasets with the same code. The EODC Catalogue can be accessed on the web via this <a href="https://services.eodc.eu/browser/#/?.language=en">link</a> as well.</p>
 <p>Each STAC catalog, composed by different providers, has many collections. To get all collections of a catalog, we can print all of them and their ids, which are used to fetch them from the catalog.</p>
-<div id="a41bcee9" class="cell" data-execution_count="4">
+<div id="ff99b56c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>collections <span class="op">=</span> eodc_catalog.get_collections()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># length of string of collection.id, for pretty print</span></span>
@@ -3609,7 +3609,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 </div>
 </div>
 <p>To get a specific collection from the catalog, we can use the <code>client.get_collection()</code> method and provide the collection name. We can then display its description, id, temporal and spatial extent, license, etc. In this notebook, we will work with the Sentinel-1 sigma naught 20m collection.</p>
-<div id="7b7398f6" class="cell" data-execution_count="5">
+<div id="8332cf65" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>colllection_id <span class="op">=</span> <span class="st">"SENTINEL1_SIG0_20M"</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>collection <span class="op">=</span> eodc_catalog.get_collection(colllection_id)</span>
@@ -3673,7 +3673,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
                     
         <li class="pystac-row">
             <span class="pystac-k">stac_version</span>
-            <span class="pystac-v">"1.0.0"</span>
+            <span class="pystac-v">"1.1.0"</span>
         </li>
     
                 
@@ -5266,21 +5266,21 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 </div>
 </div>
 <p>Each collection has multiple items. An item is one spatio-temporal instance the collection, for instance a satellite image. If items are needed for a specific timeframe or for a specific region of interest, we can define this as a query.</p>
-<div id="1d722218" class="cell" data-execution_count="6">
+<div id="2ed98968" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>time_range <span class="op">=</span> <span class="st">"2022-10-01/2022-10-07"</span>  <span class="co"># a closed range</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># time_range = "2022-01"  # whole month, same can be done for a year and a day</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># time_range = "2022-01-01/.."  # up to the current date, an open range</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># time_range = "2022-01-01T05:34:46"  # a specific time instance</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A spatial region of interest can be defined in different ways. One option is to define a simple bounding box:</p>
-<div id="1b21b06b" class="cell" data-execution_count="7">
+<div id="ea1ba8ac" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>latmin, latmax <span class="op">=</span> <span class="fl">46.3</span>, <span class="fl">49.3</span>  <span class="co"># South to North</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>lonmin, lonmax <span class="op">=</span> <span class="fl">13.8</span>, <span class="fl">17.8</span>  <span class="co"># West to East</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>bounding_box <span class="op">=</span> [lonmin, latmin, lonmax, latmax]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>If the region of interest is not rectangular, we can also define a polygon:</p>
-<div id="a13f5354" class="cell" data-execution_count="8">
+<div id="88ac1b03" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GEOJSON can be created on geojson.io</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># This specific area of interest is a rectangle, but since it is</span></span>
@@ -5300,7 +5300,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Using our previously loaded STAC catalog, we can now search for items full-filling our query. In this example we are using the bounding box. If we want to use an area of interest specified in the geojson format - one hast to use the intersects parameter as documented in the comment below.</p>
-<div id="0c1e9367" class="cell" data-execution_count="9">
+<div id="0d3a18a6" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>search <span class="op">=</span> eodc_catalog.search(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    collections<span class="op">=</span>colllection_id,  <span class="co"># can also be a list of several collections</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    bbox<span class="op">=</span>bounding_box,  <span class="co"># search by bounding box</span></span>
@@ -5319,7 +5319,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 </div>
 </div>
 <p>Now, we can fetch a single item, in this case a Sentinel-1 image, from the query results. A good practice is to always check what metadata the data provider has stored on the item level. This can be done by looking into the item properties.</p>
-<div id="a3eb5c60" class="cell" data-execution_count="10">
+<div id="680f9311" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>item <span class="op">=</span> items_eodc[<span class="dv">0</span>]</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>item.properties</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -5359,7 +5359,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 </div>
 </div>
 <p>For now, let’s display only the vertical-vertical (VV) polarized band of the item and some information about the data.</p>
-<div id="5584d795" class="cell" data-execution_count="11">
+<div id="660aaed1" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>item.assets[<span class="st">"VV"</span>].extra_fields.get(<span class="st">"raster:bands"</span>)[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>{'scale': 10,
@@ -5370,14 +5370,14 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 </div>
 </div>
 <p>In the EODC STAC catalogue an item can conveniently be displayed using its thumbnail.</p>
-<div id="9065e46c" class="cell" data-execution_count="12">
+<div id="d1e54b3f" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>item.assets[<span class="st">"thumbnail"</span>].href</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>'https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170811__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail'</code></pre>
 </div>
 </div>
 <p>Now we will plot the data on a map using the thumbnail and the python package <a href="https://python-visualization.github.io/folium/latest/user_guide.html">folium</a>. This is an easy way to quickly check how the data found by a search query looks on a map.</p>
-<div id="e86444a5" class="cell" data-execution_count="13">
+<div id="6f3ba6cc" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">map</span> <span class="op">=</span> folium.Map(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    location<span class="op">=</span>[(latmin <span class="op">+</span> latmax) <span class="op">/</span> <span class="dv">2</span>, (lonmin <span class="op">+</span> lonmax) <span class="op">/</span> <span class="dv">2</span>],</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    zoom_start<span class="op">=</span><span class="dv">7</span>,</span>
@@ -5428,7 +5428,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             <meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; />
             <style>
-                #map_e71015fc6c658b097dab746cb09aad08 {
+                #map_fb5499a19084f9bc722970b09e5ec570 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -5455,14 +5455,14 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 <body>
     
     
-            <div class=&quot;folium-map&quot; id=&quot;map_e71015fc6c658b097dab746cb09aad08&quot; ></div>
+            <div class=&quot;folium-map&quot; id=&quot;map_fb5499a19084f9bc722970b09e5ec570&quot; ></div>
         
 </body>
 <script>
     
     
-            var map_e71015fc6c658b097dab746cb09aad08 = L.map(
-                &quot;map_e71015fc6c658b097dab746cb09aad08&quot;,
+            var map_fb5499a19084f9bc722970b09e5ec570 = L.map(
+                &quot;map_fb5499a19084f9bc722970b09e5ec570&quot;,
                 {
                     center: [47.8, 15.8],
                     crs: L.CRS.EPSG3857,
@@ -5481,7 +5481,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 
         
     
-            var tile_layer_5703cb951a7dce630ac619f8a4d6b0f1 = L.tileLayer(
+            var tile_layer_3e34d3362ec57a91dc36aae86ce69b0d = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {
   &quot;minZoom&quot;: 0,
@@ -5498,34 +5498,34 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            tile_layer_5703cb951a7dce630ac619f8a4d6b0f1.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            tile_layer_3e34d3362ec57a91dc36aae86ce69b0d.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
 
-        function geo_json_cdd1dd9f9f472c71510a4ed2af10ce80_onEachFeature(feature, layer) {
+        function geo_json_a57ac5f646d065dbccebb296db88dd6c_onEachFeature(feature, layer) {
             layer.on({
             });
         };
-        var geo_json_cdd1dd9f9f472c71510a4ed2af10ce80 = L.geoJson(null, {
-                onEachFeature: geo_json_cdd1dd9f9f472c71510a4ed2af10ce80_onEachFeature,
+        var geo_json_a57ac5f646d065dbccebb296db88dd6c = L.geoJson(null, {
+                onEachFeature: geo_json_a57ac5f646d065dbccebb296db88dd6c_onEachFeature,
             
             ...{
 }
         });
 
-        function geo_json_cdd1dd9f9f472c71510a4ed2af10ce80_add (data) {
-            geo_json_cdd1dd9f9f472c71510a4ed2af10ce80
+        function geo_json_a57ac5f646d065dbccebb296db88dd6c_add (data) {
+            geo_json_a57ac5f646d065dbccebb296db88dd6c
                 .addData(data);
         }
-            geo_json_cdd1dd9f9f472c71510a4ed2af10ce80_add({&quot;coordinates&quot;: [[[17.710928010825853, 49.257630084442496], [13.881798300915221, 49.257630084442496], [13.881798300915221, 46.34747715326259], [17.710928010825853, 46.34747715326259], [17.710928010825853, 49.257630084442496]]], &quot;type&quot;: &quot;Polygon&quot;});
-        geo_json_cdd1dd9f9f472c71510a4ed2af10ce80.setStyle(function(feature) {return feature.properties.style;});
+            geo_json_a57ac5f646d065dbccebb296db88dd6c_add({&quot;coordinates&quot;: [[[17.710928010825853, 49.257630084442496], [13.881798300915221, 49.257630084442496], [13.881798300915221, 46.34747715326259], [17.710928010825853, 46.34747715326259], [17.710928010825853, 49.257630084442496]]], &quot;type&quot;: &quot;Polygon&quot;});
+        geo_json_a57ac5f646d065dbccebb296db88dd6c.setStyle(function(feature) {return feature.properties.style;});
 
         
     
-            geo_json_cdd1dd9f9f472c71510a4ed2af10ce80.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            geo_json_a57ac5f646d065dbccebb296db88dd6c.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_9c2a4ee4ac8a78d994aaa172e6ec8460 = L.imageOverlay(
+            var image_overlay_86a9369cdfc0b7247800a2eb5991e2ef = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170811__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5533,10 +5533,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_9c2a4ee4ac8a78d994aaa172e6ec8460.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_86a9369cdfc0b7247800a2eb5991e2ef.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_c4fdee52d60f4c59de15e84b1cc0d647 = L.imageOverlay(
+            var image_overlay_0fadf071b89d04df1dc6a0a631882e3a = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170746__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5544,10 +5544,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_c4fdee52d60f4c59de15e84b1cc0d647.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_0fadf071b89d04df1dc6a0a631882e3a.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_c005cf56777dd203c5b80a35f40b0fb4 = L.imageOverlay(
+            var image_overlay_59e6e9cfc74a4788f7f9dbe372915a83 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170721__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5555,10 +5555,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_c005cf56777dd203c5b80a35f40b0fb4.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_59e6e9cfc74a4788f7f9dbe372915a83.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_1d57c423100a02c585375db427254660 = L.imageOverlay(
+            var image_overlay_75d9fb9c62a488318c22c8eb0106613a = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221007T170721__VV_A117_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5566,10 +5566,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_1d57c423100a02c585375db427254660.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_75d9fb9c62a488318c22c8eb0106613a.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_85b10ffd8873972d03df923c5cf0e3db = L.imageOverlay(
+            var image_overlay_534a78b005c58a236979370b6a342e0f = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221007T170656__VV_A117_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5577,10 +5577,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_85b10ffd8873972d03df923c5cf0e3db.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_534a78b005c58a236979370b6a342e0f.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_b7917a41a1763e380ca13ff3ccaad415 = L.imageOverlay(
+            var image_overlay_b90d182b8ba5f883f2cd6018e4c6748b = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221007T170631__VV_A117_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5588,10 +5588,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_b7917a41a1763e380ca13ff3ccaad415.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_b90d182b8ba5f883f2cd6018e4c6748b.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_7899a01a503c0fd61f94588fb72a2456 = L.imageOverlay(
+            var image_overlay_36e75d56d407a539754e5216d6163c77 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221006T051947__VV_D095_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5599,10 +5599,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_7899a01a503c0fd61f94588fb72a2456.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_36e75d56d407a539754e5216d6163c77.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_44c1bd2a875f7213d6a4a05ef1495598 = L.imageOverlay(
+            var image_overlay_2211e2373c2cfd734c203f15d2f1337f = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221006T051922__VV_D095_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5610,10 +5610,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_44c1bd2a875f7213d6a4a05ef1495598.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_2211e2373c2cfd734c203f15d2f1337f.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_c8bf84985d1e69fc3b24e95759421088 = L.imageOverlay(
+            var image_overlay_4f6d193c5d38fa7b6ce440d758ca567d = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221006T051857__VV_D095_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5621,10 +5621,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_c8bf84985d1e69fc3b24e95759421088.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_4f6d193c5d38fa7b6ce440d758ca567d.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_e3df7951954316c0eeb0e24e03a74823 = L.imageOverlay(
+            var image_overlay_58cdebed7800b79166d602efdcdc12f9 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221006T051857__VV_D095_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5632,10 +5632,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_e3df7951954316c0eeb0e24e03a74823.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_58cdebed7800b79166d602efdcdc12f9.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_d4bd41212fbfb6fae0c12de8153d12a5 = L.imageOverlay(
+            var image_overlay_0a56c126b28bf7da8474b46a67660af5 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221006T051857__VV_D095_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5643,10 +5643,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_d4bd41212fbfb6fae0c12de8153d12a5.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_0a56c126b28bf7da8474b46a67660af5.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_f20610234d0fd478323945634b857aa8 = L.imageOverlay(
+            var image_overlay_1ffc2b8cd3765e420b5270339a6e9b5a = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221006T051857__VV_D095_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5654,10 +5654,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_f20610234d0fd478323945634b857aa8.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_1ffc2b8cd3765e420b5270339a6e9b5a.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_97421f71a11d817a256e7d216c7fd8e7 = L.imageOverlay(
+            var image_overlay_dbc6816217daca484f4639a692422fbc = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221006T051832__VV_D095_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5665,10 +5665,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_97421f71a11d817a256e7d216c7fd8e7.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_dbc6816217daca484f4639a692422fbc.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_22e5d2fbcfdb98036698c561e521dc8f = L.imageOverlay(
+            var image_overlay_aca47e12600849f7725e8943654ff307 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221006T051832__VV_D095_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5676,10 +5676,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_22e5d2fbcfdb98036698c561e521dc8f.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_aca47e12600849f7725e8943654ff307.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_822b07d1fe03162e38a9aa47921e4767 = L.imageOverlay(
+            var image_overlay_9279690269daa3df0fb9705a2e14c1fb = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221006T051807__VV_D095_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5687,10 +5687,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_822b07d1fe03162e38a9aa47921e4767.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_9279690269daa3df0fb9705a2e14c1fb.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_f0d787a382a1c1b3c2f2d940c7ca5caa = L.imageOverlay(
+            var image_overlay_27af8a8e70efd060624a802a047d0e05 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221006T051807__VV_D095_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5698,10 +5698,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_f0d787a382a1c1b3c2f2d940c7ca5caa.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_27af8a8e70efd060624a802a047d0e05.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_c34750bf85c63a421f85eaee9ef8802e = L.imageOverlay(
+            var image_overlay_a467c27b85efbd7c68440669bcd4a78f = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221004T164341__VV_A073_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5709,10 +5709,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_c34750bf85c63a421f85eaee9ef8802e.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_a467c27b85efbd7c68440669bcd4a78f.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_f7cb9df2a7b92ec9c180e04b648a41ac = L.imageOverlay(
+            var image_overlay_21e5ba88bd88c12b5008c6d07b0d7ecd = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221004T164316__VV_A073_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5720,10 +5720,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_f7cb9df2a7b92ec9c180e04b648a41ac.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_21e5ba88bd88c12b5008c6d07b0d7ecd.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_68792a5b1a71d32c989f336d810d8463 = L.imageOverlay(
+            var image_overlay_cca930b0513bf205457b7c28cbbc5c32 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221004T164251__VV_A073_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5731,10 +5731,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_68792a5b1a71d32c989f336d810d8463.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_cca930b0513bf205457b7c28cbbc5c32.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_dfc27a4e5790d9ca832ad4e3dbf00877 = L.imageOverlay(
+            var image_overlay_b4cf42daa0bad70d07f8ee8bcb40ee0e = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221004T164251__VV_A073_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5742,10 +5742,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_dfc27a4e5790d9ca832ad4e3dbf00877.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_b4cf42daa0bad70d07f8ee8bcb40ee0e.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_45e51572ec215763ec4fc4267e4db770 = L.imageOverlay(
+            var image_overlay_56b234092523350cdbde54d282e70f13 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221004T164226__VV_A073_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5753,10 +5753,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_45e51572ec215763ec4fc4267e4db770.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_56b234092523350cdbde54d282e70f13.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_b04f3fd0daa3cb79769713e08718e83c = L.imageOverlay(
+            var image_overlay_2026b82d21acb02c4e7b340bd64b4192 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221004T164201__VV_A073_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5764,10 +5764,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_b04f3fd0daa3cb79769713e08718e83c.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_2026b82d21acb02c4e7b340bd64b4192.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_fe18f11a07146358cbfea9664dc4d469 = L.imageOverlay(
+            var image_overlay_8be778d4be456109ca9db4be6967a989 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221004T053519__VV_D066_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5775,10 +5775,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_fe18f11a07146358cbfea9664dc4d469.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_8be778d4be456109ca9db4be6967a989.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_474139750f0d34b8d1b5a8219fdf3ec0 = L.imageOverlay(
+            var image_overlay_9cab35c650d8160971668e0e711f1dac = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221004T053454__VV_D066_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5786,10 +5786,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_474139750f0d34b8d1b5a8219fdf3ec0.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_9cab35c650d8160971668e0e711f1dac.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_9cb2cd4ff11dff2e5d18799f32807bad = L.imageOverlay(
+            var image_overlay_e771ed98309097d95ccdcbf29a266ec6 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_NA020M/E036N075T3/SIG0_20221003T180255__VV_D059_E036N075T3_NA020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[48.75587082731082, -178.46985883164925], [51.96814685810471, 179.79983153410512]],
                 {
@@ -5797,10 +5797,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_9cb2cd4ff11dff2e5d18799f32807bad.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_e771ed98309097d95ccdcbf29a266ec6.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_50a8c52052c4fb8cffd3f347d961c3e1 = L.imageOverlay(
+            var image_overlay_781a9056f1d62eed2394c135417f4ee8 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221003T045452__VV_D051_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5808,10 +5808,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_50a8c52052c4fb8cffd3f347d961c3e1.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_781a9056f1d62eed2394c135417f4ee8.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_b72e568fd9588003fb69e0c71c4bbe96 = L.imageOverlay(
+            var image_overlay_b1f0619a60c04eb7f9817f65ec63a2b7 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221003T045427__VV_D051_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5819,10 +5819,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_b72e568fd9588003fb69e0c71c4bbe96.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_b1f0619a60c04eb7f9817f65ec63a2b7.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_1b8445c0c8589f7bfdbe9859b4a43f5d = L.imageOverlay(
+            var image_overlay_ff502ff603fb3e516eb826b6a67de4ea = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221003T045427__VV_D051_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5830,10 +5830,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_1b8445c0c8589f7bfdbe9859b4a43f5d.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_ff502ff603fb3e516eb826b6a67de4ea.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_d289a116a8258f11a69d599ddf4f93da = L.imageOverlay(
+            var image_overlay_4c223abc04d617ab875a72fd140108c4 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221003T045402__VV_D051_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5841,10 +5841,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_d289a116a8258f11a69d599ddf4f93da.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_4c223abc04d617ab875a72fd140108c4.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_99457a321c99863f72bf3aa99151ca35 = L.imageOverlay(
+            var image_overlay_48eef1381ce3ff6e58c7e3f79eb6d46c = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221003T045337__VV_D051_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5852,10 +5852,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_99457a321c99863f72bf3aa99151ca35.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_48eef1381ce3ff6e58c7e3f79eb6d46c.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_b19b06fac9fd717db4326e0c48772a7d = L.imageOverlay(
+            var image_overlay_d916219177735c8419f3b2f97c8e4fce = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221002T165954__VV_A044_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5863,10 +5863,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_b19b06fac9fd717db4326e0c48772a7d.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_d916219177735c8419f3b2f97c8e4fce.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_2ff45945e7833767547d67291e5292ec = L.imageOverlay(
+            var image_overlay_be4424cf59e4a2d0fa15276c0997e367 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221002T165954__VV_A044_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5874,10 +5874,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_2ff45945e7833767547d67291e5292ec.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_be4424cf59e4a2d0fa15276c0997e367.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_21341966b1be46ccf1012ee0452e11de = L.imageOverlay(
+            var image_overlay_b7d731b5871239932d1897c4ca30d2ba = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221002T165929__VV_A044_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5885,10 +5885,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_21341966b1be46ccf1012ee0452e11de.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_b7d731b5871239932d1897c4ca30d2ba.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_5398e1c398eec8ed2cc896114d4f71de = L.imageOverlay(
+            var image_overlay_e39844d5fbfd69654c98d530e9efdfe3 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221002T165929__VV_A044_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5896,10 +5896,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_5398e1c398eec8ed2cc896114d4f71de.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_e39844d5fbfd69654c98d530e9efdfe3.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_23cb16d6222c154034f299cddcfa0639 = L.imageOverlay(
+            var image_overlay_a497f89c2701a9e1adf5861b2703ac5a = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221002T165904__VV_A044_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -5907,10 +5907,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_23cb16d6222c154034f299cddcfa0639.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_a497f89c2701a9e1adf5861b2703ac5a.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_6ec0fb77e760a7ec56ffec4384f70ab7 = L.imageOverlay(
+            var image_overlay_8d07148ac95007216c1ec10ac50b2d16 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221002T165904__VV_A044_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5918,10 +5918,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_6ec0fb77e760a7ec56ffec4384f70ab7.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_8d07148ac95007216c1ec10ac50b2d16.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_014dc0d64126c98ee86a531723793799 = L.imageOverlay(
+            var image_overlay_6c7ff0e21ba90970ad7f4934810762b9 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221002T165904__VV_A044_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -5929,10 +5929,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_014dc0d64126c98ee86a531723793799.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_6c7ff0e21ba90970ad7f4934810762b9.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_855bbcba85f9de740c4fbdd33c783be0 = L.imageOverlay(
+            var image_overlay_e4f054796a522d7ccbb2e58040635880 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221002T165904__VV_A044_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5940,10 +5940,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_855bbcba85f9de740c4fbdd33c783be0.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_e4f054796a522d7ccbb2e58040635880.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_b203fc7c2e0e09162710f91c1d55672d = L.imageOverlay(
+            var image_overlay_729aea3d46274686c20d6d07b73be8aa = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221002T165839__VV_A044_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5951,10 +5951,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_b203fc7c2e0e09162710f91c1d55672d.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_729aea3d46274686c20d6d07b73be8aa.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_797ada0f8d445296ff2876ce1c5ba1e7 = L.imageOverlay(
+            var image_overlay_7fcd39e7c10d4d4a7554a8d8003281ec = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221002T165839__VV_A044_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5962,10 +5962,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_797ada0f8d445296ff2876ce1c5ba1e7.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_7fcd39e7c10d4d4a7554a8d8003281ec.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_48d10af8222abd497fed22b32f3cd1b6 = L.imageOverlay(
+            var image_overlay_04a4e28efd8ec537f1c17b495e7f5216 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221001T051136__VV_D022_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5973,10 +5973,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_48d10af8222abd497fed22b32f3cd1b6.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_04a4e28efd8ec537f1c17b495e7f5216.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_8aa1e690476e6b4ed0df06ecb865ab2b = L.imageOverlay(
+            var image_overlay_6c117ef7b53fda5622053a01d15f552a = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221001T051136__VV_D022_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -5984,10 +5984,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_8aa1e690476e6b4ed0df06ecb865ab2b.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_6c117ef7b53fda5622053a01d15f552a.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_9d8d9d8a68edfab18d7ff0e4c1335aca = L.imageOverlay(
+            var image_overlay_0cfb58e6a5f5f2c998679a44e965e579 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221001T051111__VV_D022_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -5995,10 +5995,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_9d8d9d8a68edfab18d7ff0e4c1335aca.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_0cfb58e6a5f5f2c998679a44e965e579.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_d2edd5cf9c53bb9012fe3cb136ea3f46 = L.imageOverlay(
+            var image_overlay_8987412877e96f02f19145b83fcc0f7e = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221001T051111__VV_D022_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6006,10 +6006,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_d2edd5cf9c53bb9012fe3cb136ea3f46.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_8987412877e96f02f19145b83fcc0f7e.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_c6a572f1c1305e514c306b54baf0a027 = L.imageOverlay(
+            var image_overlay_28fe6341a54dcd8d9af30a30e6b77c7c = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221001T051046__VV_D022_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -6017,10 +6017,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_c6a572f1c1305e514c306b54baf0a027.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_28fe6341a54dcd8d9af30a30e6b77c7c.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_31e5bb43eaf2da87bab4d31196e6c1c3 = L.imageOverlay(
+            var image_overlay_6daf955136dc27a5520e622f515c7981 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221001T051046__VV_D022_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -6028,10 +6028,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_31e5bb43eaf2da87bab4d31196e6c1c3.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_6daf955136dc27a5520e622f515c7981.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_e4f5e70506b57ecb784093dd6e5e621a = L.imageOverlay(
+            var image_overlay_8a9b2fbf1a05c637674d5243f4f6d801 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221001T051046__VV_D022_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6039,10 +6039,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_e4f5e70506b57ecb784093dd6e5e621a.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_8a9b2fbf1a05c637674d5243f4f6d801.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_7611f3630b6a5d6936ac1dd80cbe0608 = L.imageOverlay(
+            var image_overlay_afc0915f1e9c906b29e9d6cf65993b57 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221001T051046__VV_D022_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6050,10 +6050,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_7611f3630b6a5d6936ac1dd80cbe0608.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_afc0915f1e9c906b29e9d6cf65993b57.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_a317758c7ab77205b438cf5fa5e502b9 = L.imageOverlay(
+            var image_overlay_7d327ea0030e907003b699020f146564 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221001T051021__VV_D022_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -6061,10 +6061,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_a317758c7ab77205b438cf5fa5e502b9.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_7d327ea0030e907003b699020f146564.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_f876b933538fdecbfc80e2a6ff3f12c8 = L.imageOverlay(
+            var image_overlay_524abbe39857baea33eed8e0e751d5c1 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221001T051021__VV_D022_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6072,10 +6072,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_f876b933538fdecbfc80e2a6ff3f12c8.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_524abbe39857baea33eed8e0e751d5c1.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_0772cf0b2f22e25bcb4b1eadf904a3d6 = L.imageOverlay(
+            var image_overlay_7d7dcb7703cd34e630da6150f6817a19 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221001T050956__VV_D022_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -6083,10 +6083,10 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_0772cf0b2f22e25bcb4b1eadf904a3d6.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_7d7dcb7703cd34e630da6150f6817a19.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var image_overlay_d0f47664f6832579978a6914cfbc1c98 = L.imageOverlay(
+            var image_overlay_3507c5003d893d380f122e9975408858 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221001T050956__VV_D022_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6094,78 +6094,78 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
             );
         
     
-            image_overlay_d0f47664f6832579978a6914cfbc1c98.addTo(map_e71015fc6c658b097dab746cb09aad08);
+            image_overlay_3507c5003d893d380f122e9975408858.addTo(map_fb5499a19084f9bc722970b09e5ec570);
         
     
-            var layer_control_a510c3a8a26b4957c381334fcc0b9df0_layers = {
+            var layer_control_72744896173adcae1337a128a56f46f4_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_5703cb951a7dce630ac619f8a4d6b0f1,
+                    &quot;openstreetmap&quot; : tile_layer_3e34d3362ec57a91dc36aae86ce69b0d,
                 },
                 overlays :  {
-                    &quot;Area of Interest&quot; : geo_json_cdd1dd9f9f472c71510a4ed2af10ce80,
-                    &quot;macro_element_9c2a4ee4ac8a78d994aaa172e6ec8460&quot; : image_overlay_9c2a4ee4ac8a78d994aaa172e6ec8460,
-                    &quot;macro_element_c4fdee52d60f4c59de15e84b1cc0d647&quot; : image_overlay_c4fdee52d60f4c59de15e84b1cc0d647,
-                    &quot;macro_element_c005cf56777dd203c5b80a35f40b0fb4&quot; : image_overlay_c005cf56777dd203c5b80a35f40b0fb4,
-                    &quot;macro_element_1d57c423100a02c585375db427254660&quot; : image_overlay_1d57c423100a02c585375db427254660,
-                    &quot;macro_element_85b10ffd8873972d03df923c5cf0e3db&quot; : image_overlay_85b10ffd8873972d03df923c5cf0e3db,
-                    &quot;macro_element_b7917a41a1763e380ca13ff3ccaad415&quot; : image_overlay_b7917a41a1763e380ca13ff3ccaad415,
-                    &quot;macro_element_7899a01a503c0fd61f94588fb72a2456&quot; : image_overlay_7899a01a503c0fd61f94588fb72a2456,
-                    &quot;macro_element_44c1bd2a875f7213d6a4a05ef1495598&quot; : image_overlay_44c1bd2a875f7213d6a4a05ef1495598,
-                    &quot;macro_element_c8bf84985d1e69fc3b24e95759421088&quot; : image_overlay_c8bf84985d1e69fc3b24e95759421088,
-                    &quot;macro_element_e3df7951954316c0eeb0e24e03a74823&quot; : image_overlay_e3df7951954316c0eeb0e24e03a74823,
-                    &quot;macro_element_d4bd41212fbfb6fae0c12de8153d12a5&quot; : image_overlay_d4bd41212fbfb6fae0c12de8153d12a5,
-                    &quot;macro_element_f20610234d0fd478323945634b857aa8&quot; : image_overlay_f20610234d0fd478323945634b857aa8,
-                    &quot;macro_element_97421f71a11d817a256e7d216c7fd8e7&quot; : image_overlay_97421f71a11d817a256e7d216c7fd8e7,
-                    &quot;macro_element_22e5d2fbcfdb98036698c561e521dc8f&quot; : image_overlay_22e5d2fbcfdb98036698c561e521dc8f,
-                    &quot;macro_element_822b07d1fe03162e38a9aa47921e4767&quot; : image_overlay_822b07d1fe03162e38a9aa47921e4767,
-                    &quot;macro_element_f0d787a382a1c1b3c2f2d940c7ca5caa&quot; : image_overlay_f0d787a382a1c1b3c2f2d940c7ca5caa,
-                    &quot;macro_element_c34750bf85c63a421f85eaee9ef8802e&quot; : image_overlay_c34750bf85c63a421f85eaee9ef8802e,
-                    &quot;macro_element_f7cb9df2a7b92ec9c180e04b648a41ac&quot; : image_overlay_f7cb9df2a7b92ec9c180e04b648a41ac,
-                    &quot;macro_element_68792a5b1a71d32c989f336d810d8463&quot; : image_overlay_68792a5b1a71d32c989f336d810d8463,
-                    &quot;macro_element_dfc27a4e5790d9ca832ad4e3dbf00877&quot; : image_overlay_dfc27a4e5790d9ca832ad4e3dbf00877,
-                    &quot;macro_element_45e51572ec215763ec4fc4267e4db770&quot; : image_overlay_45e51572ec215763ec4fc4267e4db770,
-                    &quot;macro_element_b04f3fd0daa3cb79769713e08718e83c&quot; : image_overlay_b04f3fd0daa3cb79769713e08718e83c,
-                    &quot;macro_element_fe18f11a07146358cbfea9664dc4d469&quot; : image_overlay_fe18f11a07146358cbfea9664dc4d469,
-                    &quot;macro_element_474139750f0d34b8d1b5a8219fdf3ec0&quot; : image_overlay_474139750f0d34b8d1b5a8219fdf3ec0,
-                    &quot;macro_element_9cb2cd4ff11dff2e5d18799f32807bad&quot; : image_overlay_9cb2cd4ff11dff2e5d18799f32807bad,
-                    &quot;macro_element_50a8c52052c4fb8cffd3f347d961c3e1&quot; : image_overlay_50a8c52052c4fb8cffd3f347d961c3e1,
-                    &quot;macro_element_b72e568fd9588003fb69e0c71c4bbe96&quot; : image_overlay_b72e568fd9588003fb69e0c71c4bbe96,
-                    &quot;macro_element_1b8445c0c8589f7bfdbe9859b4a43f5d&quot; : image_overlay_1b8445c0c8589f7bfdbe9859b4a43f5d,
-                    &quot;macro_element_d289a116a8258f11a69d599ddf4f93da&quot; : image_overlay_d289a116a8258f11a69d599ddf4f93da,
-                    &quot;macro_element_99457a321c99863f72bf3aa99151ca35&quot; : image_overlay_99457a321c99863f72bf3aa99151ca35,
-                    &quot;macro_element_b19b06fac9fd717db4326e0c48772a7d&quot; : image_overlay_b19b06fac9fd717db4326e0c48772a7d,
-                    &quot;macro_element_2ff45945e7833767547d67291e5292ec&quot; : image_overlay_2ff45945e7833767547d67291e5292ec,
-                    &quot;macro_element_21341966b1be46ccf1012ee0452e11de&quot; : image_overlay_21341966b1be46ccf1012ee0452e11de,
-                    &quot;macro_element_5398e1c398eec8ed2cc896114d4f71de&quot; : image_overlay_5398e1c398eec8ed2cc896114d4f71de,
-                    &quot;macro_element_23cb16d6222c154034f299cddcfa0639&quot; : image_overlay_23cb16d6222c154034f299cddcfa0639,
-                    &quot;macro_element_6ec0fb77e760a7ec56ffec4384f70ab7&quot; : image_overlay_6ec0fb77e760a7ec56ffec4384f70ab7,
-                    &quot;macro_element_014dc0d64126c98ee86a531723793799&quot; : image_overlay_014dc0d64126c98ee86a531723793799,
-                    &quot;macro_element_855bbcba85f9de740c4fbdd33c783be0&quot; : image_overlay_855bbcba85f9de740c4fbdd33c783be0,
-                    &quot;macro_element_b203fc7c2e0e09162710f91c1d55672d&quot; : image_overlay_b203fc7c2e0e09162710f91c1d55672d,
-                    &quot;macro_element_797ada0f8d445296ff2876ce1c5ba1e7&quot; : image_overlay_797ada0f8d445296ff2876ce1c5ba1e7,
-                    &quot;macro_element_48d10af8222abd497fed22b32f3cd1b6&quot; : image_overlay_48d10af8222abd497fed22b32f3cd1b6,
-                    &quot;macro_element_8aa1e690476e6b4ed0df06ecb865ab2b&quot; : image_overlay_8aa1e690476e6b4ed0df06ecb865ab2b,
-                    &quot;macro_element_9d8d9d8a68edfab18d7ff0e4c1335aca&quot; : image_overlay_9d8d9d8a68edfab18d7ff0e4c1335aca,
-                    &quot;macro_element_d2edd5cf9c53bb9012fe3cb136ea3f46&quot; : image_overlay_d2edd5cf9c53bb9012fe3cb136ea3f46,
-                    &quot;macro_element_c6a572f1c1305e514c306b54baf0a027&quot; : image_overlay_c6a572f1c1305e514c306b54baf0a027,
-                    &quot;macro_element_31e5bb43eaf2da87bab4d31196e6c1c3&quot; : image_overlay_31e5bb43eaf2da87bab4d31196e6c1c3,
-                    &quot;macro_element_e4f5e70506b57ecb784093dd6e5e621a&quot; : image_overlay_e4f5e70506b57ecb784093dd6e5e621a,
-                    &quot;macro_element_7611f3630b6a5d6936ac1dd80cbe0608&quot; : image_overlay_7611f3630b6a5d6936ac1dd80cbe0608,
-                    &quot;macro_element_a317758c7ab77205b438cf5fa5e502b9&quot; : image_overlay_a317758c7ab77205b438cf5fa5e502b9,
-                    &quot;macro_element_f876b933538fdecbfc80e2a6ff3f12c8&quot; : image_overlay_f876b933538fdecbfc80e2a6ff3f12c8,
-                    &quot;macro_element_0772cf0b2f22e25bcb4b1eadf904a3d6&quot; : image_overlay_0772cf0b2f22e25bcb4b1eadf904a3d6,
-                    &quot;macro_element_d0f47664f6832579978a6914cfbc1c98&quot; : image_overlay_d0f47664f6832579978a6914cfbc1c98,
+                    &quot;Area of Interest&quot; : geo_json_a57ac5f646d065dbccebb296db88dd6c,
+                    &quot;macro_element_86a9369cdfc0b7247800a2eb5991e2ef&quot; : image_overlay_86a9369cdfc0b7247800a2eb5991e2ef,
+                    &quot;macro_element_0fadf071b89d04df1dc6a0a631882e3a&quot; : image_overlay_0fadf071b89d04df1dc6a0a631882e3a,
+                    &quot;macro_element_59e6e9cfc74a4788f7f9dbe372915a83&quot; : image_overlay_59e6e9cfc74a4788f7f9dbe372915a83,
+                    &quot;macro_element_75d9fb9c62a488318c22c8eb0106613a&quot; : image_overlay_75d9fb9c62a488318c22c8eb0106613a,
+                    &quot;macro_element_534a78b005c58a236979370b6a342e0f&quot; : image_overlay_534a78b005c58a236979370b6a342e0f,
+                    &quot;macro_element_b90d182b8ba5f883f2cd6018e4c6748b&quot; : image_overlay_b90d182b8ba5f883f2cd6018e4c6748b,
+                    &quot;macro_element_36e75d56d407a539754e5216d6163c77&quot; : image_overlay_36e75d56d407a539754e5216d6163c77,
+                    &quot;macro_element_2211e2373c2cfd734c203f15d2f1337f&quot; : image_overlay_2211e2373c2cfd734c203f15d2f1337f,
+                    &quot;macro_element_4f6d193c5d38fa7b6ce440d758ca567d&quot; : image_overlay_4f6d193c5d38fa7b6ce440d758ca567d,
+                    &quot;macro_element_58cdebed7800b79166d602efdcdc12f9&quot; : image_overlay_58cdebed7800b79166d602efdcdc12f9,
+                    &quot;macro_element_0a56c126b28bf7da8474b46a67660af5&quot; : image_overlay_0a56c126b28bf7da8474b46a67660af5,
+                    &quot;macro_element_1ffc2b8cd3765e420b5270339a6e9b5a&quot; : image_overlay_1ffc2b8cd3765e420b5270339a6e9b5a,
+                    &quot;macro_element_dbc6816217daca484f4639a692422fbc&quot; : image_overlay_dbc6816217daca484f4639a692422fbc,
+                    &quot;macro_element_aca47e12600849f7725e8943654ff307&quot; : image_overlay_aca47e12600849f7725e8943654ff307,
+                    &quot;macro_element_9279690269daa3df0fb9705a2e14c1fb&quot; : image_overlay_9279690269daa3df0fb9705a2e14c1fb,
+                    &quot;macro_element_27af8a8e70efd060624a802a047d0e05&quot; : image_overlay_27af8a8e70efd060624a802a047d0e05,
+                    &quot;macro_element_a467c27b85efbd7c68440669bcd4a78f&quot; : image_overlay_a467c27b85efbd7c68440669bcd4a78f,
+                    &quot;macro_element_21e5ba88bd88c12b5008c6d07b0d7ecd&quot; : image_overlay_21e5ba88bd88c12b5008c6d07b0d7ecd,
+                    &quot;macro_element_cca930b0513bf205457b7c28cbbc5c32&quot; : image_overlay_cca930b0513bf205457b7c28cbbc5c32,
+                    &quot;macro_element_b4cf42daa0bad70d07f8ee8bcb40ee0e&quot; : image_overlay_b4cf42daa0bad70d07f8ee8bcb40ee0e,
+                    &quot;macro_element_56b234092523350cdbde54d282e70f13&quot; : image_overlay_56b234092523350cdbde54d282e70f13,
+                    &quot;macro_element_2026b82d21acb02c4e7b340bd64b4192&quot; : image_overlay_2026b82d21acb02c4e7b340bd64b4192,
+                    &quot;macro_element_8be778d4be456109ca9db4be6967a989&quot; : image_overlay_8be778d4be456109ca9db4be6967a989,
+                    &quot;macro_element_9cab35c650d8160971668e0e711f1dac&quot; : image_overlay_9cab35c650d8160971668e0e711f1dac,
+                    &quot;macro_element_e771ed98309097d95ccdcbf29a266ec6&quot; : image_overlay_e771ed98309097d95ccdcbf29a266ec6,
+                    &quot;macro_element_781a9056f1d62eed2394c135417f4ee8&quot; : image_overlay_781a9056f1d62eed2394c135417f4ee8,
+                    &quot;macro_element_b1f0619a60c04eb7f9817f65ec63a2b7&quot; : image_overlay_b1f0619a60c04eb7f9817f65ec63a2b7,
+                    &quot;macro_element_ff502ff603fb3e516eb826b6a67de4ea&quot; : image_overlay_ff502ff603fb3e516eb826b6a67de4ea,
+                    &quot;macro_element_4c223abc04d617ab875a72fd140108c4&quot; : image_overlay_4c223abc04d617ab875a72fd140108c4,
+                    &quot;macro_element_48eef1381ce3ff6e58c7e3f79eb6d46c&quot; : image_overlay_48eef1381ce3ff6e58c7e3f79eb6d46c,
+                    &quot;macro_element_d916219177735c8419f3b2f97c8e4fce&quot; : image_overlay_d916219177735c8419f3b2f97c8e4fce,
+                    &quot;macro_element_be4424cf59e4a2d0fa15276c0997e367&quot; : image_overlay_be4424cf59e4a2d0fa15276c0997e367,
+                    &quot;macro_element_b7d731b5871239932d1897c4ca30d2ba&quot; : image_overlay_b7d731b5871239932d1897c4ca30d2ba,
+                    &quot;macro_element_e39844d5fbfd69654c98d530e9efdfe3&quot; : image_overlay_e39844d5fbfd69654c98d530e9efdfe3,
+                    &quot;macro_element_a497f89c2701a9e1adf5861b2703ac5a&quot; : image_overlay_a497f89c2701a9e1adf5861b2703ac5a,
+                    &quot;macro_element_8d07148ac95007216c1ec10ac50b2d16&quot; : image_overlay_8d07148ac95007216c1ec10ac50b2d16,
+                    &quot;macro_element_6c7ff0e21ba90970ad7f4934810762b9&quot; : image_overlay_6c7ff0e21ba90970ad7f4934810762b9,
+                    &quot;macro_element_e4f054796a522d7ccbb2e58040635880&quot; : image_overlay_e4f054796a522d7ccbb2e58040635880,
+                    &quot;macro_element_729aea3d46274686c20d6d07b73be8aa&quot; : image_overlay_729aea3d46274686c20d6d07b73be8aa,
+                    &quot;macro_element_7fcd39e7c10d4d4a7554a8d8003281ec&quot; : image_overlay_7fcd39e7c10d4d4a7554a8d8003281ec,
+                    &quot;macro_element_04a4e28efd8ec537f1c17b495e7f5216&quot; : image_overlay_04a4e28efd8ec537f1c17b495e7f5216,
+                    &quot;macro_element_6c117ef7b53fda5622053a01d15f552a&quot; : image_overlay_6c117ef7b53fda5622053a01d15f552a,
+                    &quot;macro_element_0cfb58e6a5f5f2c998679a44e965e579&quot; : image_overlay_0cfb58e6a5f5f2c998679a44e965e579,
+                    &quot;macro_element_8987412877e96f02f19145b83fcc0f7e&quot; : image_overlay_8987412877e96f02f19145b83fcc0f7e,
+                    &quot;macro_element_28fe6341a54dcd8d9af30a30e6b77c7c&quot; : image_overlay_28fe6341a54dcd8d9af30a30e6b77c7c,
+                    &quot;macro_element_6daf955136dc27a5520e622f515c7981&quot; : image_overlay_6daf955136dc27a5520e622f515c7981,
+                    &quot;macro_element_8a9b2fbf1a05c637674d5243f4f6d801&quot; : image_overlay_8a9b2fbf1a05c637674d5243f4f6d801,
+                    &quot;macro_element_afc0915f1e9c906b29e9d6cf65993b57&quot; : image_overlay_afc0915f1e9c906b29e9d6cf65993b57,
+                    &quot;macro_element_7d327ea0030e907003b699020f146564&quot; : image_overlay_7d327ea0030e907003b699020f146564,
+                    &quot;macro_element_524abbe39857baea33eed8e0e751d5c1&quot; : image_overlay_524abbe39857baea33eed8e0e751d5c1,
+                    &quot;macro_element_7d7dcb7703cd34e630da6150f6817a19&quot; : image_overlay_7d7dcb7703cd34e630da6150f6817a19,
+                    &quot;macro_element_3507c5003d893d380f122e9975408858&quot; : image_overlay_3507c5003d893d380f122e9975408858,
                 },
             };
-            let layer_control_a510c3a8a26b4957c381334fcc0b9df0 = L.control.layers(
-                layer_control_a510c3a8a26b4957c381334fcc0b9df0_layers.base_layers,
-                layer_control_a510c3a8a26b4957c381334fcc0b9df0_layers.overlays,
+            let layer_control_72744896173adcae1337a128a56f46f4 = L.control.layers(
+                layer_control_72744896173adcae1337a128a56f46f4_layers.base_layers,
+                layer_control_72744896173adcae1337a128a56f46f4_layers.overlays,
                 {
   &quot;position&quot;: &quot;topright&quot;,
   &quot;collapsed&quot;: true,
   &quot;autoZIndex&quot;: true,
 }
-            ).addTo(map_e71015fc6c658b097dab746cb09aad08);
+            ).addTo(map_fb5499a19084f9bc722970b09e5ec570);
 
         
 </script>
@@ -6179,7 +6179,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 <p>STAC can also be a useful tool for the discovery of data, however it only loads metadata. This saves memory, but if one would like to do further analysis, the data has to be loaded into memory or downloaded on disk.</p>
 <p>In the following, we will demonstrate this with the library <code>odc-stac</code>. Here we can define what data will loaded as <code>bands</code>; in this case VV sigma naught. Moreover we can resample the data by providing any coordinate reference system (CRS) and resolution as well as a method for resampling of continuos data (e.g.&nbsp;bilinear resampling). In the example below we use the EQUI7 Grid of Europe and a 20 meter sampling. This is the native format of sigma naught stored at EODC, so there will be no actual resampling. Note, also, that resampling is not advisable for this data, as it is provided on a logarithmic scale. More about this in the notebook “Backscattering Coefficients”.</p>
 <p><em>The chunks argument is an advancement method for performing parallel computations on the data. We will not cover this in further detail.</em></p>
-<div id="dd1b925d" class="cell" data-execution_count="14">
+<div id="2955b23e" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>bands <span class="op">=</span> <span class="st">"VV"</span>  <span class="co"># Vertical-vertical polarized</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>crs <span class="op">=</span> <span class="st">"EPSG:27704"</span>  <span class="co"># Coordinate Reference System: EQUI7 Grid of Europe</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> <span class="dv">20</span>  <span class="co"># 20 meter</span></span>
@@ -6195,7 +6195,7 @@ CGLS_SSM_1KM                     : Copernicus Global Land Surface Soil Moisture<
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Let’s have a look at the VV polarized band of the dataset.</p>
-<div id="6e11c83e" class="cell" data-execution_count="15">
+<div id="8206f634" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sig0_dc.VV</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
@@ -6576,7 +6576,7 @@ Coordinates:
     spatial_ref  int32 4B 27704
   * time         (time) datetime64[ns] 248B 2022-10-01T05:09:56 ... 2022-10-0...
 Attributes:
-    nodata:   -9999</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-array-name">'VV'</div><ul class="xr-dim-list"><li><span class="xr-has-index">time</span>: 31</li><li><span class="xr-has-index">y</span>: 18269</li><li><span class="xr-has-index">x</span>: 16725</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input id="section-0807bd78-5a5e-4ed1-afb7-f06666d1ef3d" class="xr-array-in" type="checkbox" checked=""><label for="section-0807bd78-5a5e-4ed1-afb7-f06666d1ef3d" title="Show/hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>dask.array&lt;chunksize=(1, 18269, 16725), meta=np.ndarray&gt;</span></div><div class="xr-array-data">
+    nodata:   -9999</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-array-name">'VV'</div><ul class="xr-dim-list"><li><span class="xr-has-index">time</span>: 31</li><li><span class="xr-has-index">y</span>: 18269</li><li><span class="xr-has-index">x</span>: 16725</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input id="section-b109bbe8-55dc-43a2-8519-0b580dcc3ff2" class="xr-array-in" type="checkbox" checked=""><label for="section-b109bbe8-55dc-43a2-8519-0b580dcc3ff2" title="Show/hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>dask.array&lt;chunksize=(1, 18269, 16725), meta=np.ndarray&gt;</span></div><div class="xr-array-data">
 <table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
 <colgroup>
 <col style="width: 50%">
@@ -6619,7 +6619,7 @@ Attributes:
 </tr>
 </tbody>
 </table>
-</div></div></li><li class="xr-section-item"><input id="section-a14c682a-11da-4bd4-8ec0-8f5481dc5e0f" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-a14c682a-11da-4bd4-8ec0-8f5481dc5e0f" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">1.762e+06 1.762e+06 ... 1.396e+06</div><input id="attrs-143148ad-8f8b-4ba1-a205-8a3cc4e2cc82" class="xr-var-attrs-in" type="checkbox"><label for="attrs-143148ad-8f8b-4ba1-a205-8a3cc4e2cc82" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-2e0f2226-4751-45ab-ba4f-d151a623bc7d" class="xr-var-data-in" type="checkbox"><label for="data-2e0f2226-4751-45ab-ba4f-d151a623bc7d" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>-20.0</dd><dt><span>crs :</span></dt><dd>EPSG:27704</dd></dl></div><div class="xr-var-data"><pre>array([1761670., 1761650., 1761630., ..., 1396350., 1396330., 1396310.])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">5.052e+06 5.052e+06 ... 5.387e+06</div><input id="attrs-727306d4-6c31-41e7-b486-1fb03e3a8462" class="xr-var-attrs-in" type="checkbox"><label for="attrs-727306d4-6c31-41e7-b486-1fb03e3a8462" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-936e42b4-230f-4d59-a49d-522bb29826a8" class="xr-var-data-in" type="checkbox"><label for="data-936e42b4-230f-4d59-a49d-522bb29826a8" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>20.0</dd><dt><span>crs :</span></dt><dd>EPSG:27704</dd></dl></div><div class="xr-var-data"><pre>array([5052090., 5052110., 5052130., ..., 5386530., 5386550., 5386570.])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">27704</div><input id="attrs-020aac15-b06c-416b-acf6-4fdb46927b8d" class="xr-var-attrs-in" type="checkbox"><label for="attrs-020aac15-b06c-416b-acf6-4fdb46927b8d" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-aaf54271-3766-4b3b-8af4-4937751f350e" class="xr-var-data-in" type="checkbox"><label for="data-aaf54271-3766-4b3b-8af4-4937751f350e" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>PROJCRS["WGS 84 / Equi7 Europe",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Equi7 projection - Europe",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.82,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.696,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Continental mapping of raster data."],AREA["Europe including Russia west of the Ural Mountains."],BBOX[29.24,-42.52,83.67,51.73]],ID["EPSG",27704]]</dd><dt><span>crs_wkt :</span></dt><dd>PROJCRS["WGS 84 / Equi7 Europe",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Equi7 projection - Europe",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.82,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.696,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Continental mapping of raster data."],AREA["Europe including Russia west of the Ural Mountains."],BBOX[29.24,-42.52,83.67,51.73]],ID["EPSG",27704]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984 ensemble</dd><dt><span>projected_crs_name :</span></dt><dd>WGS 84 / Equi7 Europe</dd><dt><span>grid_mapping_name :</span></dt><dd>azimuthal_equidistant</dd><dt><span>latitude_of_projection_origin :</span></dt><dd>53.0</dd><dt><span>longitude_of_projection_origin :</span></dt><dd>24.0</dd><dt><span>false_easting :</span></dt><dd>5837287.82</dd><dt><span>false_northing :</span></dt><dd>2121415.696</dd><dt><span>GeoTransform :</span></dt><dd>5052080 20 0 1761680 0 -20</dd></dl></div><div class="xr-var-data"><pre>array(27704, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2022-10-01T05:09:56 ... 2022-10-...</div><input id="attrs-3cb70c72-c944-4e80-a869-f77d94ddc25b" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-3cb70c72-c944-4e80-a869-f77d94ddc25b" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-8ffa8959-788b-45dc-bd51-afe5ab936453" class="xr-var-data-in" type="checkbox"><label for="data-8ffa8959-788b-45dc-bd51-afe5ab936453" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2022-10-01T05:09:56.000000000', '2022-10-01T05:10:21.000000000',
+</div></div></li><li class="xr-section-item"><input id="section-e408f770-6dd3-4883-802b-023e636dc790" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-e408f770-6dd3-4883-802b-023e636dc790" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">1.762e+06 1.762e+06 ... 1.396e+06</div><input id="attrs-44e58072-c384-41a5-ba65-c17b5f303c34" class="xr-var-attrs-in" type="checkbox"><label for="attrs-44e58072-c384-41a5-ba65-c17b5f303c34" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-a63f8e38-8338-4a96-9851-53d8ec6c91c2" class="xr-var-data-in" type="checkbox"><label for="data-a63f8e38-8338-4a96-9851-53d8ec6c91c2" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>-20.0</dd><dt><span>crs :</span></dt><dd>EPSG:27704</dd></dl></div><div class="xr-var-data"><pre>array([1761670., 1761650., 1761630., ..., 1396350., 1396330., 1396310.])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">5.052e+06 5.052e+06 ... 5.387e+06</div><input id="attrs-18e95615-3860-4a6d-9ee5-728095ec2c20" class="xr-var-attrs-in" type="checkbox"><label for="attrs-18e95615-3860-4a6d-9ee5-728095ec2c20" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-af2372f6-552c-4c7b-a79e-628619bffe2b" class="xr-var-data-in" type="checkbox"><label for="data-af2372f6-552c-4c7b-a79e-628619bffe2b" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>20.0</dd><dt><span>crs :</span></dt><dd>EPSG:27704</dd></dl></div><div class="xr-var-data"><pre>array([5052090., 5052110., 5052130., ..., 5386530., 5386550., 5386570.])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">27704</div><input id="attrs-801fb0b6-e8d5-410e-a859-e2ba50ed4a8d" class="xr-var-attrs-in" type="checkbox"><label for="attrs-801fb0b6-e8d5-410e-a859-e2ba50ed4a8d" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-8a3c11e6-d77a-42cc-a7df-8477aad94c1f" class="xr-var-data-in" type="checkbox"><label for="data-8a3c11e6-d77a-42cc-a7df-8477aad94c1f" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>PROJCRS["WGS 84 / Equi7 Europe",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Equi7 projection - Europe",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.82,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.696,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Continental mapping of raster data."],AREA["Europe including Russia west of the Ural Mountains."],BBOX[29.24,-42.52,83.67,51.73]],ID["EPSG",27704]]</dd><dt><span>crs_wkt :</span></dt><dd>PROJCRS["WGS 84 / Equi7 Europe",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Equi7 projection - Europe",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.82,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.696,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Continental mapping of raster data."],AREA["Europe including Russia west of the Ural Mountains."],BBOX[29.24,-42.52,83.67,51.73]],ID["EPSG",27704]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984 ensemble</dd><dt><span>projected_crs_name :</span></dt><dd>WGS 84 / Equi7 Europe</dd><dt><span>grid_mapping_name :</span></dt><dd>azimuthal_equidistant</dd><dt><span>latitude_of_projection_origin :</span></dt><dd>53.0</dd><dt><span>longitude_of_projection_origin :</span></dt><dd>24.0</dd><dt><span>false_easting :</span></dt><dd>5837287.82</dd><dt><span>false_northing :</span></dt><dd>2121415.696</dd><dt><span>GeoTransform :</span></dt><dd>5052080 20 0 1761680 0 -20</dd></dl></div><div class="xr-var-data"><pre>array(27704, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2022-10-01T05:09:56 ... 2022-10-...</div><input id="attrs-3597286a-abf9-4b0d-a08e-96ba7b7e0002" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-3597286a-abf9-4b0d-a08e-96ba7b7e0002" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-df6463a4-d658-4b38-84ca-eb1484977301" class="xr-var-data-in" type="checkbox"><label for="data-df6463a4-d658-4b38-84ca-eb1484977301" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2022-10-01T05:09:56.000000000', '2022-10-01T05:10:21.000000000',
        '2022-10-01T05:10:46.000000000', '2022-10-01T05:11:11.000000000',
        '2022-10-01T05:11:36.000000000', '2022-10-02T16:58:39.000000000',
        '2022-10-02T16:59:04.000000000', '2022-10-02T16:59:29.000000000',
@@ -6634,17 +6634,17 @@ Attributes:
        '2022-10-06T05:19:22.000000000', '2022-10-06T05:19:47.000000000',
        '2022-10-07T17:06:31.000000000', '2022-10-07T17:06:56.000000000',
        '2022-10-07T17:07:21.000000000', '2022-10-07T17:07:46.000000000',
-       '2022-10-07T17:08:11.000000000'], dtype='datetime64[ns]')</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-0055b6fd-5ddc-439e-956a-8e56660c28fd" class="xr-section-summary-in" type="checkbox"><label for="section-0055b6fd-5ddc-439e-956a-8e56660c28fd" class="xr-section-summary">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>y</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-03709fc0-e72e-4e60-82ed-8d7f8c612c59" class="xr-index-data-in" type="checkbox"><label for="index-03709fc0-e72e-4e60-82ed-8d7f8c612c59" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([1761670.0, 1761650.0, 1761630.0, 1761610.0, 1761590.0, 1761570.0,
+       '2022-10-07T17:08:11.000000000'], dtype='datetime64[ns]')</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-ff397d4f-68e2-493f-a377-014fd2721e9d" class="xr-section-summary-in" type="checkbox"><label for="section-ff397d4f-68e2-493f-a377-014fd2721e9d" class="xr-section-summary">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>y</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-56d57be7-a1dd-4731-8e11-e6052b4cab25" class="xr-index-data-in" type="checkbox"><label for="index-56d57be7-a1dd-4731-8e11-e6052b4cab25" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([1761670.0, 1761650.0, 1761630.0, 1761610.0, 1761590.0, 1761570.0,
        1761550.0, 1761530.0, 1761510.0, 1761490.0,
        ...
        1396490.0, 1396470.0, 1396450.0, 1396430.0, 1396410.0, 1396390.0,
        1396370.0, 1396350.0, 1396330.0, 1396310.0],
-      dtype='float64', name='y', length=18269))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>x</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-ce098a36-6fe2-4016-a435-7615fe62b3d4" class="xr-index-data-in" type="checkbox"><label for="index-ce098a36-6fe2-4016-a435-7615fe62b3d4" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([5052090.0, 5052110.0, 5052130.0, 5052150.0, 5052170.0, 5052190.0,
+      dtype='float64', name='y', length=18269))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>x</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-830a316e-06db-4434-9f5a-fe902e8f6c10" class="xr-index-data-in" type="checkbox"><label for="index-830a316e-06db-4434-9f5a-fe902e8f6c10" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([5052090.0, 5052110.0, 5052130.0, 5052150.0, 5052170.0, 5052190.0,
        5052210.0, 5052230.0, 5052250.0, 5052270.0,
        ...
        5386390.0, 5386410.0, 5386430.0, 5386450.0, 5386470.0, 5386490.0,
        5386510.0, 5386530.0, 5386550.0, 5386570.0],
-      dtype='float64', name='x', length=16725))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>time</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-292b974e-7c66-40f6-be50-6eb30445a299" class="xr-index-data-in" type="checkbox"><label for="index-292b974e-7c66-40f6-be50-6eb30445a299" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(DatetimeIndex(['2022-10-01 05:09:56', '2022-10-01 05:10:21',
+      dtype='float64', name='x', length=16725))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>time</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-49f5c9e5-21e6-4929-aca7-dfb9874564e4" class="xr-index-data-in" type="checkbox"><label for="index-49f5c9e5-21e6-4929-aca7-dfb9874564e4" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(DatetimeIndex(['2022-10-01 05:09:56', '2022-10-01 05:10:21',
                '2022-10-01 05:10:46', '2022-10-01 05:11:11',
                '2022-10-01 05:11:36', '2022-10-02 16:58:39',
                '2022-10-02 16:59:04', '2022-10-02 16:59:29',
@@ -6660,13 +6660,13 @@ Attributes:
                '2022-10-07 17:06:31', '2022-10-07 17:06:56',
                '2022-10-07 17:07:21', '2022-10-07 17:07:46',
                '2022-10-07 17:08:11'],
-              dtype='datetime64[ns]', name='time', freq=None))</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-ce065810-d90f-471f-a8a2-1993f81719a6" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-ce065810-d90f-471f-a8a2-1993f81719a6" class="xr-section-summary">Attributes: <span>(1)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>-9999</dd></dl></div></li></ul></div></div>
+              dtype='datetime64[ns]', name='time', freq=None))</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-44376e84-d0d8-4687-92b4-d65356058f52" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-44376e84-d0d8-4687-92b4-d65356058f52" class="xr-section-summary">Attributes: <span>(1)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"><dt><span>nodata :</span></dt><dd>-9999</dd></dl></div></li></ul></div></div>
 </div>
 </div>
 <p>As we can see, the data is stored as a <code>xarray</code> DataArray. Xarray is a convenient package for multidimensional labeled arrays, like temperature, humidity, pressure, different bands of satellite imagery, and so on. <a href="https://docs.xarray.dev/en/stable/index.html">The link</a> provides detailed documentation. In a later notebook we will explore some more of the functionality of <code>xarray</code>. As we can see in the coordinates, the data here consists of 21 time steps.</p>
 <p>In general, data from STAC is “lazily” loaded, which means that the structure of the DataArray is constructed, but the data is not loaded yet. It is loaded only at instance when it is needed, for example, for plotting, computations, and so on.</p>
 <p>Since the DataArray has currently a size of almost 18 GiB, we will subset it to the region of Vienna.</p>
-<div id="98acadb2" class="cell" data-execution_count="16">
+<div id="f55ab496" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a bounding box covering the region of Vienna</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>latmin_smaller, latmax_smaller <span class="op">=</span> <span class="dv">48</span>, <span class="fl">48.4</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>lonmin_smaller, lonmax_smaller <span class="op">=</span> <span class="dv">16</span>, <span class="fl">16.5</span></span>
@@ -6733,7 +6733,7 @@ Attributes:
             <meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; />
             <style>
-                #map_de55dba390d102038a0e7dd1d0900b73 {
+                #map_972750d484652cfff2a30389aedd2ebc {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -6760,14 +6760,14 @@ Attributes:
 <body>
     
     
-            <div class=&quot;folium-map&quot; id=&quot;map_de55dba390d102038a0e7dd1d0900b73&quot; ></div>
+            <div class=&quot;folium-map&quot; id=&quot;map_972750d484652cfff2a30389aedd2ebc&quot; ></div>
         
 </body>
 <script>
     
     
-            var map_de55dba390d102038a0e7dd1d0900b73 = L.map(
-                &quot;map_de55dba390d102038a0e7dd1d0900b73&quot;,
+            var map_972750d484652cfff2a30389aedd2ebc = L.map(
+                &quot;map_972750d484652cfff2a30389aedd2ebc&quot;,
                 {
                     center: [48.2, 16.25],
                     crs: L.CRS.EPSG3857,
@@ -6786,7 +6786,7 @@ Attributes:
 
         
     
-            var tile_layer_1da38027f1e8c0592042b7a7c93fa820 = L.tileLayer(
+            var tile_layer_be2e3469c2c0dbef9ba78662160d1d22 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {
   &quot;minZoom&quot;: 0,
@@ -6803,40 +6803,40 @@ Attributes:
             );
         
     
-            tile_layer_1da38027f1e8c0592042b7a7c93fa820.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            tile_layer_be2e3469c2c0dbef9ba78662160d1d22.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
 
-        function geo_json_80f490d5e08c18fec78bb4a45528189c_onEachFeature(feature, layer) {
+        function geo_json_15449dba799439e4af36d4bd9b8eda5d_onEachFeature(feature, layer) {
             layer.on({
             });
         };
-        var geo_json_80f490d5e08c18fec78bb4a45528189c = L.geoJson(null, {
-                onEachFeature: geo_json_80f490d5e08c18fec78bb4a45528189c_onEachFeature,
+        var geo_json_15449dba799439e4af36d4bd9b8eda5d = L.geoJson(null, {
+                onEachFeature: geo_json_15449dba799439e4af36d4bd9b8eda5d_onEachFeature,
             
             ...{
 }
         });
 
-        function geo_json_80f490d5e08c18fec78bb4a45528189c_add (data) {
-            geo_json_80f490d5e08c18fec78bb4a45528189c
+        function geo_json_15449dba799439e4af36d4bd9b8eda5d_add (data) {
+            geo_json_15449dba799439e4af36d4bd9b8eda5d
                 .addData(data);
         }
-            geo_json_80f490d5e08c18fec78bb4a45528189c_add({&quot;coordinates&quot;: [[[17.710928010825853, 49.257630084442496], [13.881798300915221, 49.257630084442496], [13.881798300915221, 46.34747715326259], [17.710928010825853, 46.34747715326259], [17.710928010825853, 49.257630084442496]]], &quot;type&quot;: &quot;Polygon&quot;});
-        geo_json_80f490d5e08c18fec78bb4a45528189c.setStyle(function(feature) {return feature.properties.style;});
+            geo_json_15449dba799439e4af36d4bd9b8eda5d_add({&quot;coordinates&quot;: [[[17.710928010825853, 49.257630084442496], [13.881798300915221, 49.257630084442496], [13.881798300915221, 46.34747715326259], [17.710928010825853, 46.34747715326259], [17.710928010825853, 49.257630084442496]]], &quot;type&quot;: &quot;Polygon&quot;});
+        geo_json_15449dba799439e4af36d4bd9b8eda5d.setStyle(function(feature) {return feature.properties.style;});
 
         
     
-            geo_json_80f490d5e08c18fec78bb4a45528189c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            geo_json_15449dba799439e4af36d4bd9b8eda5d.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var rectangle_44892195d97f2501b5fa79af7c50c079 = L.rectangle(
+            var rectangle_e29f57231a360cd60b86b5bb89e8afcb = L.rectangle(
                 [[48.0, 16.0], [48.4, 16.5]],
                 {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;red&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: false, &quot;fillColor&quot;: &quot;red&quot;, &quot;fillOpacity&quot;: 0.2, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;noClip&quot;: false, &quot;opacity&quot;: 1.0, &quot;smoothFactor&quot;: 1.0, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
-            ).addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            ).addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_ac65a7969e81e3037f835b4ef8be3fc1 = L.imageOverlay(
+            var image_overlay_3e16068d583b58988b21ebd64daa3edd = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170811__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6844,10 +6844,10 @@ Attributes:
             );
         
     
-            image_overlay_ac65a7969e81e3037f835b4ef8be3fc1.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_3e16068d583b58988b21ebd64daa3edd.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_5b2c52c340232bb431eca151e4831d1a = L.imageOverlay(
+            var image_overlay_d8e6e4ab44a0c70fe04de8ff8f2d14fc = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170746__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6855,10 +6855,10 @@ Attributes:
             );
         
     
-            image_overlay_5b2c52c340232bb431eca151e4831d1a.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_d8e6e4ab44a0c70fe04de8ff8f2d14fc.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_d195dd01beaebb9b6d63c0e8e9f97662 = L.imageOverlay(
+            var image_overlay_34cebd9683ba9dd3cb6f661e8714be51 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221007T170721__VV_A117_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6866,10 +6866,10 @@ Attributes:
             );
         
     
-            image_overlay_d195dd01beaebb9b6d63c0e8e9f97662.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_34cebd9683ba9dd3cb6f661e8714be51.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_7d96e2a483cccb6d8949508873dd7adb = L.imageOverlay(
+            var image_overlay_07d957bf283bc7dd074ad89efb9765aa = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221007T170721__VV_A117_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6877,10 +6877,10 @@ Attributes:
             );
         
     
-            image_overlay_7d96e2a483cccb6d8949508873dd7adb.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_07d957bf283bc7dd074ad89efb9765aa.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_110fb97595bd7c1e49966d6d83ecd931 = L.imageOverlay(
+            var image_overlay_e80500d464ebf3f09fafbf17d623980e = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221007T170656__VV_A117_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6888,10 +6888,10 @@ Attributes:
             );
         
     
-            image_overlay_110fb97595bd7c1e49966d6d83ecd931.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_e80500d464ebf3f09fafbf17d623980e.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_4169af4bb983acbdf7aa531921face75 = L.imageOverlay(
+            var image_overlay_b38081ec763655208800b95b45d8adeb = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221007T170631__VV_A117_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6899,10 +6899,10 @@ Attributes:
             );
         
     
-            image_overlay_4169af4bb983acbdf7aa531921face75.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_b38081ec763655208800b95b45d8adeb.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_01a0d5e3cb4b30a68dd712ece078488e = L.imageOverlay(
+            var image_overlay_e7847253d71f850a72dca1aef195a1d9 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221006T051947__VV_D095_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6910,10 +6910,10 @@ Attributes:
             );
         
     
-            image_overlay_01a0d5e3cb4b30a68dd712ece078488e.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_e7847253d71f850a72dca1aef195a1d9.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_f452ed778f3de5b28d8671d8ff969418 = L.imageOverlay(
+            var image_overlay_088201e5c105182a1d4c6b91035b2849 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221006T051922__VV_D095_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6921,10 +6921,10 @@ Attributes:
             );
         
     
-            image_overlay_f452ed778f3de5b28d8671d8ff969418.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_088201e5c105182a1d4c6b91035b2849.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_068434e2555a0120237970dcb3e23468 = L.imageOverlay(
+            var image_overlay_913c5451cdf8359a7ee734e593e964da = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221006T051857__VV_D095_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -6932,10 +6932,10 @@ Attributes:
             );
         
     
-            image_overlay_068434e2555a0120237970dcb3e23468.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_913c5451cdf8359a7ee734e593e964da.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_72b05b67b46ecdf6c19bab698cc254ba = L.imageOverlay(
+            var image_overlay_a5cd3f5e060ff33b7ead952c17390d5e = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221006T051857__VV_D095_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -6943,10 +6943,10 @@ Attributes:
             );
         
     
-            image_overlay_72b05b67b46ecdf6c19bab698cc254ba.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_a5cd3f5e060ff33b7ead952c17390d5e.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_31a8f909d393220b4564a78eaad51367 = L.imageOverlay(
+            var image_overlay_7bd6116655978d2fcf8b72ed7adce289 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221006T051857__VV_D095_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6954,10 +6954,10 @@ Attributes:
             );
         
     
-            image_overlay_31a8f909d393220b4564a78eaad51367.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_7bd6116655978d2fcf8b72ed7adce289.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_8599d3f01b16392666dce9bc67523cfd = L.imageOverlay(
+            var image_overlay_93c64b9f1157558e0884042efff0df70 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221006T051857__VV_D095_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -6965,10 +6965,10 @@ Attributes:
             );
         
     
-            image_overlay_8599d3f01b16392666dce9bc67523cfd.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_93c64b9f1157558e0884042efff0df70.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_b94df61a77031adc46ece414c1c65fd4 = L.imageOverlay(
+            var image_overlay_2bfccb278be533b070084db8e532a371 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221006T051832__VV_D095_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -6976,10 +6976,10 @@ Attributes:
             );
         
     
-            image_overlay_b94df61a77031adc46ece414c1c65fd4.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_2bfccb278be533b070084db8e532a371.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_9b72f94dcd39cef903c5f8ead2f520d7 = L.imageOverlay(
+            var image_overlay_abe9584f52fa480c49fff64d125bfc85 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221006T051832__VV_D095_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -6987,10 +6987,10 @@ Attributes:
             );
         
     
-            image_overlay_9b72f94dcd39cef903c5f8ead2f520d7.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_abe9584f52fa480c49fff64d125bfc85.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_9542e29e942db160f5917425f1aac3e4 = L.imageOverlay(
+            var image_overlay_c95f94956a41a91853b075540cad0392 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221006T051807__VV_D095_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -6998,10 +6998,10 @@ Attributes:
             );
         
     
-            image_overlay_9542e29e942db160f5917425f1aac3e4.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_c95f94956a41a91853b075540cad0392.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_1762efcce656dfa60d40d78b1eb6e70c = L.imageOverlay(
+            var image_overlay_417608905d55f45f9170417eda181d69 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221006T051807__VV_D095_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7009,10 +7009,10 @@ Attributes:
             );
         
     
-            image_overlay_1762efcce656dfa60d40d78b1eb6e70c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_417608905d55f45f9170417eda181d69.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_9b78cf3166c3ec3d465d244f4ad517ce = L.imageOverlay(
+            var image_overlay_68e7b3ea06d6196a277dc3b997d2a2cb = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221004T164341__VV_A073_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7020,10 +7020,10 @@ Attributes:
             );
         
     
-            image_overlay_9b78cf3166c3ec3d465d244f4ad517ce.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_68e7b3ea06d6196a277dc3b997d2a2cb.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_a7727c763684eb137c42c42beccf869c = L.imageOverlay(
+            var image_overlay_9bc356d55c9ef30f7809ac924fb51399 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221004T164316__VV_A073_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7031,10 +7031,10 @@ Attributes:
             );
         
     
-            image_overlay_a7727c763684eb137c42c42beccf869c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_9bc356d55c9ef30f7809ac924fb51399.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_682898d450b37a49e3c385856a9bd3d9 = L.imageOverlay(
+            var image_overlay_da6f60046c3bea850585b2ed15dfdc79 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221004T164251__VV_A073_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7042,10 +7042,10 @@ Attributes:
             );
         
     
-            image_overlay_682898d450b37a49e3c385856a9bd3d9.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_da6f60046c3bea850585b2ed15dfdc79.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_c4326e47bee042adce05299488772305 = L.imageOverlay(
+            var image_overlay_f03a302ecb8f623d6bd74f8c4035fcc9 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221004T164251__VV_A073_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7053,10 +7053,10 @@ Attributes:
             );
         
     
-            image_overlay_c4326e47bee042adce05299488772305.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_f03a302ecb8f623d6bd74f8c4035fcc9.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_be68e839eb6d573d8cfa25d6750c6a64 = L.imageOverlay(
+            var image_overlay_45d5576ffd24bab473941608a131ed30 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221004T164226__VV_A073_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7064,10 +7064,10 @@ Attributes:
             );
         
     
-            image_overlay_be68e839eb6d573d8cfa25d6750c6a64.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_45d5576ffd24bab473941608a131ed30.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_711cf3be3b27f973af69e82c1f95e50a = L.imageOverlay(
+            var image_overlay_84a25f0caa8ee0630eb95bee4eb0514c = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221004T164201__VV_A073_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7075,10 +7075,10 @@ Attributes:
             );
         
     
-            image_overlay_711cf3be3b27f973af69e82c1f95e50a.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_84a25f0caa8ee0630eb95bee4eb0514c.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_edb09350203ea881cf9cbac6be16353c = L.imageOverlay(
+            var image_overlay_8666e89a82793de7ebfb40e8c95b9888 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221004T053519__VV_D066_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7086,10 +7086,10 @@ Attributes:
             );
         
     
-            image_overlay_edb09350203ea881cf9cbac6be16353c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_8666e89a82793de7ebfb40e8c95b9888.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_e4dab4b14bb747c0f8ea545b33cfab5e = L.imageOverlay(
+            var image_overlay_a681b65135ad9351ea3cb696fcc9373d = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221004T053454__VV_D066_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7097,10 +7097,10 @@ Attributes:
             );
         
     
-            image_overlay_e4dab4b14bb747c0f8ea545b33cfab5e.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_a681b65135ad9351ea3cb696fcc9373d.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_2325f2d70706220f3017b043033dfb40 = L.imageOverlay(
+            var image_overlay_b4a3052ab7985b44636d45d8dc20a1b8 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_NA020M/E036N075T3/SIG0_20221003T180255__VV_D059_E036N075T3_NA020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[48.75587082731082, -178.46985883164925], [51.96814685810471, 179.79983153410512]],
                 {
@@ -7108,10 +7108,10 @@ Attributes:
             );
         
     
-            image_overlay_2325f2d70706220f3017b043033dfb40.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_b4a3052ab7985b44636d45d8dc20a1b8.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_7890bcba2877242b4559c86732eba9b1 = L.imageOverlay(
+            var image_overlay_0576cefee1f4956a0ef284462c00b92f = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221003T045452__VV_D051_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7119,10 +7119,10 @@ Attributes:
             );
         
     
-            image_overlay_7890bcba2877242b4559c86732eba9b1.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_0576cefee1f4956a0ef284462c00b92f.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_89aa92c4cb68744843d770ac4c391d35 = L.imageOverlay(
+            var image_overlay_59271978b4f8eea6a2375a1cda9c2e42 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221003T045427__VV_D051_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7130,10 +7130,10 @@ Attributes:
             );
         
     
-            image_overlay_89aa92c4cb68744843d770ac4c391d35.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_59271978b4f8eea6a2375a1cda9c2e42.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_70aa0d64ffd012118f0b34d98156df13 = L.imageOverlay(
+            var image_overlay_d2b74aeedeec920c7c0f48e987c0ace4 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221003T045427__VV_D051_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7141,10 +7141,10 @@ Attributes:
             );
         
     
-            image_overlay_70aa0d64ffd012118f0b34d98156df13.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_d2b74aeedeec920c7c0f48e987c0ace4.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_8a1312bd5d9021d2695313c1ae5a019c = L.imageOverlay(
+            var image_overlay_7b637271d0f80daf4ec52ce9e049e5f5 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221003T045402__VV_D051_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7152,10 +7152,10 @@ Attributes:
             );
         
     
-            image_overlay_8a1312bd5d9021d2695313c1ae5a019c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_7b637271d0f80daf4ec52ce9e049e5f5.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_f05d8f8d195eb8df03bcae8df045cd92 = L.imageOverlay(
+            var image_overlay_59474a1867d03321571f55f28a8db895 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221003T045337__VV_D051_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7163,10 +7163,10 @@ Attributes:
             );
         
     
-            image_overlay_f05d8f8d195eb8df03bcae8df045cd92.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_59474a1867d03321571f55f28a8db895.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_5fe729559f4fa34b6fe6eab3d5e96ca1 = L.imageOverlay(
+            var image_overlay_944e88defedfc27f8ffa62766f579229 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221002T165954__VV_A044_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7174,10 +7174,10 @@ Attributes:
             );
         
     
-            image_overlay_5fe729559f4fa34b6fe6eab3d5e96ca1.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_944e88defedfc27f8ffa62766f579229.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_63b15d312f71fdb0a06e3880ba86fd71 = L.imageOverlay(
+            var image_overlay_3ab2052cc9b1a0588a55864de2e2721a = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221002T165954__VV_A044_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7185,10 +7185,10 @@ Attributes:
             );
         
     
-            image_overlay_63b15d312f71fdb0a06e3880ba86fd71.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_3ab2052cc9b1a0588a55864de2e2721a.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_5c4ab7533061f2531ecce4fbea45fadd = L.imageOverlay(
+            var image_overlay_617af7549d188e22aa0ada381db5406f = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221002T165929__VV_A044_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7196,10 +7196,10 @@ Attributes:
             );
         
     
-            image_overlay_5c4ab7533061f2531ecce4fbea45fadd.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_617af7549d188e22aa0ada381db5406f.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_e8fa7a1dc0102b21cd5b34af465d8732 = L.imageOverlay(
+            var image_overlay_c9551f18062d9a3a30339752f4aa2636 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221002T165929__VV_A044_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7207,10 +7207,10 @@ Attributes:
             );
         
     
-            image_overlay_e8fa7a1dc0102b21cd5b34af465d8732.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_c9551f18062d9a3a30339752f4aa2636.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_5a4ec95856010488d6461944530a86c9 = L.imageOverlay(
+            var image_overlay_6b5a24665b301d1b8be5f1d1f8410ae7 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221002T165904__VV_A044_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7218,10 +7218,10 @@ Attributes:
             );
         
     
-            image_overlay_5a4ec95856010488d6461944530a86c9.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_6b5a24665b301d1b8be5f1d1f8410ae7.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_e52770a879edbc2c85be8515377322af = L.imageOverlay(
+            var image_overlay_6e99b3a937d3dc38fae1cd886b9c9734 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221002T165904__VV_A044_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7229,10 +7229,10 @@ Attributes:
             );
         
     
-            image_overlay_e52770a879edbc2c85be8515377322af.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_6e99b3a937d3dc38fae1cd886b9c9734.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_e32c7bf071ae0a77d63401e4f8cde23f = L.imageOverlay(
+            var image_overlay_0b6d65d1ebad5f94b16650ec56b9e921 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221002T165904__VV_A044_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7240,10 +7240,10 @@ Attributes:
             );
         
     
-            image_overlay_e32c7bf071ae0a77d63401e4f8cde23f.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_0b6d65d1ebad5f94b16650ec56b9e921.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_943beec9ffb976a0ba878f7b7098dfec = L.imageOverlay(
+            var image_overlay_21a4c13ac73fa60813f53068f9c26a7d = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221002T165904__VV_A044_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -7251,10 +7251,10 @@ Attributes:
             );
         
     
-            image_overlay_943beec9ffb976a0ba878f7b7098dfec.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_21a4c13ac73fa60813f53068f9c26a7d.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_0ad6128efe28b00311b5275ad2b95cb0 = L.imageOverlay(
+            var image_overlay_5ca37158c3ef8ecde1b60fe5309b1f81 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221002T165839__VV_A044_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7262,10 +7262,10 @@ Attributes:
             );
         
     
-            image_overlay_0ad6128efe28b00311b5275ad2b95cb0.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_5ca37158c3ef8ecde1b60fe5309b1f81.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_85a04f640b38a75d55e3bf0d0223c460 = L.imageOverlay(
+            var image_overlay_b9df8946d9793069299f064380970ac8 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221002T165839__VV_A044_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -7273,10 +7273,10 @@ Attributes:
             );
         
     
-            image_overlay_85a04f640b38a75d55e3bf0d0223c460.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_b9df8946d9793069299f064380970ac8.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_de9628f65fbdf2db77cf1e3a88464e3c = L.imageOverlay(
+            var image_overlay_92bee1bde804fd7bad5944f05840bf4d = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221001T051136__VV_D022_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7284,10 +7284,10 @@ Attributes:
             );
         
     
-            image_overlay_de9628f65fbdf2db77cf1e3a88464e3c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_92bee1bde804fd7bad5944f05840bf4d.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_f9aaa20157d37c7d83745b8c3d1e1621 = L.imageOverlay(
+            var image_overlay_532e2b67b47f41df68ec2215f84dae36 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221001T051136__VV_D022_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -7295,10 +7295,10 @@ Attributes:
             );
         
     
-            image_overlay_f9aaa20157d37c7d83745b8c3d1e1621.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_532e2b67b47f41df68ec2215f84dae36.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_a3034d1151fb57e98ae64d5a93a087ea = L.imageOverlay(
+            var image_overlay_9f6b0f3982ffaec0840396ae49aceb16 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221001T051111__VV_D022_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7306,10 +7306,10 @@ Attributes:
             );
         
     
-            image_overlay_a3034d1151fb57e98ae64d5a93a087ea.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_9f6b0f3982ffaec0840396ae49aceb16.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_1dfe3cd183dd099eed6d8a889fb8efc2 = L.imageOverlay(
+            var image_overlay_a225fcaa0d5572c8d9352070b1cd0c2b = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221001T051111__VV_D022_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -7317,10 +7317,10 @@ Attributes:
             );
         
     
-            image_overlay_1dfe3cd183dd099eed6d8a889fb8efc2.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_a225fcaa0d5572c8d9352070b1cd0c2b.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_9245207a80e24b5ca7a7be5a8c84854c = L.imageOverlay(
+            var image_overlay_3f232b38b5487c7596a99e0562790da9 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221001T051046__VV_D022_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7328,10 +7328,10 @@ Attributes:
             );
         
     
-            image_overlay_9245207a80e24b5ca7a7be5a8c84854c.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_3f232b38b5487c7596a99e0562790da9.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_1e4de19708d11b76ac866af3c6e25419 = L.imageOverlay(
+            var image_overlay_7c155325348c31ad7ce272101564ea41 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N012T3/SIG0_20221001T051046__VV_D022_E051N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[44.30312794759763, 14.300858713240709], [47.258967109670905, 18.510048506404672]],
                 {
@@ -7339,10 +7339,10 @@ Attributes:
             );
         
     
-            image_overlay_1e4de19708d11b76ac866af3c6e25419.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_7c155325348c31ad7ce272101564ea41.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_de04edaa994358c8a9b13d224dc0d007 = L.imageOverlay(
+            var image_overlay_fb7547605404b7da6d5ff43718746f26 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221001T051046__VV_D022_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7350,10 +7350,10 @@ Attributes:
             );
         
     
-            image_overlay_de04edaa994358c8a9b13d224dc0d007.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_fb7547605404b7da6d5ff43718746f26.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_42e1ed3a4e6b4c4e8f19e2982d1e5ece = L.imageOverlay(
+            var image_overlay_6ac8e26ceee7b1d6d510bb1e66675c37 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N012T3/SIG0_20221001T051046__VV_D022_E048N012T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[43.90398467125304, 10.428304773879525], [46.97589438776257, 14.773124633455096]],
                 {
@@ -7361,10 +7361,10 @@ Attributes:
             );
         
     
-            image_overlay_42e1ed3a4e6b4c4e8f19e2982d1e5ece.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_6ac8e26ceee7b1d6d510bb1e66675c37.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_d82ae058168241f6e07875bcf8fb8fb1 = L.imageOverlay(
+            var image_overlay_b708ff53e4c0949c65dadf09e623728d = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221001T051021__VV_D022_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7372,10 +7372,10 @@ Attributes:
             );
         
     
-            image_overlay_d82ae058168241f6e07875bcf8fb8fb1.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_b708ff53e4c0949c65dadf09e623728d.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_c252f868bd9b1243ba30110f1c2ae16d = L.imageOverlay(
+            var image_overlay_a685ce833856c5672b08b3d8e29603e0 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221001T051021__VV_D022_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7383,10 +7383,10 @@ Attributes:
             );
         
     
-            image_overlay_c252f868bd9b1243ba30110f1c2ae16d.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_a685ce833856c5672b08b3d8e29603e0.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_e23bde21bfb47cb3d09df08713b48f44 = L.imageOverlay(
+            var image_overlay_9e6ae7736c8cf4c81294f43e896414a1 = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E051N015T3/SIG0_20221001T050956__VV_D022_E051N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.97589438776257, 13.764210082457867], [49.946137426193815, 18.226337492631504]],
                 {
@@ -7394,10 +7394,10 @@ Attributes:
             );
         
     
-            image_overlay_e23bde21bfb47cb3d09df08713b48f44.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_9e6ae7736c8cf4c81294f43e896414a1.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var image_overlay_c1de2cd810db1d5aaecd7d8bc82ecf29 = L.imageOverlay(
+            var image_overlay_aef73caa29be90d32c913ea0a078820f = L.imageOverlay(
                 &quot;https://data.eodc.eu/collections/SENTINEL1_SIG0_20M/V1M1R1/EQUI7_EU020M/E048N015T3/SIG0_20221001T050956__VV_D022_E048N015T3_EU020M_V1M1R1_S1AIWGRDH_TUWIEN.tif/thumbnail&quot;,
                 [[46.551778699301416, 9.68932306318512], [49.64394265685644, 14.300858713240709]],
                 {
@@ -7405,78 +7405,78 @@ Attributes:
             );
         
     
-            image_overlay_c1de2cd810db1d5aaecd7d8bc82ecf29.addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            image_overlay_aef73caa29be90d32c913ea0a078820f.addTo(map_972750d484652cfff2a30389aedd2ebc);
         
     
-            var layer_control_07772dfa215181d5ac592eff894e0131_layers = {
+            var layer_control_54a7eb18716ce7ac5f857cf3eb0ad32c_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_1da38027f1e8c0592042b7a7c93fa820,
+                    &quot;openstreetmap&quot; : tile_layer_be2e3469c2c0dbef9ba78662160d1d22,
                 },
                 overlays :  {
-                    &quot;Area of Interest&quot; : geo_json_80f490d5e08c18fec78bb4a45528189c,
-                    &quot;macro_element_ac65a7969e81e3037f835b4ef8be3fc1&quot; : image_overlay_ac65a7969e81e3037f835b4ef8be3fc1,
-                    &quot;macro_element_5b2c52c340232bb431eca151e4831d1a&quot; : image_overlay_5b2c52c340232bb431eca151e4831d1a,
-                    &quot;macro_element_d195dd01beaebb9b6d63c0e8e9f97662&quot; : image_overlay_d195dd01beaebb9b6d63c0e8e9f97662,
-                    &quot;macro_element_7d96e2a483cccb6d8949508873dd7adb&quot; : image_overlay_7d96e2a483cccb6d8949508873dd7adb,
-                    &quot;macro_element_110fb97595bd7c1e49966d6d83ecd931&quot; : image_overlay_110fb97595bd7c1e49966d6d83ecd931,
-                    &quot;macro_element_4169af4bb983acbdf7aa531921face75&quot; : image_overlay_4169af4bb983acbdf7aa531921face75,
-                    &quot;macro_element_01a0d5e3cb4b30a68dd712ece078488e&quot; : image_overlay_01a0d5e3cb4b30a68dd712ece078488e,
-                    &quot;macro_element_f452ed778f3de5b28d8671d8ff969418&quot; : image_overlay_f452ed778f3de5b28d8671d8ff969418,
-                    &quot;macro_element_068434e2555a0120237970dcb3e23468&quot; : image_overlay_068434e2555a0120237970dcb3e23468,
-                    &quot;macro_element_72b05b67b46ecdf6c19bab698cc254ba&quot; : image_overlay_72b05b67b46ecdf6c19bab698cc254ba,
-                    &quot;macro_element_31a8f909d393220b4564a78eaad51367&quot; : image_overlay_31a8f909d393220b4564a78eaad51367,
-                    &quot;macro_element_8599d3f01b16392666dce9bc67523cfd&quot; : image_overlay_8599d3f01b16392666dce9bc67523cfd,
-                    &quot;macro_element_b94df61a77031adc46ece414c1c65fd4&quot; : image_overlay_b94df61a77031adc46ece414c1c65fd4,
-                    &quot;macro_element_9b72f94dcd39cef903c5f8ead2f520d7&quot; : image_overlay_9b72f94dcd39cef903c5f8ead2f520d7,
-                    &quot;macro_element_9542e29e942db160f5917425f1aac3e4&quot; : image_overlay_9542e29e942db160f5917425f1aac3e4,
-                    &quot;macro_element_1762efcce656dfa60d40d78b1eb6e70c&quot; : image_overlay_1762efcce656dfa60d40d78b1eb6e70c,
-                    &quot;macro_element_9b78cf3166c3ec3d465d244f4ad517ce&quot; : image_overlay_9b78cf3166c3ec3d465d244f4ad517ce,
-                    &quot;macro_element_a7727c763684eb137c42c42beccf869c&quot; : image_overlay_a7727c763684eb137c42c42beccf869c,
-                    &quot;macro_element_682898d450b37a49e3c385856a9bd3d9&quot; : image_overlay_682898d450b37a49e3c385856a9bd3d9,
-                    &quot;macro_element_c4326e47bee042adce05299488772305&quot; : image_overlay_c4326e47bee042adce05299488772305,
-                    &quot;macro_element_be68e839eb6d573d8cfa25d6750c6a64&quot; : image_overlay_be68e839eb6d573d8cfa25d6750c6a64,
-                    &quot;macro_element_711cf3be3b27f973af69e82c1f95e50a&quot; : image_overlay_711cf3be3b27f973af69e82c1f95e50a,
-                    &quot;macro_element_edb09350203ea881cf9cbac6be16353c&quot; : image_overlay_edb09350203ea881cf9cbac6be16353c,
-                    &quot;macro_element_e4dab4b14bb747c0f8ea545b33cfab5e&quot; : image_overlay_e4dab4b14bb747c0f8ea545b33cfab5e,
-                    &quot;macro_element_2325f2d70706220f3017b043033dfb40&quot; : image_overlay_2325f2d70706220f3017b043033dfb40,
-                    &quot;macro_element_7890bcba2877242b4559c86732eba9b1&quot; : image_overlay_7890bcba2877242b4559c86732eba9b1,
-                    &quot;macro_element_89aa92c4cb68744843d770ac4c391d35&quot; : image_overlay_89aa92c4cb68744843d770ac4c391d35,
-                    &quot;macro_element_70aa0d64ffd012118f0b34d98156df13&quot; : image_overlay_70aa0d64ffd012118f0b34d98156df13,
-                    &quot;macro_element_8a1312bd5d9021d2695313c1ae5a019c&quot; : image_overlay_8a1312bd5d9021d2695313c1ae5a019c,
-                    &quot;macro_element_f05d8f8d195eb8df03bcae8df045cd92&quot; : image_overlay_f05d8f8d195eb8df03bcae8df045cd92,
-                    &quot;macro_element_5fe729559f4fa34b6fe6eab3d5e96ca1&quot; : image_overlay_5fe729559f4fa34b6fe6eab3d5e96ca1,
-                    &quot;macro_element_63b15d312f71fdb0a06e3880ba86fd71&quot; : image_overlay_63b15d312f71fdb0a06e3880ba86fd71,
-                    &quot;macro_element_5c4ab7533061f2531ecce4fbea45fadd&quot; : image_overlay_5c4ab7533061f2531ecce4fbea45fadd,
-                    &quot;macro_element_e8fa7a1dc0102b21cd5b34af465d8732&quot; : image_overlay_e8fa7a1dc0102b21cd5b34af465d8732,
-                    &quot;macro_element_5a4ec95856010488d6461944530a86c9&quot; : image_overlay_5a4ec95856010488d6461944530a86c9,
-                    &quot;macro_element_e52770a879edbc2c85be8515377322af&quot; : image_overlay_e52770a879edbc2c85be8515377322af,
-                    &quot;macro_element_e32c7bf071ae0a77d63401e4f8cde23f&quot; : image_overlay_e32c7bf071ae0a77d63401e4f8cde23f,
-                    &quot;macro_element_943beec9ffb976a0ba878f7b7098dfec&quot; : image_overlay_943beec9ffb976a0ba878f7b7098dfec,
-                    &quot;macro_element_0ad6128efe28b00311b5275ad2b95cb0&quot; : image_overlay_0ad6128efe28b00311b5275ad2b95cb0,
-                    &quot;macro_element_85a04f640b38a75d55e3bf0d0223c460&quot; : image_overlay_85a04f640b38a75d55e3bf0d0223c460,
-                    &quot;macro_element_de9628f65fbdf2db77cf1e3a88464e3c&quot; : image_overlay_de9628f65fbdf2db77cf1e3a88464e3c,
-                    &quot;macro_element_f9aaa20157d37c7d83745b8c3d1e1621&quot; : image_overlay_f9aaa20157d37c7d83745b8c3d1e1621,
-                    &quot;macro_element_a3034d1151fb57e98ae64d5a93a087ea&quot; : image_overlay_a3034d1151fb57e98ae64d5a93a087ea,
-                    &quot;macro_element_1dfe3cd183dd099eed6d8a889fb8efc2&quot; : image_overlay_1dfe3cd183dd099eed6d8a889fb8efc2,
-                    &quot;macro_element_9245207a80e24b5ca7a7be5a8c84854c&quot; : image_overlay_9245207a80e24b5ca7a7be5a8c84854c,
-                    &quot;macro_element_1e4de19708d11b76ac866af3c6e25419&quot; : image_overlay_1e4de19708d11b76ac866af3c6e25419,
-                    &quot;macro_element_de04edaa994358c8a9b13d224dc0d007&quot; : image_overlay_de04edaa994358c8a9b13d224dc0d007,
-                    &quot;macro_element_42e1ed3a4e6b4c4e8f19e2982d1e5ece&quot; : image_overlay_42e1ed3a4e6b4c4e8f19e2982d1e5ece,
-                    &quot;macro_element_d82ae058168241f6e07875bcf8fb8fb1&quot; : image_overlay_d82ae058168241f6e07875bcf8fb8fb1,
-                    &quot;macro_element_c252f868bd9b1243ba30110f1c2ae16d&quot; : image_overlay_c252f868bd9b1243ba30110f1c2ae16d,
-                    &quot;macro_element_e23bde21bfb47cb3d09df08713b48f44&quot; : image_overlay_e23bde21bfb47cb3d09df08713b48f44,
-                    &quot;macro_element_c1de2cd810db1d5aaecd7d8bc82ecf29&quot; : image_overlay_c1de2cd810db1d5aaecd7d8bc82ecf29,
+                    &quot;Area of Interest&quot; : geo_json_15449dba799439e4af36d4bd9b8eda5d,
+                    &quot;macro_element_3e16068d583b58988b21ebd64daa3edd&quot; : image_overlay_3e16068d583b58988b21ebd64daa3edd,
+                    &quot;macro_element_d8e6e4ab44a0c70fe04de8ff8f2d14fc&quot; : image_overlay_d8e6e4ab44a0c70fe04de8ff8f2d14fc,
+                    &quot;macro_element_34cebd9683ba9dd3cb6f661e8714be51&quot; : image_overlay_34cebd9683ba9dd3cb6f661e8714be51,
+                    &quot;macro_element_07d957bf283bc7dd074ad89efb9765aa&quot; : image_overlay_07d957bf283bc7dd074ad89efb9765aa,
+                    &quot;macro_element_e80500d464ebf3f09fafbf17d623980e&quot; : image_overlay_e80500d464ebf3f09fafbf17d623980e,
+                    &quot;macro_element_b38081ec763655208800b95b45d8adeb&quot; : image_overlay_b38081ec763655208800b95b45d8adeb,
+                    &quot;macro_element_e7847253d71f850a72dca1aef195a1d9&quot; : image_overlay_e7847253d71f850a72dca1aef195a1d9,
+                    &quot;macro_element_088201e5c105182a1d4c6b91035b2849&quot; : image_overlay_088201e5c105182a1d4c6b91035b2849,
+                    &quot;macro_element_913c5451cdf8359a7ee734e593e964da&quot; : image_overlay_913c5451cdf8359a7ee734e593e964da,
+                    &quot;macro_element_a5cd3f5e060ff33b7ead952c17390d5e&quot; : image_overlay_a5cd3f5e060ff33b7ead952c17390d5e,
+                    &quot;macro_element_7bd6116655978d2fcf8b72ed7adce289&quot; : image_overlay_7bd6116655978d2fcf8b72ed7adce289,
+                    &quot;macro_element_93c64b9f1157558e0884042efff0df70&quot; : image_overlay_93c64b9f1157558e0884042efff0df70,
+                    &quot;macro_element_2bfccb278be533b070084db8e532a371&quot; : image_overlay_2bfccb278be533b070084db8e532a371,
+                    &quot;macro_element_abe9584f52fa480c49fff64d125bfc85&quot; : image_overlay_abe9584f52fa480c49fff64d125bfc85,
+                    &quot;macro_element_c95f94956a41a91853b075540cad0392&quot; : image_overlay_c95f94956a41a91853b075540cad0392,
+                    &quot;macro_element_417608905d55f45f9170417eda181d69&quot; : image_overlay_417608905d55f45f9170417eda181d69,
+                    &quot;macro_element_68e7b3ea06d6196a277dc3b997d2a2cb&quot; : image_overlay_68e7b3ea06d6196a277dc3b997d2a2cb,
+                    &quot;macro_element_9bc356d55c9ef30f7809ac924fb51399&quot; : image_overlay_9bc356d55c9ef30f7809ac924fb51399,
+                    &quot;macro_element_da6f60046c3bea850585b2ed15dfdc79&quot; : image_overlay_da6f60046c3bea850585b2ed15dfdc79,
+                    &quot;macro_element_f03a302ecb8f623d6bd74f8c4035fcc9&quot; : image_overlay_f03a302ecb8f623d6bd74f8c4035fcc9,
+                    &quot;macro_element_45d5576ffd24bab473941608a131ed30&quot; : image_overlay_45d5576ffd24bab473941608a131ed30,
+                    &quot;macro_element_84a25f0caa8ee0630eb95bee4eb0514c&quot; : image_overlay_84a25f0caa8ee0630eb95bee4eb0514c,
+                    &quot;macro_element_8666e89a82793de7ebfb40e8c95b9888&quot; : image_overlay_8666e89a82793de7ebfb40e8c95b9888,
+                    &quot;macro_element_a681b65135ad9351ea3cb696fcc9373d&quot; : image_overlay_a681b65135ad9351ea3cb696fcc9373d,
+                    &quot;macro_element_b4a3052ab7985b44636d45d8dc20a1b8&quot; : image_overlay_b4a3052ab7985b44636d45d8dc20a1b8,
+                    &quot;macro_element_0576cefee1f4956a0ef284462c00b92f&quot; : image_overlay_0576cefee1f4956a0ef284462c00b92f,
+                    &quot;macro_element_59271978b4f8eea6a2375a1cda9c2e42&quot; : image_overlay_59271978b4f8eea6a2375a1cda9c2e42,
+                    &quot;macro_element_d2b74aeedeec920c7c0f48e987c0ace4&quot; : image_overlay_d2b74aeedeec920c7c0f48e987c0ace4,
+                    &quot;macro_element_7b637271d0f80daf4ec52ce9e049e5f5&quot; : image_overlay_7b637271d0f80daf4ec52ce9e049e5f5,
+                    &quot;macro_element_59474a1867d03321571f55f28a8db895&quot; : image_overlay_59474a1867d03321571f55f28a8db895,
+                    &quot;macro_element_944e88defedfc27f8ffa62766f579229&quot; : image_overlay_944e88defedfc27f8ffa62766f579229,
+                    &quot;macro_element_3ab2052cc9b1a0588a55864de2e2721a&quot; : image_overlay_3ab2052cc9b1a0588a55864de2e2721a,
+                    &quot;macro_element_617af7549d188e22aa0ada381db5406f&quot; : image_overlay_617af7549d188e22aa0ada381db5406f,
+                    &quot;macro_element_c9551f18062d9a3a30339752f4aa2636&quot; : image_overlay_c9551f18062d9a3a30339752f4aa2636,
+                    &quot;macro_element_6b5a24665b301d1b8be5f1d1f8410ae7&quot; : image_overlay_6b5a24665b301d1b8be5f1d1f8410ae7,
+                    &quot;macro_element_6e99b3a937d3dc38fae1cd886b9c9734&quot; : image_overlay_6e99b3a937d3dc38fae1cd886b9c9734,
+                    &quot;macro_element_0b6d65d1ebad5f94b16650ec56b9e921&quot; : image_overlay_0b6d65d1ebad5f94b16650ec56b9e921,
+                    &quot;macro_element_21a4c13ac73fa60813f53068f9c26a7d&quot; : image_overlay_21a4c13ac73fa60813f53068f9c26a7d,
+                    &quot;macro_element_5ca37158c3ef8ecde1b60fe5309b1f81&quot; : image_overlay_5ca37158c3ef8ecde1b60fe5309b1f81,
+                    &quot;macro_element_b9df8946d9793069299f064380970ac8&quot; : image_overlay_b9df8946d9793069299f064380970ac8,
+                    &quot;macro_element_92bee1bde804fd7bad5944f05840bf4d&quot; : image_overlay_92bee1bde804fd7bad5944f05840bf4d,
+                    &quot;macro_element_532e2b67b47f41df68ec2215f84dae36&quot; : image_overlay_532e2b67b47f41df68ec2215f84dae36,
+                    &quot;macro_element_9f6b0f3982ffaec0840396ae49aceb16&quot; : image_overlay_9f6b0f3982ffaec0840396ae49aceb16,
+                    &quot;macro_element_a225fcaa0d5572c8d9352070b1cd0c2b&quot; : image_overlay_a225fcaa0d5572c8d9352070b1cd0c2b,
+                    &quot;macro_element_3f232b38b5487c7596a99e0562790da9&quot; : image_overlay_3f232b38b5487c7596a99e0562790da9,
+                    &quot;macro_element_7c155325348c31ad7ce272101564ea41&quot; : image_overlay_7c155325348c31ad7ce272101564ea41,
+                    &quot;macro_element_fb7547605404b7da6d5ff43718746f26&quot; : image_overlay_fb7547605404b7da6d5ff43718746f26,
+                    &quot;macro_element_6ac8e26ceee7b1d6d510bb1e66675c37&quot; : image_overlay_6ac8e26ceee7b1d6d510bb1e66675c37,
+                    &quot;macro_element_b708ff53e4c0949c65dadf09e623728d&quot; : image_overlay_b708ff53e4c0949c65dadf09e623728d,
+                    &quot;macro_element_a685ce833856c5672b08b3d8e29603e0&quot; : image_overlay_a685ce833856c5672b08b3d8e29603e0,
+                    &quot;macro_element_9e6ae7736c8cf4c81294f43e896414a1&quot; : image_overlay_9e6ae7736c8cf4c81294f43e896414a1,
+                    &quot;macro_element_aef73caa29be90d32c913ea0a078820f&quot; : image_overlay_aef73caa29be90d32c913ea0a078820f,
                 },
             };
-            let layer_control_07772dfa215181d5ac592eff894e0131 = L.control.layers(
-                layer_control_07772dfa215181d5ac592eff894e0131_layers.base_layers,
-                layer_control_07772dfa215181d5ac592eff894e0131_layers.overlays,
+            let layer_control_54a7eb18716ce7ac5f857cf3eb0ad32c = L.control.layers(
+                layer_control_54a7eb18716ce7ac5f857cf3eb0ad32c_layers.base_layers,
+                layer_control_54a7eb18716ce7ac5f857cf3eb0ad32c_layers.overlays,
                 {
   &quot;position&quot;: &quot;topright&quot;,
   &quot;collapsed&quot;: true,
   &quot;autoZIndex&quot;: true,
 }
-            ).addTo(map_de55dba390d102038a0e7dd1d0900b73);
+            ).addTo(map_972750d484652cfff2a30389aedd2ebc);
 
         
 </script>
@@ -7485,7 +7485,7 @@ Attributes:
 </div>
 <p><em>Figure 2: Map of study area. Blue rectangle is the area covered by the discovered data. Red rectangle covers the selected data.</em></p>
 <p>Create a new dataset with the smaller bounding box covering the region of Vienna. We will leave out the arguments for resampling and directly use the native format as defined in the metadata.</p>
-<div id="bb9fcb6e" class="cell" data-execution_count="17">
+<div id="561b3586" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sig0_dc <span class="op">=</span> odc_stac.load(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    items_eodc,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    bands<span class="op">=</span>bands,</span>
@@ -7495,7 +7495,7 @@ Attributes:
 </div>
 <p>Due to the way the data is acquired and stored, some items include “no data” areas. In our case, no data has the value -9999, but this can vary from data provider to data provider. This information can usually be found in the metadata. Furthermore, to save memory, data is often stored as integer (e.g.&nbsp;25) and not in float (e.g.&nbsp;2.5) format. For this reason, the backscatter values are often multiplied by a scale factor, in this case factor 10.</p>
 <p>As Sentinel-1 satellites overpasses Austria every few days, only some time steps of the dataset will have physical data. As a final step, we will now decode the data and create a plot of two consecutive Sentinel-1 acquisitions of Vienna.</p>
-<div id="b0dd0f09" class="cell" data-execution_count="18">
+<div id="e9ff59dc" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve the scale factor and NoData value from the metadata. raster:bands is</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># a STAC raster extension</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>scale <span class="op">=</span> item.assets[<span class="st">"VV"</span>].extra_fields.get(<span class="st">"raster:bands"</span>)[<span class="dv">0</span>][<span class="st">"scale"</span>]</span>
@@ -7508,7 +7508,7 @@ Attributes:
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># (no satellite overpass)</span></span>
 <span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>sig0_dc <span class="op">=</span> sig0_dc.dropna(dim<span class="op">=</span><span class="st">"time"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="a6b132a0" class="cell" data-execution_count="19">
+<div id="3ac240b6" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sig0_dc.VV.plot(col<span class="op">=</span><span class="st">"time"</span>, robust<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">"Greys_r"</span>, aspect<span class="op">=</span><span class="dv">1</span>, size<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
