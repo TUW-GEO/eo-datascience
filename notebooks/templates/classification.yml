@@ -19,4 +19,5 @@ dependencies:
   - seaborn
   - stackstac
   - xarray
+  - pystac == 1.11.0
   - pystac-client
