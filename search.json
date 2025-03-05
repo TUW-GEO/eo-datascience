@@ -14,7 +14,7 @@
     "href": "chapters/courses/microwave-remote-sensing.html",
     "title": "Microwave Remote Sensing",
     "section": "",
-    "text": "This course at the TU Wien teaches students to read, visualize and analyze Synthetic Aperture Radar (SAR) data. This will aid interpretation of SAR data based upon a physical understanding of sensing principles and the interaction of microwaves with natural objects.\n\n\n\n\n\n\nNote\n\n\n\nThese notebooks contain interactive elements. The full interactive elements can only be viewed on Binder by clicking on the Binder badge or 🚀 button.",
+    "text": "This course at the TU Wien teaches students to read, visualize and analyze Synthetic Aperture Radar (SAR) data. This will aid interpretation of SAR data based upon a physical understanding of sensing principles and the interaction of microwaves with natural objects.\n\n\n\nConcepts\nImportance\nNotes\n\n\n\n\nIntro to xarray\nNeccesary\n\n\n\nDask Arrays\nNeccesary\n\n\n\nIntake\nHelpful\n\n\n\nMatplotlib\nHelpful\nPloting in Python\n\n\nDocumentation hvPlot\nHelpful\nInteractive ploting\n\n\nDocumentation odc-stac\nHelpful\nData access\n\n\n\n\nTime to learn: 30 min\n\n\n\n\n\n\n\nNote\n\n\n\nThese notebooks contain interactive elements. The full interactive elements can only be viewed on Binder by clicking on the Binder badge or 🚀 button.",
     "crumbs": [
       "Microwave Remote Sensing"
     ]
@@ -416,6 +416,17 @@
     ]
   },
   {
+    "objectID": "chapters/templates/prereqs-templates.html",
+    "href": "chapters/templates/prereqs-templates.html",
+    "title": "Templates",
+    "section": "",
+    "text": "This section of the Cookbook covers a wide range of topics. The intent is to showcase different applications of remote sensing, which are not in the context of a specific course.\n\n\n\nConcepts\nImportance\nNotes\n\n\n\n\nIntro to xarray\nNeccesary\n\n\n\nDask Arrays\nNeccesary\n\n\n\nDocumentation scikit-learn\nNeccesary\nMachine Learning in Python\n\n\nDocumentation Matplotlib\nHelpful\nPloting in Python\n\n\nDocumentation odc-stac\nHelpful\nData access\n\n\n\n\nTime to learn: 30 min",
+    "crumbs": [
+      "Appendices",
+      "Templates"
+    ]
+  },
+  {
     "objectID": "chapters/templates/classification.html",
     "href": "chapters/templates/classification.html",
     "title": "Appendix A — Classification of Sentinel-2 imagery",
@@ -473,6 +484,17 @@
       "Appendices",
       "Templates",
       "<span class='chapter-number'>A</span>  <span class='chapter-title'>Classification of Sentinel-2 imagery</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/tutorials/prereqs-tutorials.html",
+    "href": "chapters/tutorials/prereqs-tutorials.html",
+    "title": "Tutorials",
+    "section": "",
+    "text": "This section of the Cookbook covers a wide range of topics. The intent is to showcase different applications of remote sensing, which are not in the context of a specific course.\n\n\n\nConcepts\nImportance\nNotes\n\n\n\n\nIntro to xarray\nNeccesary\n\n\n\nDask Arrays\nNeccesary\n\n\n\nDocumentation hvPlot\nHelpful\nInteractive ploting\n\n\nDocumentation odc-stac\nHelpful\nData access\n\n\nScientific Background\nHelpful\n\n\n\n\n\nTime to learn: 30 min",
+    "crumbs": [
+      "Appendices",
+      "Tutorials"
     ]
   },
   {
