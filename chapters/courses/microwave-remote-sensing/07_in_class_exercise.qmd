@@ -1,10 +1,6 @@
 ---
 title: Speckle Statistics
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: eo-datascience-cookbook
 ---
 
 This notebook will provide an empirical demonstration of speckle - how it originates, how it visually and statistically looks like, and some of the most common approaches to filter it.

@@ -31,10 +31,6 @@ help:
 		temporary files"
 	@echo "  make help         - Display this help message"
 
-$(CONDA_ENV)/envs/eo-datascience:
-	- conda update -n base -c conda-forge conda -y
-	conda env create --file environment.yml
-
 $(CONDA_ENV_DIR):
 	$(foreach f, $(YML), \
 		conda env create --file $(f) \
@@ -85,7 +81,7 @@ clean:
 		**/**/*.quarto_ipynb **/__pycache__ **/**/__pycache__ __pycache__
 
 teardown:
-	conda remove -n $(PREFIX)/eo-datascience --all -y
+	conda remove -n $(PREFIX)/eo-datascience-cookbook --all -y
 	$(foreach f, $(REQ), \
 		$(CONDA_ACTIVATE) $(PREFIX)/$(f); \
 		jupyter kernelspec uninstall -y $(f); \
@@ -95,4 +91,8 @@ teardown:
 
 master:
 	python -m pip install .
-	merge_envs --out environment.yml --name eo-datascience-dev
+	merge_envs --out environment.yml --name eo-datascience-cookbook
+	conda env create --file environment.yml --prefix $(PREFIX)/eo-datascience-cookbook
+	$(CONDA_ACTIVATE) $(PREFIX)/eo-datascience-cookbook; \
+	python -m ipykernel install --user --name eo-datascience-cookbook --display-name eo-datascience-cookbook
+	conda deactivate
