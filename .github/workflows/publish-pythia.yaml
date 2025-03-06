@@ -47,12 +47,12 @@ jobs:
           path: |
             ~/.local/share/jupyter/kernels
             ~/.cache/pip
-            /usr/share/miniconda/envs
+            ./conda_envs
             ./chapters/courses/.jupyter_cache
             ./chapters/courses/microwave-remote-sensing/.jupyter_cache
             ./chapters/templates/.jupyter_cache
             ./chapters/tutorials/.jupyter_cache
-          key: ${{ runner.os }}-env-${{ hashFiles('./environment.yml', './notebooks/**/*.yml') }}
+          key: ${{ runner.os }}-env-${{ hashFiles('./environment.yml') }}
           restore-keys: ${{ runner.os }}-env-
 
       - name: Render and Publish
@@ -69,7 +69,7 @@ jobs:
           python -m pip install nbstripout black isort nbqa
           render_sfinx_toc ./pythia
           clean_nb ./notebooks  ./pythia/notebooks
-          merge_envs --out environment.yml --name eo-datascience-cookbook-dev
+          merge_envs --out environment.yml --name eo-datascience-cookbook
           cp -rf ./chapters/references.bib ./pythia/notebooks/
           cp -rf --parents ./notebooks/images ./pythia
           cp -rf --parents $(find notebooks -name "*.yml") environment.yml ./pythia

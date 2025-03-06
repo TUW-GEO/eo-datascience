@@ -1,10 +1,6 @@
 ---
 title: Discover and Read SAR Data
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: eo-datascience-cookbook
 ---
 
 

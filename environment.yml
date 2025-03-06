@@ -1,4 +1,4 @@
-name: eo-datascience
+name: eo-datascience-cookbook
 channels:
   - conda-forge
 dependencies:

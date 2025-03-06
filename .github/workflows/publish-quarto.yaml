@@ -6,8 +6,8 @@ on:
 name: Quarto Publish
 
 permissions:
-    contents: write
-    pages: write
+  contents: write
+  pages: write
 
 jobs:
   build-deploy:
@@ -26,8 +26,8 @@ jobs:
       - name: Install Python and Jupyter
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
       - run: pip install jupyter jupyter-cache
 
       - name: Cache Environment
@@ -36,12 +36,12 @@ jobs:
           path: |
             ~/.local/share/jupyter/kernels
             ~/.cache/pip
-            /usr/share/miniconda/envs
+            ./conda_envs
             ./chapters/courses/.jupyter_cache
             ./chapters/courses/microwave-remote-sensing/.jupyter_cache
             ./chapters/templates/.jupyter_cache
             ./chapters/tutorials/.jupyter_cache
-          key: ${{ runner.os }}-env-${{ hashFiles('./environment.yml', './notebooks/**/*.yml') }}
+          key: ${{ runner.os }}-env-${{ hashFiles('./environment.yml') }}
           restore-keys: ${{ runner.os }}-env-
 
       - name: Render and Publish
