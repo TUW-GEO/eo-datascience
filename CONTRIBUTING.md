@@ -50,7 +50,8 @@ pre-commit install
 
 Furthermore use the provided `Makefile` to:
 
-- **preview** the notebook in Pythia Style with: `make preview`
+- **preview** the notebook in Pythia Style with (optional): `make preview`
 - **setup** the environment with the necessary dependencies: `make environment`
+- **install** the kernels to the environments: `make kernel`
 - **convert** the notebooks with: `make convert`
 - **clean** the repository with: `make clean`
