@@ -8,6 +8,8 @@ I am submitting
 
 - [ ] a new notebook
 - [ ] an update for a notebook
+- [ ] a new feature
+- [ ] a bug fix
 
 <!--
 Please add a brief description of your notebook below and explain why you think it is useful to others. If this is an update, please briefly say what changed.
@@ -25,5 +27,6 @@ I have read and followed the contributing guidelines and, in particular, I
 - [ ] added an `env.yml` file with the minimal dependencies required to run the notebook
 - [ ] tested my notebook locally on my system and it worked
 - [ ] ran the `pre-commit` hooks to ensure my code is formatted correctly
+- [ ] added the notebook to the `_quarto.yml` file
 - [ ] ran the `make preview` command to ensure the desired output is achieved
 - [ ] not added any large or not needed files
