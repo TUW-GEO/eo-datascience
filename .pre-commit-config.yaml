@@ -61,15 +61,15 @@ repos:
       - id: flake8-nb
         args: ["--max-line-length=88"]
 
-  # - repo: local
-  #   hooks:
-  #     - id: convert-ipynb
-  #       name: Convert Jupyter notebooks
-  #       entry: make convert
-  #       language: system
-  #       pass_filenames: false
-
   - repo: https://github.com/kynan/nbstripout
     rev: 0.7.1
     hooks:
       - id: nbstripout
+
+  - repo: local
+    hooks:
+      - id: convert-ipynb
+        name: convert-ipynb
+        files: '.*\.ipynb$'
+        language: script
+        entry: /usr/local/bin/quarto convert
