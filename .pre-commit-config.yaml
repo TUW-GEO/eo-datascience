@@ -71,5 +71,5 @@ repos:
       - id: convert-ipynb
         name: convert-ipynb
         files: '.*\.ipynb$'
-        language: script
-        entry: /usr/local/bin/quarto convert
+        language: python
+        entry: quarto convert

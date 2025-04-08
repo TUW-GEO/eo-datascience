@@ -13,3 +13,5 @@ dependencies:
   - pytest
   - jupyter-book
   - sphinx-pythia-theme
+  - pip:
+      - quarto
