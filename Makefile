@@ -89,7 +89,3 @@ teardown:
 		conda deactivate; \
 		conda remove --prefix $(PREFIX)/$(f) --all -y ; \
 		conda deactivate; )
-
-master:
-	python -m pip install .
-	merge_envs --out environment.yml --name eo-datascience-cookbook-dev
