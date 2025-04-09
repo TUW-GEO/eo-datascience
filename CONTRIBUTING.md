@@ -8,20 +8,39 @@ We accept contributions in the following forms:
 - Discussing the current state of the code
 - Proposing or Submitting new content
 
+## Environment management
+
+For convenience one can install the top level conda environment (`environment.yml`).
+
+```bash
+conda create env --file environment.yml
+conda activate eo-datascience
+```
+
+This environment contains all the tools needed for development.
+
 ## How this project is organized
 
-This repository is connected to the [Pythia Cookbook](https://github.com/ProjectPythia/eo-datascience-cookbook), where the notebooks are rendered into a website. The quarto notebooks from this repository are converted into jupyter notebooks and these are then pushed to the other repository.
+This repository is connected to the [Pythia Cookbook](https://github.com/ProjectPythia/eo-datascience-cookbook), where the notebooks are rendered into a Jupyter Book. The Jupyter notebooks from this repository are reformatted to comply with Jupyter Book prerequisites and these are then pushed to the other repository.
 
 > ![](assets/cookbook.png)
 > A conceptual overview of the linked Repositories and how new content can be added.
 
-The entrypoint for new content is therefore in the chapters directory, where the quarto notebooks are stored. There are curently 3 sections to the book:
+The entrypoint for new content is therefore in the `notebooks` directory, where the Jupyter notebooks are stored. There are currently 3 sections to the book:
 
 - **Courses** which is dedicated to notebooks from courses from TU Wien
 - **Templates** which is dedicated to notebooks that can be used starting points for new projects
 - **Tutorials** which is dedicated to notebooks that are tutorials on how to use the products developed by TU Wien.
 
-Place new content in the appropriate section and make sure to adapt the `_quarto.yml` file to include the new content.
+Place new content in the appropriate section. Run the pre-commit hooks by commiting the files or run without commiting.
+
+```bash
+pre-commit run --all-files
+```
+
+This will automatically format the code and convert all Jupyter notebooks to Quarto equivalents.
+
+As a last step, make sure to adapt the `_quarto.yml` file to include the new content, so that it is visible in both the Quarto and Pythia books.
 
 ## Ground Rules
 
@@ -31,7 +50,7 @@ Make sure your code is running and tested before submitting a pull request.
 
 Use the `pre-commit` hooks to ensure your code is formatted correctly.
 
-If you are submitting a **new notebook**, please make sure it is done in the Quarto `.qmd` format. This makes the source code more readable. Also provide a environment `env.yml` file which lists
+If you are submitting a **new notebook**, please make sure it is done in the Quarto `.qmd` format. This makes the source code more readable. Also provide a environment `<environment>.yml` file which lists
 the minimal dependencies required to run the notebook.
 
 If you are submitting something other than a notebook, please make sure it is well documented and tested.
