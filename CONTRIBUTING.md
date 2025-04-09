@@ -21,7 +21,7 @@ This environment contains all the tools needed for development.
 
 ## How this project is organized
 
-This repository is connected to the [Pythia Cookbook](https://github.com/ProjectPythia/eo-datascience-cookbook), where the notebooks are rendered into a Jupyter Book. The Jupyter notebooks from this repository are reformatted to comply with Jupyter Book prerequisites and these are then pushed to the other repository.
+This repository is connected to the [Project Pythia EO Data Science Cookbook](https://github.com/ProjectPythia/eo-datascience-cookbook), where the notebooks are rendered into a Jupyter Book. The Jupyter notebooks from this repository are reformatted to comply with Jupyter Book prerequisites and these are then pushed to the other repository.
 
 > ![](assets/cookbook.png)
 > A conceptual overview of the linked Repositories and how new content can be added.
