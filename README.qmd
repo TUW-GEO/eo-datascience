@@ -17,4 +17,4 @@ This book is based on [Quarto](https://quarto.org/), a literate programming syst
 
 ## Contributing Guidelines
 
-Please find the contributing guielines in the specific file [here](CONTRIBUTING.md).
+Please find the contributing guidelines in the specific file [here](CONTRIBUTING.md).
