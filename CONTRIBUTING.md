@@ -26,7 +26,11 @@ This repository is connected to the [Project Pythia EO Data Science Cookbook](ht
 > ![](assets/cookbook.png)
 > A conceptual overview of the linked Repositories and how new content can be added.
 
-The entrypoint for new content is therefore in the `notebooks` directory, where the Jupyter notebooks are stored. There are currently 3 sections to the book:
+### Notebooks
+
+The entrypoint for new content is therefore in the `notebooks` directory, where the Jupyter notebooks are stored. Use the [notebook template](https://github.com/TUW-GEO/eo-datascience/tree/0a455daf92f034795a6005549a3b04b1d787393b/assets/template.ipynb) as a starting point and replace the <ENTER TITLE> and <ENTER KERNEl NAME> with the notebook's title and Jupyter kernel's name, respectively.
+
+There are currently 3 sections to the book:
 
 - **Courses** which is dedicated to notebooks from courses from TU Wien
 - **Templates** which is dedicated to notebooks that can be used starting points for new projects
@@ -39,6 +43,12 @@ pre-commit run --all-files
 ```
 
 This will automatically format the code and convert all Jupyter notebooks to Quarto equivalents.
+
+### Data
+
+If you notebook requires data, you need to be able to access the data from an external repository over the internet (e.g. STAC or a HuggingFace Repository). If this condition cannot be met, then the notebook can still be included in the repository but not in the book.
+
+### Book
 
 As a last step, make sure to adapt the `_quarto.yml` file to include the new content, so that it is visible in both the Quarto and Pythia books.
 
