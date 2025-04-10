@@ -28,7 +28,7 @@ This repository is connected to the [Project Pythia EO Data Science Cookbook](ht
 
 ### Notebooks
 
-The entrypoint for new content is therefore in the `notebooks` directory, where the Jupyter notebooks are stored. Use the [notebook template](https://github.com/TUW-GEO/eo-datascience/tree/0a455daf92f034795a6005549a3b04b1d787393b/assets/template.ipynb) as a starting point and replace the <ENTER TITLE> and <ENTER KERNEl NAME> with the notebook's title and Jupyter kernel's name, respectively.
+The entrypoint for new content is therefore in the `notebooks` directory, where the Jupyter notebooks are stored. Use the [notebook template](https://github.com/TUW-GEO/eo-datascience/tree/0a455daf92f034795a6005549a3b04b1d787393b/assets/template.ipynb) as a starting point and replace the `<ENTER TITLE>` and `<ENTER KERNEl NAME>` with the notebook's title and Jupyter kernel's name, respectively.
 
 There are currently 3 sections to the book:
 
@@ -60,8 +60,7 @@ Make sure your code is running and tested before submitting a pull request.
 
 Use the `pre-commit` hooks to ensure your code is formatted correctly.
 
-If you are submitting a **new notebook**, please make sure it is done in the Quarto `.qmd` format. This makes the source code more readable. Also provide a environment `<environment>.yml` file which lists
-the minimal dependencies required to run the notebook.
+If you are submitting a **new notebook**, please make sure it is done in Jupyter `.ipynb` and the Quarto `.qmd` format. The latter makes the source code more readable in a GitHub PR. Also provide a environment `<environment>.yml` file which lists the minimal dependencies required to run the notebook. Follow the [yaml template](https://github.com/TUW-GEO/eo-datascience/tree/0a455daf92f034795a6005549a3b04b1d787393b/assets/template.yml) and replace `<ENTER KERNEl NAME>` with the same name as used in the accompanying notebook.
 
 If you are submitting something other than a notebook, please make sure it is well documented and tested.
 Also make sure that the `pre-commit` hooks are running correctly.

@@ -1,0 +1,5 @@
+name: <ENTER KERNEL NAME>
+channels:
+  - conda-forge
+dependencies:
+  - add your dependencies
