@@ -30,7 +30,7 @@ notebooks from this repository are reformatted to comply with Jupyter
 Book prerequisites and these are then pushed to the other repository.
 
 > ![](assets/cookbook.png) A conceptual overview of the linked
-> Repositories and how new content can be added.
+> repositories and how new content can be added.
 
 ### Notebooks
 
