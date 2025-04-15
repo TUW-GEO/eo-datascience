@@ -70,6 +70,5 @@ repos:
     hooks:
       - id: convert-ipynb
         name: convert-ipynb
-        files: '.*\.ipynb$'
-        language: python
-        entry: quarto convert
+        language: script
+        entry: convert.sh
