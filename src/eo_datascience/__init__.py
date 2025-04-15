@@ -1,4 +1,3 @@
-from eo_datascience._version import __commit__
-from eo_datascience._version import __version__
+from eo_datascience._version import __commit__, __version__
 
 name = "eo_datascience"

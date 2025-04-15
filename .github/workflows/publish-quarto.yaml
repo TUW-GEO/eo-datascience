@@ -6,8 +6,8 @@ on:
 name: Quarto Publish
 
 permissions:
-    contents: write
-    pages: write
+  contents: write
+  pages: write
 
 jobs:
   build-deploy:
@@ -26,8 +26,8 @@ jobs:
       - name: Install Python and Jupyter
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
       - run: pip install jupyter jupyter-cache
 
       - name: Cache Environment
