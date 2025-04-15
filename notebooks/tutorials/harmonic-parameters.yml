@@ -1,4 +1,4 @@
-name: harmonic-params
+name: harmonic-parameters
 channels:
   - conda-forge
 dependencies:

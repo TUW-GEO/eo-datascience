@@ -1,37 +1,31 @@
 ---
-title: Harmonic Parameters of Sentinel 1 Backscatter Time Series - showcase of the concept
-jupyter: python3
+title: Harmonic Parameters of Sentinel 1 Backscatter Time Series
+jupyter:
+  kernelspec:
+    display_name: harmonic-parameters
+    language: python
+    name: harmonic-parameters
+    path: /usr/share/jupyter/kernels/python3
 ---
 
-
-In this notebook, we will show the concept of extracting coefficients that describe seasonal patterns in Sentinel 1 radar backscatter variability. Namely, sine and cosine functions as harmonic oscillators are used to describe periodicities in the time series of, either VV or VH polarisations, backscatter. Those can then be removed from time series and what is left would generally be the noise or transient events, for example floods, volcano erruptions, and whatever is possible to detect with radar Earth Observation data.
-
-
 ```{python}
-import warnings
-import datetime as dt
-from pathlib import Path
-
+import folium
+import holoviews as hv
+import hvplot.xarray  # noqa
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap, BoundaryNorm
-import scipy.optimize as opt
 import xarray as xr
-import zarr
-import folium
-import panel as pn
-import holoviews as hv
-import hvplot.xarray
-
-warnings.filterwarnings("ignore", category=FutureWarning)
-hv.extension("bokeh")
 ```
 
 Loading sigma nought time series.
 
 ```{python}
-timeseries_dc = xr.open_zarr("sigma0_timeseries.zarr")
+timeseries_dc = xr.open_dataset(
+    "simplecache::file:///home/mschobbe/Documents/projects/eo-datascience/notebooks/tutorials/sigma0_timeseries.zarr",
+    engine="zarr",
+    storage_options={"simplecache": {"cache_storage": "/tmp/fsspec_cache/file"}},
+)
 timeseries_dc
 ```
 
@@ -41,9 +35,7 @@ The data that is loaded represents VV and VH backsatter polarisations, as detect
 latmin, latmax = 37.283606, 37.40621527385254
 lonmin, lonmax = 14.826223, 15.109736519516783
 
-bounding_box = [lonmin, latmin, lonmax, latmax]
-
-smaller_bounding_box = [
+bounding_box = [
     [latmin, lonmin],
     [latmax, lonmax],
 ]
@@ -61,7 +53,7 @@ map = folium.Map(
 
 
 folium.Rectangle(
-    bounds=smaller_bounding_box,
+    bounds=bounding_box,
     color="red",
 ).add_to(map)
 
@@ -83,7 +75,7 @@ map
 Let's plot time series of those two points.
 
 ```{python}
-event_date = pd.to_datetime("2018-10-19")
+event_date = pd.to_datetime("2018-05-17")
 
 lake_curve = timeseries_dc.sel(point="lake").VV.hvplot(
     label="Lake Lentini VV",
@@ -138,16 +130,13 @@ phi = 0.0
 y = amplitude * np.cos((2 * np.pi / period) * time + phi)
 
 hv.Curve((time, y), "Time", "Amplitude").opts(
-    title="Simple Cosine Plot",
-    width=1000,
-    height=600,
-    line_width=2
+    title="Simple Cosine Plot", width=1000, height=600, line_width=2
 )
 ```
 
-Now, if we have data of a physical quantitiy over long time period, for example temperature of some region over decades, we have time series. A harmonic regression would be process of least-square-fitting harmonic function to the complex signal or time series. This is done so a seasonal pattern of time series can be detected and filtered out - either to understand physics behind this harmonic nature (for example water cycle that repeats over months) or to detect events that don't regulary repeat, like flood events in water bodies time series.
+Now, if we have measure a physical quantity over a long time period, for example temperature of some region, we have a time series. A harmonic regression is a least-square-fit of a harmonic function to the complex signal - or time series. In regard to microwave backscattering time series this property can be utilized to represent seasonal patterns caused by vegetation. This way we can filter out the vegetation signal from our microwave backscattering time series - to either better understand the physics behind this harmonic or to better detect events that don't seasonally repeat, like flood events.
 
-Harmonic parameters would be input parameters that define such fitted harmonic components, in this case: ampltiude, shifting phase and period of an oscillating function. However, period and starting phase are inside non-linear (sinusoidal) function, so a linearisation has to be done, as those parameters are going to be esimated in least-square regression algorithm. In our case we will only estimate phase shift and amplitude, not period of the harmonics.
+Harmonic parameters would be input parameters that define such fitted harmonic components, in this case: amplitude, shifting phase and period of an oscillating function. However, the period and starting phase are inside the non-linear (sinusoidal) function, so a linearisation has to be done, as those parameters are going to be estimated with a least-square regression algorithm. In our case we will only estimate phase shift and amplitude, not the period of the harmonics.
 
 Using the angle sum identity:
 
@@ -158,8 +147,9 @@ we expand:
 $$ A \cos \left( \frac{2\pi t}{n} + \phi \right) = A \left[ \cos \phi \cos \left( \frac{2\pi t}{n} \right) - \sin \phi \sin \left( \frac{2\pi t}{n} \right) \right] $$
 
 
-#### **Defining Coefficients $ c_i $ and $ s_i $**
-Now, we define coefficients, that have units of a physical quantity (ampltiude, such as temperature or radar backscatter):
+#### Defining Coefficients $ c_i $ and $ s_i $
+
+Now, we can define the coefficients, that have units of a physical quantity (amplitude, such as radar backscatter cross sections):
 
 $$ c = A \cos \phi, \quad s = - A \sin \phi $$
 
@@ -167,20 +157,20 @@ so that the equation becomes:
 
 $$ A \cos \left( \frac{2\pi t}{n} + \phi \right) = c \cdot \cos \left( \frac{2\pi t}{n} \right) + s \cdot \sin \left( \frac{2\pi t}{n} \right) $$
 
-So we extracted starting phase information outside of sinusoidal function. The period information is still there, but only because in this case it is not estimated in least-square process, but predetermined.
+We can then extract the starting phase information outside of the sinusoidal function. The period information is still there, but only because in this case it is not estimated in least-square process, but predetermined.
 
-
-#### **Generalizing to $ k $ Harmonics**
+#### Generalizing to $ k $ Harmonics
 
 A complex signal is generally summation of many basic harmonic terms. Summing over all harmonics, we obtain:
 
 $$ f(t) = f^0 + \sum_{i=1}^{k} \left[ c_i \cos \left( \frac{2\pi i t}{n} \right) + s_i \sin \left( \frac{2\pi i t}{n} \right) \right] $$
 
 where:
+
 - $ f^0 $ is the **mean function value**,
 - $ c_i = A_i \cos \phi_i $ and $ s_i = - A_i \sin \phi_i $ are the **harmonic coefficients**.
 
-In this form different periodicites are covered, for example with $ i = 1, 2, ... k $, we can have periods of $ \frac{1}{n}, \frac{2}{n} $ and so on.
+In this form different periodicities are covered, for example with $ i = 1, 2, ... k $, we can have periods of $ \frac{1}{n}, \frac{2}{n} $, and so on.
 
 ```{python}
 # Simulation of complex signal with many harmonics
@@ -231,15 +221,15 @@ plt.tight_layout()
 plt.show()
 ```
 
-**Recovering Amplitude and Phase**
+### Recovering Amplitude and Phase
 
-If we have estimated harmonic coefficients **$ c_i $** and **$ s_i $** from harmonic regression, we can recover the **original amplitude and phase** for physical interpetation, as:
+Now that we have estimated the harmonic coefficients **$ c_i $** and **$ s_i $** wit the harmonic regression, we can recover the **original amplitude and phase** for a physical interpretation, as:
 
 $$ A_i = \sqrt{c_i^2 + s_i^2} $$
 
 $$ \phi_i = \tan^{-1} \left( -\frac{s_i}{c_i} \right) $$
 
-### Harmonic Model Equation for Radar Backscatter in Flood Events Detection Algorithm
+### Harmonic Model Equation for Radar Backscatter in Flood Detection Algorithm
 
 The harmonic model function is given by:
 
@@ -259,17 +249,18 @@ k &\quad \text{is the number of harmonic iterations}.
 \end{aligned}
 
 
-Let's define a function that will fit a model like this with a least squares method, on `xarray` dataarays. Of course, initial harmonic parameters first need to be estimated or known and their number depends on k.
+Let's define a function that will fit a model like this with a least squares method, on a `xarray` array. Of course, the initial harmonic parameters first need to be estimated or known and their number depends on $k$.
 
 ```{python}
-def build_initial_parameters(dataarray, k):
+def build_initial_parameters(array, k):
     """
     Constructs initial parameters and their names for harmonic curve fitting
-    with option to choose number of k harmonics. Needed for xarray.DataArray.curvefit
+    with option to choose number of k harmonics. Needed for
+    xarray.DataArray.curvefit
 
     Parameters
     ----------
-    dataarray : xarray.DataArray
+    array : xarray.DataArray
         The input 1D time series data for which the harmonic model is being fitted.
 
     k : int
@@ -286,7 +277,7 @@ def build_initial_parameters(dataarray, k):
         A dictionary containing initial guesses for each parameter.
         The mean is initialized from the data, and all harmonic coefficients are set to 1.0.
     """
-    mean_val = float(dataarray.mean().values)
+    mean_val = float(array.mean().values)
 
     param_names = ["mean"]
     for i in range(1, k + 1):
@@ -300,28 +291,32 @@ def build_initial_parameters(dataarray, k):
 ```
 
 ```{python}
-def harmonic_model(t, mean, *coeffs):
+def harmonic_model(t, mean, *coef):
     """
     Harmonic model function for fitting periodic components in time series data.
     To be passed in xarray.DataArray.curvefit as func argument
 
-    This function computes a sum of sine and cosine terms up to a specified number of harmonics.
-    The number of harmonics k is inferred from the length of the coeffs argument (must be 2 * k).
-    The time variable t is expected to be in nanoseconds, e.g., from datetime64[ns] converted to int.
+    This function computes a sum of sine and cosine terms up to a specified
+    number of harmonics. The number of harmonics k is inferred from the length
+    of the coef argument (must be 2 * k). The time variable t is expected to
+    be in nanoseconds, e.g., from datetime64[ns] converted to int.
 
     Parameters
     ----------
     t : array-like or float
-        Time values (in nanoseconds) over which to evaluate the harmonic model. This should match
-        the time coordinate used in the original dataset, converted to integers via .astype('int64').
+        Time values (in nanoseconds) over which to evaluate the harmonic model.
+        This should match the time coordinate used in the original dataset,
+        converted to integers via .astype('int64').
 
     mean : float
-        The mean (baseline) value of the signal to which the harmonic components are added.
+        The mean (baseline) value of the signal to which the harmonic components
+        are added.
 
-    *coeffs : float
+    *coef : float
         Variable-length list of harmonic coefficients, ordered as:
-        [c1, s1, c2, s2, ..., ck, sk], where k = len(coeffs) // 2.
-        Each `ci` and `si` corresponds to the cosine and sine coefficients for the i-th harmonic.
+        [c1, s1, c2, s2, ..., ck, sk], where k = len(coef) // 2.
+        Each `ci` and `si` corresponds to the cosine and sine coefficients for
+        the i-th harmonic.
 
     Returns
     -------
@@ -330,17 +325,18 @@ def harmonic_model(t, mean, *coeffs):
 
     Notes
     -----
-    The fundamental frequency is assumed to be one cycle per year. The time normalization
-    is based on the number of nanoseconds in a year (365 * 24 * 60 * 60 * 1e9).
+    The fundamental frequency is assumed to be one cycle per year. The time
+    normalization is based on the number of nanoseconds in a year (365 * 24 * 60
+    * 60 * 1e9).
     """
     n = 365
     result = mean
 
-    k = len(coeffs) // 2  # Number of harmonics
+    k = len(coef) // 2  # Number of harmonics
 
     for i in range(1, k + 1):
-        c_i = coeffs[2 * (i - 1)]
-        s_i = coeffs[2 * (i - 1) + 1]
+        c_i = coef[2 * (i - 1)]
+        s_i = coef[2 * (i - 1) + 1]
         result += c_i * np.cos(2 * np.pi * i * t / n) + s_i * np.sin(
             2 * np.pi * i * t / n
         )
@@ -348,15 +344,14 @@ def harmonic_model(t, mean, *coeffs):
     return result
 ```
 
-#### Harmonic Function Fitting
+### Harmonic Function Fitting
 
-Now, a time series can be selected from two aformentioned points and polarisations. Let's choose VV polarisation for a land pixel and 3 harmonics (7 parameters).
+Now, the two time series can be selected and the coefficients can be estimated.
+We pick the VV polarisation for a land pixel and 3 harmonics (7 parameters).
 
 ```{python}
-k = 3
-
 land_VV_series = timeseries_dc.sel(point="land").VH
-param_names, p0 = build_initial_parameters(land_VV_series, k)
+param_names, p0 = build_initial_parameters(land_VV_series, k=3)
 
 fit_result = land_VV_series.curvefit(
     coords="time.dayofyear",
@@ -377,7 +372,7 @@ for name, val in zip(fit_result.param.values, estimated_params):
     print(f"{name:>6}: {val: .4f}")
 ```
 
-Now, they can be used to construct a total harmonic signal.
+Now, these coefficient can be used to construct a total harmonic signal.
 
 ```{python}
 # Extract estimated harmonic parameters and reconstruct a signal as xarray dataaray
@@ -398,7 +393,7 @@ plot = land_VV_series.hvplot(
 ) * fitted_da.hvplot(label="Harmonic Fit", color="darkorange", line_width=2.5)
 
 plot.opts(
-    title="Harmonic Model Fit to VV Timeseries of a land pixel",
+    title="Harmonic Model Fit to VV Timeseries over Land",
     xlabel="Time",
     ylabel="VV backscatter",
     # responsive=True,
@@ -407,11 +402,11 @@ plot.opts(
 )
 ```
 
-We can see cycles that happen once a year, twice a year and three times a year, so it makes sense to work with time series over several years. Important parameter is a number of observations (NOBS) - the more the better. It directly relates to the uncertainity of our estimate. With it, the standard deviation is an important parameter, as it tells us how well our harmonic function fits the observations. It does not, however, tell us the uncertainty of the observations, just how well they align with seasonal patterns defined by the model.
+We can see cycles that happen once a year, twice a year and three times a year, so it makes sense to work with time series over several years. Important parameter is a number of observations (NOBS) - the more observations the better. It directly relates to the uncertainty of our estimate. In this respect, the standard deviation is an important parameter, as it tells us how well our harmonic function fits the observations. It does not, however, tell us the uncertainty of the observations, just how well they align with seasonal patterns defined by the model.
 
 ```{python}
-residuals_land = (land_VV_series - fitted_da)
-sse = np.sum(residuals_land.dropna(dim="time").values**2)
+residuals_land = land_VV_series - fitted_da
+sse = np.sum(residuals_land.dropna(dim="time").values ** 2)
 
 nobs = residuals_land.size
 dof = nobs - (2 * k + 1)
@@ -437,18 +432,16 @@ land_residuals_ts.hvplot(
     ylabel="Residual (VV)",
     width=900,
     height=300,
-)
+) * event_line
 ```
 
 #### Lake Lentini Example
 
-Lets see how time summed harmonic signal looks like for a lake pixel, where backscatter is more stable. Therefore, periodicities should be less pronounced, having smaller amplitudes.
+Lets see how time summed harmonic signal looks like for a lake pixel, where backscatter is more stable. Therefore, vegetation periodicities should be less pronounced over water.
 
 ```{python}
-k = 3
-
 lake_VV_series = timeseries_dc.sel(point="lake").VV
-param_names_lake, p0_lake = build_initial_parameters(lake_VV_series, k)
+param_names_lake, p0_lake = build_initial_parameters(lake_VV_series, k=3)
 
 fit_result = lake_VV_series.curvefit(
     coords="time", func=harmonic_model, p0=p0_lake, param_names=param_names_lake
@@ -478,15 +471,14 @@ plot.opts(
     title="Harmonic Model Fit to VV Timeseries of a pixel inside lake Lentini",
     xlabel="Time",
     ylabel="VV backscatter",
-    # responsive=True,
     width=900,
     height=400,
 )
 ```
 
 ```{python}
-residuals_lake = (lake_VV_series - fitted_da)
-sse = np.sum(residuals_lake.dropna(dim="time").values**2)
+residuals_lake = lake_VV_series - fitted_da
+sse = np.sum(residuals_lake.dropna(dim="time").values ** 2)
 
 nobs = residuals_lake.size
 dof = nobs - (2 * k + 1)
@@ -513,11 +505,11 @@ lake_residuals_ts.hvplot(
 )
 ```
 
-As one can notice, general pattern is more around mean value and underlaying periodicies are less pronounced. One can argue that k = 3 actually introduced artefacts, as original signal was not that periodic in the first place.
+As one can notice, general pattern is a more stochastic signal. One can argue that setting `k = 3` actually introduces artifacts, as the original signal was not periodic in the first place.
 
 ### Overfitting Problem - Choosing $k$ iterations
 
-Parameter $k$ that governs the number of harmonic terms, is usually two or three. Higher order terms would lead to overfitting to noise and also flood events. A flood event in time series would be an impulse (jump in backscatter value) that would propagate as an artefact if higher order harmonics are fitted to years-long time series. Higher order terms would usually have low amplitude, an estimation of those would highly depend on noise level in signal. Therefore, those harmonics would not be so physical, or in other words, they wouldn't represent water cycle patterns over months and years.
+Parameter $k$ that governs the number of harmonic terms, is usually two or three. Higher order terms would lead to overfitting. A flood event in time series would be an impulse (jump in backscatter value) that would propagate as an artefact if higher order harmonics are fitted to years-long time series. Higher order terms would usually have low amplitude, an estimation of those would highly depend on noise level in signal. Therefore, those harmonics would not be of a physical nature, or in other words, they wouldn't represent seasonal vegetation cycles.
 
 ```{python}
 ks = [1, 2, 3, 10]
@@ -562,4 +554,3 @@ plot.opts(
     legend_position="top_left",
 )
 ```
-
