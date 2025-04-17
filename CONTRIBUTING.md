@@ -108,8 +108,8 @@ hooks are running correctly.
 - Push your changes to your fork and **submit a pull request** to the
   main repository.
 
-If you want to add new content to the cookbook, provide the `.qmd`
-files, as well as the `env.yml` file. Give the environment file a name
+If you want to add new content to the cookbook, provide the `.ipynb` and `.qmd`
+files, as well as the `<environment>.yml` file. Give the environment file a name
 that is descriptive of the content of the notebook.
 
 ## Pull Requests
