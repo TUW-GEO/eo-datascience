@@ -1,40 +1,24 @@
 ---
 title: Reverend Bayes updates our Belief in Flood Detection
 subtitle: How an 275 year old idea helps map the extent of floods
-jupyter:
-  kernelspec:
-    name: "floodmapping"
-    language: "python"
-    display_name: "floodmapping"
+jupyter: floodmapping
 ---
 
-![Image from [wikipedia](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)
-
-::: {.callout-note}
-This notebook contains interactive elements. The full interactive elements can only be viewed on Binder by clicking on the Binder badge or 🚀 button.
-:::
-
-
-This notebook explains how microwave ($\sigma^0$) backscattering can be used to map the extent of a flood. We replicate in this exercise the work of [@bauer-marschallinger_satellite-based_2022] on the TU Wien Bayesian-based flood mapping algorithm.
-
-
 ```{python}
-import pystac_client
-import numpy as np
-import xarray as xr
-import numpy as np
 import datetime
-import rioxarray  # noqa: F401
-import pandas as pd
 
+import holoviews as hv
 import hvplot.pandas
 import hvplot.xarray
+import numpy as np
+import pandas as pd
 import panel as pn
-import holoviews as hv
+import pystac_client
+import rioxarray  # noqa: F401
+import xarray as xr
 from bokeh.models import FixedTicker
-
-from scipy.stats import norm
 from odc import stac as odc_stac
+from scipy.stats import norm
 
 pn.extension()
 hv.extension("bokeh")
@@ -168,7 +152,7 @@ In the following lines we create a map with microwave backscattering values.
 
 ```{python}
 #| label: fig-area
-#| fig-cap: "Area targeted for $\\sigma^0$ backscattering is the Greek region of Thessaly, which experienced a major flood in February of 2018."
+#| fig-cap: Area targeted for $\sigma^0$ backscattering is the Greek region of Thessaly, which experienced a major flood in February of 2018.
 mrs_view = flood_dc.sig0.hvplot.image(
     x="x", y="y", cmap="viridis", geo=True, tiles=True
 ).opts(frame_height=400)
@@ -274,7 +258,9 @@ Without going into the details of how these likelihoods are calculated, you can 
 
 ```{python}
 #| label: fig-lik
-#| fig-cap: "Likelihoods for $\\sigma^0$ being associated with land or water for 1 pixel in the Greek area of Thessaly. Likelihoods are calculated over a range of $\\sigma^0$. The pixel's observed $\\sigma^0$ is given with a vertical line. Hover on the map to re-calculate and update this figure for another pixel in the study area."
+#| fig-cap: Likelihoods for $\sigma^0$ being associated with land or water for 1 pixel in the Greek area of Thessaly. Likelihoods are calculated over a range of $\sigma^0$. The pixel's observed $\sigma^0$ is given with a vertical line. Hover on the map to re-calculate and update this figure for another pixel in the study area.
+
+
 def model_likelihoods(sigma=(-30, 0), x=None, y=None):
     """
     Model likelihoods over a range of sigma naught.
@@ -313,9 +299,7 @@ likelihood_pdi = hvplot.bind(
 ).interactive()
 
 view_likelihoods = (
-    likelihood_pdi.hvplot(
-        "sigma", "water_likelihood",
-        ylabel="likelihoods").dmap()
+    likelihood_pdi.hvplot("sigma", "water_likelihood", ylabel="likelihoods").dmap()
     * likelihood_pdi.hvplot("sigma", "land_likelihood").dmap()
     * likelihood_pdi.hvplot("observed", "land_likelihood").dmap()
 ).opts(frame_height=200, frame_width=300)
@@ -361,7 +345,7 @@ We can plot the posterior probabilities of flooding and non-flooding again and c
 
 ```{python}
 #| label: fig-post
-#| fig-cap: "Posterior probabilities for $\\sigma^0$ of 1 pixel being associated with land for water in the Greek area of Thessaly. Hover on the map to re-calculate and update this figure for another pixel in the study area."
+#| fig-cap: Posterior probabilities for $\sigma^0$ of 1 pixel being associated with land for water in the Greek area of Thessaly. Hover on the map to re-calculate and update this figure for another pixel in the study area.
 
 
 def model_posteriors(sigma=(-30, 0), x=None, y=None):
@@ -436,7 +420,8 @@ def bayesian_flood_decision(sigma, x=None, y=None):
 
 ```{python}
 #| label: fig-clas
-#| fig-cap: "Flood extent of the Greek region of Thessaly based on Bayesian probabilities are shown on the map superimposed on an open street map. Hover over a pixel to generate the point's water and land likelihoods as well as the posterior probabilities."
+#| fig-cap: Flood extent of the Greek region of Thessaly based on Bayesian probabilities are shown on the map superimposed on an open street map. Hover over a pixel to generate the point's water and land likelihoods as well as the posterior probabilities.
+
 
 flood_dc["decision"] = (
     ("y", "x"),
@@ -451,8 +436,8 @@ colorbar_opts = {
     "ticker": FixedTicker(ticks=[0, 1]),
 }
 flood_view = flood_dc.decision.hvplot.image(
-    x="x", y="y", rasterize=True, geo=True,
-    cmap=["rgba(0, 0, 1, 0.1)", "darkred"]
+    x="x", y="y", rasterize=True, geo=True, cmap=["rgba(0, 0, 1, 0.1)", "darkred"]
 ).opts(frame_height=400, colorbar_opts={**colorbar_opts})
 mrs_view.get(0) * flood_view
 ```
+

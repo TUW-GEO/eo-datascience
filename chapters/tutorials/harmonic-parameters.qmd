@@ -1,11 +1,6 @@
 ---
 title: Harmonic Parameters of Sentinel 1 Backscatter Time Series
-jupyter:
-  kernelspec:
-    display_name: harmonic-parameters
-    language: python
-    name: harmonic-parameters
-    path: /usr/share/jupyter/kernels/python3
+jupyter: harmonic-parameters
 ---
 
 ```{python}
@@ -22,9 +17,11 @@ Loading sigma nought time series.
 
 ```{python}
 timeseries_dc = xr.open_dataset(
-    "simplecache::file:///home/mschobbe/Documents/projects/eo-datascience/notebooks/tutorials/sigma0_timeseries.zarr",
+    "simplecache::zip:///::https://huggingface.co/datasets/martinschobben/tutorials/resolve/main/harmonic-parameters.zarr.zip",  # noqa
     engine="zarr",
-    storage_options={"simplecache": {"cache_storage": "/tmp/fsspec_cache/file"}},
+    storage_options={
+        "simplecache": {"cache_storage": "/tmp/fsspec_cache/harmonic-parameters"}
+    },
 )
 timeseries_dc
 ```
@@ -239,14 +236,14 @@ $$
 
 where:
 
-\begin{aligned}
+$$
 \sigma^0 &\quad \text{is the effective mean radar backscatter,} \\
 \widehat{\sigma}^0 (t_{doy}) &\quad \text{is the estimated radar backscatter at time } t, \\
 t_{doy} &\quad \text{is the time instance (as a day of a year),} \\
 n &= 365 \text{ days} \\
 c_i, s_i &\quad \text{are harmonic coefficients for } i = 1, 2, ..., k, \\
 k &\quad \text{is the number of harmonic iterations}.
-\end{aligned}
+$$
 
 
 Let's define a function that will fit a model like this with a least squares method, on a `xarray` array. Of course, the initial harmonic parameters first need to be estimated or known and their number depends on $k$.
@@ -261,21 +258,26 @@ def build_initial_parameters(array, k):
     Parameters
     ----------
     array : xarray.DataArray
-        The input 1D time series data for which the harmonic model is being fitted.
+        The input 1D time series data for which the harmonic model is being
+        fitted.
 
     k : int
-        Number of harmonics to include in the model. For each harmonic, two parameters
-        (cosine and sine coefficients) will be added: 'c1', 's1', ..., 'ck', 'sk'.
+        Number of harmonics to include in the model. For each harmonic, two
+        parameters
+        (cosine and sine coefficients) will be added: 'c1', 's1', ..., 'ck',
+        'sk'.
 
     Returns
     -------
     param_names : list of str
-        A list of parameter names in the order expected by the harmonic model function.
+        A list of parameter names in the order expected by the harmonic model
+        function.
         Format: ['mean', 'c1', 's1', ..., 'ck', 'sk'].
 
     p0 : dict
         A dictionary containing initial guesses for each parameter.
-        The mean is initialized from the data, and all harmonic coefficients are set to 1.0.
+        The mean is initialized from the data, and all harmonic coefficients are
+        set to 1.0.
     """
     mean_val = float(array.mean().values)
 
@@ -346,7 +348,7 @@ def harmonic_model(t, mean, *coef):
 
 ### Harmonic Function Fitting
 
-Now, the two time series can be selected and the coefficients can be estimated.
+Now, the two time series can be selected and the coefficients can be estimated. 
 We pick the VV polarisation for a land pixel and 3 harmonics (7 parameters).
 
 ```{python}
@@ -369,7 +371,7 @@ Let's extract and print estimated harmonic parameters for this pixel
 estimated_params = fit_result.curvefit_coefficients.values
 
 for name, val in zip(fit_result.param.values, estimated_params):
-    print(f"{name:>6}: {val: .4f}")
+    print(f"{name: >6}: {val: .4f}")
 ```
 
 Now, these coefficient can be used to construct a total harmonic signal.
@@ -396,7 +398,6 @@ plot.opts(
     title="Harmonic Model Fit to VV Timeseries over Land",
     xlabel="Time",
     ylabel="VV backscatter",
-    # responsive=True,
     width=900,
     height=400,
 )
@@ -414,7 +415,7 @@ dof = nobs - (2 * k + 1)
 stdev = np.sqrt(sse / dof)
 
 print(f"Number of observations (NOBS): {nobs}")
-print(f"Estimated standard deviation of the fit: {stdev:.4f}")
+print(f"Estimated standard deviation of the fit: {stdev: .4f}")
 ```
 
 Lets plot residuals that were used to calculate standard deviation and see the possible outliers that do not fit those seasonal patterns.
@@ -450,7 +451,7 @@ fit_result = lake_VV_series.curvefit(
 estimated_params_lake = fit_result.curvefit_coefficients.values
 
 for name, val in zip(fit_result.param.values, estimated_params_lake):
-    print(f"{name:>6}: {val: .4f}")
+    print(f"{name: >6}: {val: .4f}")
 ```
 
 ```{python}
@@ -486,7 +487,7 @@ dof = nobs - (2 * k + 1)
 stdev = np.sqrt(sse / dof)
 
 print(f"Number of observations (NOBS): {nobs}")
-print(f"Estimated standard deviation of the fit: {stdev:.4f}")
+print(f"Estimated standard deviation of the fit: {stdev: .4f}")
 ```
 
 ```{python}
@@ -554,3 +555,4 @@ plot.opts(
     legend_position="top_left",
 )
 ```
+

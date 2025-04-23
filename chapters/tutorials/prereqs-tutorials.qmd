@@ -3,15 +3,3 @@ title: Tutorials
 jupyter: python3
 ---
 
-This section of the Cookbook covers a wide range of topics. They showcase the
-creation and usage of data products developed by TU Wien and EODC.
-
-
-| Concepts | Importance | Notes |
-|---|---|---|
-| [Intro to xarray](https://foundations.projectpythia.org/core/xarray/xarray-intro.html) | Necessary | |
-| [Dask Arrays](https://foundations.projectpythia.org/core/xarray/dask-arrays-xarray.html)| Necessary| |
-| [Documentation hvPlot](https://hvplot.holoviz.org/)|Helpful|Interactive plotting|
-| [Documentation odc-stac](https://odc-stac.readthedocs.io/en/latest/)|Helpful|Data access|
-
-- **Time to learn**: 10 min
