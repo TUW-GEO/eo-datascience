@@ -37,6 +37,7 @@ book:
     - part: chapters/tutorials/prereqs-tutorials.qmd
       chapters:
         - chapters/tutorials/floodmapping.qmd
+        - chapters/tutorials/harmonic-parameters.qmd
     - chapters/references.qmd
   navbar:
     logo: chapters/images/logos/tuw-geo_eodc_logo_horizontal.png
