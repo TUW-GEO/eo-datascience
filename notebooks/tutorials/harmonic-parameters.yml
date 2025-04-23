@@ -2,23 +2,15 @@ name: harmonic-parameters
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
-  - pip
-  - numpy=1.26
-  - numba=0.59
-  - dask=2023.12.1
-  - jupyterlab
   - xarray
-  - rioxarray
-  - pystac-client
-  - odc-stac
   - folium
   - hvplot
-  - holoviews
   - matplotlib
-  - scipy
-  - pandas
-  - panel
-  - bokeh
   - jupyter_bokeh
-  - datashader=0.15.2
+  - datashader
+  - requests
+  - aiohttp
+  - zarr=2.18.4
+  - ipykernel
+  - fsspec
+  - dask
