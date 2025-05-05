@@ -6,7 +6,7 @@ YML = $(wildcard notebooks/**/*.yml)
 REQ := $(basename $(notdir $(YML)))
 NB != find chapters -name "*.quarto_ipynb" -o  -name "*.ipynb" -not -path \
 	"*/.jupyter_cache/*"
-QN != git diff --cached --name-only "***.ipynb"
+QN != find chapters notebooks -name "*.ipynb" -not -path "*/.jupyter_cache/*" -not -path */.ipynb_checkpoints/*
 
 CONDA_ENV != conda info --base
 CONDA_ACTIVATE := source $(CONDA_ENV)/etc/profile.d/conda.sh ; \

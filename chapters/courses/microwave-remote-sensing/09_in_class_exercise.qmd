@@ -1,11 +1,8 @@
 ---
 title: Phase Unwrapping
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: microwave-remote-sensing
 ---
+
 
 
 The goal of this notebook is to read an interferogram image (i.e., 2-D array of phase values) and unwrap it. Phase unwrapping is a critical process in interferometry, which involves recovering unambiguous phase data from the interferogram.
@@ -23,14 +20,14 @@ In this notebook we will use the resulting wrapped interferogram from notebook "
 
 ```{python}
 # Imports
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import xarray as xr
 import cmcrameri as cmc  # noqa: F401
-import snaphu
-import seaborn as sns
 import intake
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import snaphu
+import xarray as xr
 from IPython.display import clear_output
 ```
 
@@ -193,9 +190,9 @@ fig, axs = plt.subplots(1, 3, figsize=(14, 4))
 
 # Unwrapped Phase
 (
-    subset.unwrapped.plot.imshow(cmap=cmap_cyc, ax=axs[1], vmin=-80, vmax=80).axes.set_title(
-        "Unwrapped Phase of the Subset"
-    )
+    subset.unwrapped.plot.imshow(
+        cmap=cmap_cyc, ax=axs[1], vmin=-80, vmax=80
+    ).axes.set_title("Unwrapped Phase of the Subset")
 )
 
 # Subset inside the complete image
@@ -246,15 +243,15 @@ Let's compare the unwrapped image with and without the coherence mask.
 ```{python}
 fig, axs = plt.subplots(1, 2, figsize=(13, 5))
 (
-    subset.unwrapped_coh.plot.imshow(cmap=cmap_cyc, ax=axs[0], vmin=-80, vmax=80).axes.set_title(
-        f"Unwrapped Phase with Coherence Threshold {threshold1}"
-    )
+    subset.unwrapped_coh.plot.imshow(
+        cmap=cmap_cyc, ax=axs[0], vmin=-80, vmax=80
+    ).axes.set_title(f"Unwrapped Phase with Coherence Threshold {threshold1}")
 )
 
 (
-    subset.unwrapped.plot.imshow(cmap=cmap_cyc, ax=axs[1], vmin=-80, vmax=80).axes.set_title(
-        "Unwrapped Phase without Coherence Threshold"
-    )
+    subset.unwrapped.plot.imshow(
+        cmap=cmap_cyc, ax=axs[1], vmin=-80, vmax=80
+    ).axes.set_title("Unwrapped Phase without Coherence Threshold")
 )
 
 plt.show()
@@ -274,15 +271,15 @@ subset = unwrap_array(
 
 fig, axs = plt.subplots(1, 2, figsize=(13, 5))
 (
-    subset.unwrapped_coh2.plot.imshow(cmap=cmap_cyc, ax=axs[0], vmin=-80, vmax=80).axes.set_title(
-        "Coherence Threshold 0.5"
-    )
+    subset.unwrapped_coh2.plot.imshow(
+        cmap=cmap_cyc, ax=axs[0], vmin=-80, vmax=80
+    ).axes.set_title("Coherence Threshold 0.5")
 )
 
 (
-    subset.unwrapped_coh.plot.imshow(cmap=cmap_cyc, ax=axs[1], vmin=-80, vmax=80).axes.set_title(
-        "Coherence Threshold 0.3"
-    )
+    subset.unwrapped_coh.plot.imshow(
+        cmap=cmap_cyc, ax=axs[1], vmin=-80, vmax=80
+    ).axes.set_title("Coherence Threshold 0.3")
 )
 plt.show()
 ```
@@ -396,9 +393,9 @@ fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 ax = axs.ravel()
 
 (
-    subset.unwrapped_coh.plot.imshow(cmap=cmap_cyc, ax=ax[0], vmin=-80, vmax=80).axes.set_title(
-        "Unwrapped Phase of the subset with Coherence Threshold 0.3"
-    )
+    subset.unwrapped_coh.plot.imshow(
+        cmap=cmap_cyc, ax=ax[0], vmin=-80, vmax=80
+    ).axes.set_title("Unwrapped Phase of the subset with Coherence Threshold 0.3")
 )
 
 (

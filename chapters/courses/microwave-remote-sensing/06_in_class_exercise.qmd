@@ -1,27 +1,25 @@
 ---
 title: Dielectric Properties
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: microwave-remote-sensing
 ---
+
 
 
 In this notebook, we will investigate the varying backscatter values associated with different land surfaces like water bodies, forests, grasslands and urban areas. We will use backscatter data from the Sentinel-1 satellite and we will utilize the CORINE Land Cover dataset to classify and extrapolate these surfaces, enabling us to analyze how different land cover types influence backscatter responses.
 
 
 ```{python}
-import numpy as np
-import xarray as xr
-import rioxarray  # noqa: F401
-import intake
 import json
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.colors import ListedColormap, BoundaryNorm
+
 import holoviews as hv
+import intake
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import numpy as np
+import rioxarray  # noqa: F401
+import xarray as xr
 from holoviews.streams import RangeXY
+from matplotlib.colors import BoundaryNorm, ListedColormap
 
 hv.extension("bokeh")
 ```
@@ -53,7 +51,7 @@ cor_da = cat.corine.read().land_cover.compute()
 
 ### Colormapping and Encoding
 
-For the different land cover types we use the official color encoding.
+For the different land cover types we use the official color encoding which can be found in [CORINE Land Cover](https://collections.sentinel-hub.com/corine-land-cover/readme.html).
 
 ```{python}
 # Load encoding
@@ -61,8 +59,7 @@ with cat.corine_cmap.read()[0] as f:
     color_mapping_data = json.load(f)
 
 # Get mapping
-color_mapping = {item["value"]: item for item in
-                 color_mapping_data["land_cover"]}
+color_mapping = {item["value"]: item for item in color_mapping_data["land_cover"]}
 
 # Create cmap and norm for plotting
 colors = [info["color"] for info in color_mapping.values()]
@@ -75,21 +72,19 @@ Now we can plot the CORINE Land Cover dataset.
 
 ```{python}
 # Get landcover codes present in the image
-present_landcover_codes = np.unique(cor_da.values[~np.isnan(cor_da.values)].
-                                    astype(int))
+present_landcover_codes = np.unique(cor_da.values[~np.isnan(cor_da.values)].astype(int))
 
 # Get colors + text for legend
 handles = [
-    mpatches.Patch(
-        color=info["color"], label=(f'{info["value"]} - ' + (info["label"]))
-        )
+    mpatches.Patch(color=info["color"], label=(f'{info["value"]} - ' + (info["label"])))
     for info in color_mapping.values()
     if info["value"] in present_landcover_codes
 ]
 
 # Create the plot
-cor_da.plot(figsize=(10, 10), cmap=cmap, norm=norm, add_colorbar=False).\
-    axes.set_aspect("equal")
+cor_da.plot(figsize=(10, 10), cmap=cmap, norm=norm, add_colorbar=False).axes.set_aspect(
+    "equal"
+)
 
 plt.legend(
     handles=handles,

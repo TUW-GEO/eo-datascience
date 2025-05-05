@@ -1,11 +1,8 @@
 ---
 title: Wavelength and Polarization
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: microwave-remote-sensing
 ---
+
 
 
 In this notebook, we aim to demonstrate how C-band (4–8 GHz, wavelengths of approximately 3.75–7.5 cm) and L-band (1–2 GHz, wavelengths of approximately 15–30 cm) radio frequencies differ for different land covers and times of the year. In addition, we'll look at co- and cross-polarized backscattering:
@@ -19,11 +16,11 @@ In this notebook, we aim to demonstrate how C-band (4–8 GHz, wavelengths of ap
 
 
 ```{python}
-import numpy as np
+import holoviews as hv
+import hvplot.xarray  # noqa: F401
 import intake
 import matplotlib.pyplot as plt
-import hvplot.xarray  # noqa: F401
-import holoviews as hv
+import numpy as np
 ```
 
 ## Data Loading
@@ -85,17 +82,21 @@ Let's put this to the test by checking the microwave backscatter signatures over
 ```{python}
 hv.output(widget_location="bottom")
 
-t1 = fused_ds.gam0.\
-    isel(time=2).\
-    hvplot.image(robust=True, data_aspect=1, cmap="Greys_r",
-                 rasterize=True, clim=(-25, 0)).\
-    opts(frame_height=400, aspect="equal")
+t1 = (
+    fused_ds.gam0.isel(time=2)
+    .hvplot.image(
+        robust=True, data_aspect=1, cmap="Greys_r", rasterize=True, clim=(-25, 0)
+    )
+    .opts(frame_height=400, aspect="equal")
+)
 
-t2 = fused_ds.gam0.\
-    isel(time=-1).\
-    hvplot.image(robust=True, data_aspect=1, cmap="Greys_r",
-                 rasterize=True, clim=(-25, 0)).\
-    opts(frame_height=400, aspect="equal")
+t2 = (
+    fused_ds.gam0.isel(time=-1)
+    .hvplot.image(
+        robust=True, data_aspect=1, cmap="Greys_r", rasterize=True, clim=(-25, 0)
+    )
+    .opts(frame_height=400, aspect="equal")
+)
 
 t1 + t2
 ```
@@ -105,9 +106,9 @@ t1 + t2
 The most notable difference is the lower energy received for cross-polarized than for co-polarized microwaves for both Sentinel-1 and Alos-2. The latter differences are independent of the time of year. However, one can also note small changes in the received energy for the same satellite dependent on the time of year. To get a better feel for these changes over time we generate the following interactive plot. On the following plot one can select areas of a certain mean LAI (by clicking on the map) and see the associated timeseries of $\gamma^0_T$ for each of the sensors.
 
 ```{python}
-LAI_image = LAI_mean.hvplot.\
-    image(rasterize=True, cmap="viridis", clim=(0, 6)).\
-    opts(title="Mean LAI (Selectable)", frame_height=400, aspect="equal")
+LAI_image = LAI_mean.hvplot.image(rasterize=True, cmap="viridis", clim=(0, 6)).opts(
+    title="Mean LAI (Selectable)", frame_height=400, aspect="equal"
+)
 
 
 def get_timeseries(x, y):

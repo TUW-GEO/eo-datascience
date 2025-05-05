@@ -3,6 +3,7 @@ title: Templates
 jupyter: python3
 ---
 
+
 This section of the Cookbook covers a wide range of topics. The intent is to
 create templates to showcase workflows that can be used by students as a primer
 for independent research projects.

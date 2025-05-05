@@ -1,39 +1,34 @@
 ---
 title: Classification of Sentinel-2 imagery
 subtitle: Finding forests with satellite imagery
-jupyter:
-  kernelspec:
-    name: "classification"
-    language: "python"
-    display_name: "classification"
+jupyter: classification
 ---
+
 
 ## Data Acquisition
 In this chapter, we will employ machine learning techniques to classify a scene using satellite imagery. Specifically, we will utilize ``scikit-learn`` to implement two distinct classifiers and subsequently compare their results. To begin, we need to import the following modules.
 
+
 ```{python}
 from datetime import datetime, timedelta
 
-import xarray as xr
-import pystac_client
-import odc.stac
-import rioxarray  # noqa: F401
+import cmcrameri as cmc  # noqa: F401
 import geopandas as gpd
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
+import numpy as np
+import odc.stac
+import pandas as pd
+import pystac_client
+import rioxarray  # noqa: F401
+import xarray as xr
 from odc.geo.geobox import GeoBox
 from shapely.geometry import Polygon
-
-import cmcrameri as cmc  # noqa: F401
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-import pandas as pd
-
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
 # Scikit Learn
 from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
 ```
 
 Before we start, we need to load the data. We will use ``odc-stac`` to obtain data from Earth Search by Element 84. Here we define the area of interest and the time frame, aswell as the EPSG code and the resolution.
@@ -59,15 +54,17 @@ time_format = "%Y-%m-%d"
 date_query = start_date.strftime(time_format) + "/" + end_date.strftime(time_format)
 
 # Search for Sentinel-2 data
-items = pystac_client.Client.open(
-    "https://earth-search.aws.element84.com/v1"
-).search(
-    bbox=bounds,
-    collections=["sentinel-2-l2a"],
-    datetime=date_query,
-    limit=100,
-).item_collection()
-print(len(items), 'scenes found')
+items = (
+    pystac_client.Client.open("https://earth-search.aws.element84.com/v1")
+    .search(
+        bbox=bounds,
+        collections=["sentinel-2-l2a"],
+        datetime=date_query,
+        limit=100,
+    )
+    .item_collection()
+)
+print(len(items), "scenes found")
 ```
 
 We will now focus on the area south-east of Vienna, where the Nationalpark _Donauauen_ is situated. The time frame we are interested in is the beginning of May 2024.
@@ -86,7 +83,7 @@ geobox = GeoBox.from_bbox(bounds, crs=f"epsg:{epsg}", resolution=dx)
 dc = odc.stac.load(
     items,
     bands=["scl", "red", "green", "blue", "nir"],
-    chunks={'time': 5, 'x': 600, 'y': 600},
+    chunks={"time": 5, "x": 600, "y": 600},
     geobox=geobox,
     resampling="bilinear",
 )
@@ -101,6 +98,8 @@ First, we define a mask to exclude cloud cover and areas with missing data. Subs
 
 ```{python}
 # define a mask for valid pixels (non-cloud)
+
+
 def is_valid_pixel(data):
     # include only vegetated, not_vegitated, water, and snow
     return ((data > 3) & (data < 7)) | (data == 11)
@@ -133,7 +132,7 @@ In addition to the regular RGB Image, we can swap any of the bands from the visi
 # compute a false color image
 # near infrared instead of red
 fc_median = (
-    dc[['nir', 'green', 'blue']]
+    dc[["nir", "green", "blue"]]
     .where(dc.valid)
     .to_dataarray(dim="band")
     .transpose(..., "band")
@@ -142,8 +141,8 @@ fc_median = (
 )
 
 title_fc = (
-    "False color - Median Composite"+
-    f"\n{start_date.strftime('%d.%m.%Y')} - {end_date.strftime('%d.%m.%Y')}"
+    "False color - Median Composite"
+    + f"\n{start_date.strftime('%d.%m.%Y')} - {end_date.strftime('%d.%m.%Y')}"
 )
 fc_median.plot.imshow(robust=True).axes.set_title(title_fc)
 plt.show()
@@ -165,14 +164,16 @@ This gives us a good overview of the vegetation in the area. The values can rang
 
 ```{python}
 # Normalized Difference Vegetation Index (NDVI)
+
+
 def normalized_difference(a, b):
     return (a - b * 1.0) / (a + b)
 
 
 ndvi = normalized_difference(dc.nir, dc.red)
-ndvi.median(dim="time").plot.imshow(
-    cmap="cmc.cork", vmin=-1, vmax=1
-).axes.set_title("NDVI")
+ndvi.median(dim="time").plot.imshow(cmap="cmc.cork", vmin=-1, vmax=1).axes.set_title(
+    "NDVI"
+)
 plt.show()
 ```
 
@@ -181,27 +182,146 @@ In this chapter, we will classify the satellite data to identify forested areas 
 
 ### Regions of Interest
 Since this is a supervised classification, we need to have some training data. Therefore we need to define areas or regions, which we are certain represent the feature which we are classifiying. In this case we are interested in forested areas and regions that are definitly not forested. These regions will be used to train our classifiers.
+
 ```{python}
 # Define Polygons
 forest_areas = {
-    0: [Polygon([(16.482772, 47.901753), (16.465133, 47.870124), (16.510142, 47.874382), (16.482772, 47.901753)])],
-    1: [Polygon([(16.594079, 47.938855), (16.581914, 47.894454), (16.620233, 47.910268), (16.594079, 47.938855)])],
-    2: [Polygon([(16.67984, 47.978998), (16.637263, 47.971091), (16.660376, 47.929123), (16.67984, 47.978998)])],
-    3: [Polygon([(16.756477, 48.000286), (16.723024, 47.983256), (16.739446, 47.972916), (16.756477, 48.000286)])],
-    4: [Polygon([(16.80696, 48.135923), (16.780806, 48.125583), (16.798445, 48.115243), (16.80696, 48.135923)])],
-    5: [Polygon([(16.684097, 48.144438), (16.664634, 48.124366), (16.690788, 48.118892), (16.684097, 48.144438)])],
-    6: [Polygon([(16.550894, 48.169984), (16.530822, 48.165118), (16.558801, 48.137139), (16.550894, 48.169984)])],
-    7: [Polygon([(16.588604, 48.402329), (16.556976, 48.401112), (16.580697, 48.382865), (16.588604, 48.402329)])],
+    0: [
+        Polygon(
+            [
+                (16.482772, 47.901753),
+                (16.465133, 47.870124),
+                (16.510142, 47.874382),
+                (16.482772, 47.901753),
+            ]
+        )
+    ],
+    1: [
+        Polygon(
+            [
+                (16.594079, 47.938855),
+                (16.581914, 47.894454),
+                (16.620233, 47.910268),
+                (16.594079, 47.938855),
+            ]
+        )
+    ],
+    2: [
+        Polygon(
+            [
+                (16.67984, 47.978998),
+                (16.637263, 47.971091),
+                (16.660376, 47.929123),
+                (16.67984, 47.978998),
+            ]
+        )
+    ],
+    3: [
+        Polygon(
+            [
+                (16.756477, 48.000286),
+                (16.723024, 47.983256),
+                (16.739446, 47.972916),
+                (16.756477, 48.000286),
+            ]
+        )
+    ],
+    4: [
+        Polygon(
+            [
+                (16.80696, 48.135923),
+                (16.780806, 48.125583),
+                (16.798445, 48.115243),
+                (16.80696, 48.135923),
+            ]
+        )
+    ],
+    5: [
+        Polygon(
+            [
+                (16.684097, 48.144438),
+                (16.664634, 48.124366),
+                (16.690788, 48.118892),
+                (16.684097, 48.144438),
+            ]
+        )
+    ],
+    6: [
+        Polygon(
+            [
+                (16.550894, 48.169984),
+                (16.530822, 48.165118),
+                (16.558801, 48.137139),
+                (16.550894, 48.169984),
+            ]
+        )
+    ],
+    7: [
+        Polygon(
+            [
+                (16.588604, 48.402329),
+                (16.556976, 48.401112),
+                (16.580697, 48.382865),
+                (16.588604, 48.402329),
+            ]
+        )
+    ],
 }
 
 nonforest_areas = {
-    0: [Polygon([(16.674974, 48.269126), (16.623882, 48.236281), (16.682272, 48.213168), (16.674974, 48.269126)])],
-    1: [Polygon([(16.375723, 48.228374), (16.357476, 48.188839), (16.399444, 48.185798), (16.375723, 48.228374)])],
-    2: [Polygon([(16.457834, 48.26426), (16.418907, 48.267301), (16.440804, 48.23324), (16.457834, 48.26426)])],
-    3: [Polygon([(16.519266, 48.101861), (16.470607, 48.100645), (16.500411, 48.07145), (16.519266, 48.101861)])],
-    4: [Polygon([(16.453577, 48.051986), (16.412217, 48.067192), (16.425598, 48.012451), (16.453577, 48.051986)])],
+    0: [
+        Polygon(
+            [
+                (16.674974, 48.269126),
+                (16.623882, 48.236281),
+                (16.682272, 48.213168),
+                (16.674974, 48.269126),
+            ]
+        )
+    ],
+    1: [
+        Polygon(
+            [
+                (16.375723, 48.228374),
+                (16.357476, 48.188839),
+                (16.399444, 48.185798),
+                (16.375723, 48.228374),
+            ]
+        )
+    ],
+    2: [
+        Polygon(
+            [
+                (16.457834, 48.26426),
+                (16.418907, 48.267301),
+                (16.440804, 48.23324),
+                (16.457834, 48.26426),
+            ]
+        )
+    ],
+    3: [
+        Polygon(
+            [
+                (16.519266, 48.101861),
+                (16.470607, 48.100645),
+                (16.500411, 48.07145),
+                (16.519266, 48.101861),
+            ]
+        )
+    ],
+    4: [
+        Polygon(
+            [
+                (16.453577, 48.051986),
+                (16.412217, 48.067192),
+                (16.425598, 48.012451),
+                (16.453577, 48.051986),
+            ]
+        )
+    ],
 }
 ```
+
 ```{python}
 # Geoppandas Dataframe from Polygons
 forest_df = gpd.GeoDataFrame(
@@ -223,9 +343,9 @@ ax.set_aspect("equal")
 plt.show()
 ```
 
-
 ### Data Preparation
 In addition to the Regions of Interest we will extract the specific bands from the loaded dataset that we intend to use for the classification, which are the `red, green, blue` and `near-infrared` bands, although other bands can also be utilized. Using these bands, we will create both a training and a testing dataset. The training dataset will be used to train the classifier, while the testing dataset will be employed to evaluate its performance.
+
 ```{python}
 # Classifiying dataset (only necessary bands)
 bands = ["red", "green", "blue", "nir"]
@@ -244,10 +364,10 @@ data_dict_feat = {
     idx: clip_array(ds_class, polygon) for idx, polygon in forest_areas.items()
 }
 data_dict_nonfeat = {
-    idx: clip_array(ds_class, polygon)
-    for idx, polygon in nonforest_areas.items()
+    idx: clip_array(ds_class, polygon) for idx, polygon in nonforest_areas.items()
 }
 ```
+
 ```{python}
 # Reshape the polygon dataarrays to get a tuple (one value per band) of pixel values
 feat_data = [
@@ -267,6 +387,7 @@ nonfeat_values = np.concatenate(nonfeat_data)
 X_feat_data = feat_values[~np.isnan(feat_values).any(axis=1)]
 X_nonfeat_data = nonfeat_values[~np.isnan(nonfeat_values).any(axis=1)]
 ```
+
 ```{python}
 # Creating Output Vector (1 for pixel is features; 0 for pixel is not feature)
 y_feat_data = np.ones(X_feat_data.shape[0])
@@ -286,9 +407,7 @@ Now that we have prepared the training and testing data, we will create an image
 
 ```{python}
 image_data = (
-    ds_class[bands]
-    .to_array(dim="band")
-    .transpose("latitude", "longitude", "band")
+    ds_class[bands].to_array(dim="band").transpose("latitude", "longitude", "band")
 )
 
 # Reshape the image data
@@ -404,10 +523,8 @@ We can already see from the `classification reports` and the `confusion matrices
 To gain a more in-depth understanding of the classifiers' performance, we will compare their results. Specifically, we will identify the areas where both classifiers agree and the areas where they disagree. This comparison will provide valuable insights into the strengths and weaknesses of each classifier, allowing us to better assess their effectiveness in identifying forested and non-forested regions.
 
 ```{python}
-# | code-fold: true
-cmap_trio = colors.ListedColormap(
-    ["whitesmoke", "indianred", "goldenrod", "darkgreen"]
-)
+#| code-fold: true
+cmap_trio = colors.ListedColormap(["whitesmoke", "indianred", "goldenrod", "darkgreen"])
 
 
 double_clf = ds_class["NB-forest"] + 2 * ds_class["RF-forest"]
@@ -426,7 +543,7 @@ plt.show()
 The areas where both classifiers agree include the larger forested regions, such as the _Nationalpark Donau-Auen_ and the _Leithagebirge_. Additionally, both classifiers accurately identified the urban areas of Vienna and correctly excluded them from being classified as forested.
 
 ```{python}
-# | code-fold: true
+#| code-fold: true
 # Plot only one class, either None (0), Naive Bayes (1), Random Forest (2), or Both (3)
 fig, axs = plt.subplots(2, 2, figsize=(8, 8))
 ax = axs.ravel()
@@ -453,15 +570,13 @@ Finally, by analyzing the proportion of forested areas within the scene, we find
 The accompanying bar chart illustrates the distribution of these classifications, highlighting the percentage of forested areas, non-forested areas, and regions classified by only one of the two classifiers. This visual representation helps to quantify the areas of agreement and disagreement between the classifiers, providing a clearer picture of their performance.
 
 ```{python}
-# | code-fold: true
+#| code-fold: true
 counts = {}
 for num in range(0, 4):
     num_2_class = {0: "None", 1: "Naive Bayes", 2: "Random Forest", 3: "Both"}
     counts[num_2_class[num]] = int((double_clf == num).sum().values)
 
-class_counts_df = pd.DataFrame(
-    list(counts.items()), columns=["Class", "Count"]
-)
+class_counts_df = pd.DataFrame(list(counts.items()), columns=["Class", "Count"])
 class_counts_df["Percentage"] = (
     class_counts_df["Count"] / class_counts_df["Count"].sum()
 ) * 100

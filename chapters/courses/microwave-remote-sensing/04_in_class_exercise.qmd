@@ -1,11 +1,8 @@
 ---
 title: Datacubes
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: microwave-remote-sensing
 ---
+
 
 
 In this notebook we discuss how we can easily compare images of two or more different time slices, satellites or other earth observation products. We limit our selves to products on a regular grid with an associated coordinate reference system (CRS), known as a raster. This means that each cell of the raster contains an attribute value and location coordinates. The process of combining such rasters to form datacubes is called raster stacking. We can have datacubes in many forms, such as the spatiotemporal datacube:
@@ -37,18 +34,19 @@ In this notebook we will study two different SAR products. SAR data from the Adv
 
 
 ```{python}
+from functools import partial
+from pathlib import Path
+
+import folium
+import hvplot.xarray  # noqa: F401
 import numpy as np
 import pandas as pd
-import xarray as xr
 import rioxarray  # noqa: F401
-import hvplot.xarray  # noqa: F401
-import folium
+import xarray as xr
 from huggingface_hub import snapshot_download
-from shapely.geometry import mapping, box
-from shapely import affinity
 from rasterio.enums import Resampling
-from pathlib import Path
-from functools import partial
+from shapely import affinity
+from shapely.geometry import box, mapping
 ```
 
 ## Download Data
@@ -73,9 +71,8 @@ bbox = xr.open_mfdataset(
     (data_path / "sentinel-1").glob("**/*.tif"),
     engine="rasterio",
     combine="nested",
-    concat_dim="band"
-    ).\
-    rio.transform_bounds("EPSG:4326")
+    concat_dim="band",
+).rio.transform_bounds("EPSG:4326")
 
 bbox = box(*bbox)
 
@@ -171,7 +168,7 @@ def print_raster(raster, name):
 
     print(
         f"{name} Raster: \n----------------\n"
-        f"resolution: {raster.rio.resolution()} {raster.rio.crs.units_factor}\n" #noqa
+        f"resolution: {raster.rio.resolution()} {raster.rio.crs.units_factor}\n"  # noqa
         f"bounds: {raster.rio.bounds()}\n"
         f"CRS: {raster.rio.crs}\n"
     )
@@ -232,8 +229,8 @@ alos_ds = xr.open_mfdataset(
     engine="rasterio",
     combine="nested",
     chunks=-1,
-    preprocess=partial_
-    )
+    preprocess=partial_,
+)
 ```
 
 Also, for this dataset we will look at the metadata in order to compare it with Sentinel-1.
@@ -251,17 +248,19 @@ alos_ds_lin = 10 ** (alos_ds / 10)
 alos_ds_lin = alos_ds_lin.rio.reproject_match(
     s1_ds,
     resampling=Resampling.bilinear,
-    )
+)
 alos_ds = 10 * np.log10(alos_ds_lin)
 ```
 
 We will overwrite the coordinate values of ALOS-2 with those of Sentinel-1. If we would not do this last step, small errors in how the numbers are stored would prevent stacking of the rasters.
 
 ```{python}
-alos_ds = alos_ds.assign_coords({
-    "x": s1_ds.x.data,
-    "y": s1_ds.y.data,
-})
+alos_ds = alos_ds.assign_coords(
+    {
+        "x": s1_ds.x.data,
+        "y": s1_ds.y.data,
+    }
+)
 ```
 
 Lastly, we will turn the `xarray.DataSet` to an `xarray.DataArray` where a new dimension will constitute the sensor for measurement (satellite + polarization).
@@ -284,16 +283,15 @@ fused_da
 The measurements for both satellites don't occur at the same time. Hence the cube is now padded with 2-D arrays entirely filled with NaN (Not A Number) for some time slices. As we have learned in notebook 2 we can use the `resample` method to make temporally coherent timeslices for each month. To deal with the dB scale backscatter values as well as the low number of observations per month we use a median of the samples. As taking the median only sorts the samples according to the sample quantiles we do not have to convert the observations to the linear scale.
 
 ```{python}
-fused_da = fused_da.\
-    resample(time="ME", skipna=True).median().compute()
+fused_da = fused_da.resample(time="ME", skipna=True).median().compute()
 ```
 
 We can plot each of the variables: "ALOS-2" and "Sentinel-1" to check our results.
 
 ```{python}
-fused_da.\
-    hvplot.image(robust=True, data_aspect=1, cmap="Greys_r", rasterize=True).\
-    opts(frame_height=600, aspect="equal")
+fused_da.hvplot.image(robust=True, data_aspect=1, cmap="Greys_r", rasterize=True).opts(
+    frame_height=600, aspect="equal"
+)
 ```
 
 *Figure 3: Stacked array with ALOS-2 L-band and Sentinel-1 C-band $\gamma^0_T (dB)$.*
