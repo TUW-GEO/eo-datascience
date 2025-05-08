@@ -1,11 +1,8 @@
 ---
 title: Speckle Statistics
-jupyter:
-  kernelspec:
-    name: "microwave-remote-sensing"
-    language: "python"
-    display_name: "microwave-remote-sensing"
+jupyter: microwave-remote-sensing
 ---
+
 
 This notebook will provide an empirical demonstration of speckle - how it originates, how it visually and statistically looks like, and some of the most common approaches to filter it.
 
@@ -17,14 +14,15 @@ Speckle is defined as a kind of noise that affects all radar images. Given the m
 
 
 ```{python}
-import numpy as np
-import intake
 import json
-import matplotlib.pyplot as plt
+from functools import partial
+
 import holoviews as hv
+import intake
+import matplotlib.pyplot as plt
+import numpy as np
 from holoviews.streams import RangeXY
 from scipy.ndimage import uniform_filter
-from functools import partial
 
 hv.extension("bokeh")
 ```
@@ -62,9 +60,9 @@ speckled_indices = np.random.choice(
 speckled_data_linear = ideal_data_linear.copy()
 
 speckle_noise = np.random.gumbel(scale=1.0, size=num_speckled_pixels)
-speckled_data_linear.ravel()[speckled_indices] *= (
-    speckle_noise  # Add speckle to the selected pixels
-)
+speckled_data_linear.ravel()[
+    speckled_indices
+] *= speckle_noise  # Add speckle to the selected pixels
 
 ideal_data_dB = 10 * np.log10(ideal_data_linear)
 speckled_data_dB = 10 * np.log10(speckled_data_linear)
@@ -83,8 +81,7 @@ plt.title(f"Speckled Backscatter ({int(speckle_fraction * 100)}% of Pixels)")
 plt.colorbar(label="Backscatter (dB)")
 
 bins = 25
-hist_ideal, bins_ideal = np.histogram(ideal_data_dB.ravel(), bins=bins,
-                                      range=(-20, 0))
+hist_ideal, bins_ideal = np.histogram(ideal_data_dB.ravel(), bins=bins, range=(-20, 0))
 hist_speckled, bins_speckled = np.histogram(
     speckled_data_dB.ravel(), bins=bins, range=(-20, 0)
 )
@@ -94,8 +91,7 @@ max_freq = max(
 
 # Histogram for ideal data
 plt.subplot(2, 2, 3)
-plt.hist(ideal_data_dB.ravel(), bins=bins, range=(-20, 0), color="gray",
-         alpha=0.7)
+plt.hist(ideal_data_dB.ravel(), bins=bins, range=(-20, 0), color="gray", alpha=0.7)
 plt.ylim(0, max_freq)
 plt.title("Histogram of Ideal Backscatter")
 plt.xlabel("Backscatter (dB)")
@@ -103,12 +99,9 @@ plt.ylabel("Frequency")
 
 # Histogram for speckled data
 plt.subplot(2, 2, 4)
-plt.hist(speckled_data_dB.ravel(), bins=bins, range=(-20, 0), color="gray",
-         alpha=0.7)
+plt.hist(speckled_data_dB.ravel(), bins=bins, range=(-20, 0), color="gray", alpha=0.7)
 plt.ylim(0, max_freq)
-plt.title(
-    f"Histogram of Speckled Backscatter ({int(speckle_fraction * 100)}%)"
-)
+plt.title(f"Histogram of Speckled Backscatter ({int(speckle_fraction * 100)}%)")
 plt.xlabel("Backscatter (dB)")
 plt.ylabel("Frequency")
 
@@ -141,18 +134,15 @@ with cat.corine_cmap.read()[0] as f:
     color_mapping_data = json.load(f)
 
 # Get mapping
-color_mapping = {item["value"]: item for item in
-                 color_mapping_data["land_cover"]}
+color_mapping = {item["value"]: item for item in color_mapping_data["land_cover"]}
 
 # Get landcover codes present in the image
 present_landcover_codes = np.unique(
-    fused_ds.land_cover.values[~np.isnan(fused_ds.land_cover.values)].
-    astype(int)
+    fused_ds.land_cover.values[~np.isnan(fused_ds.land_cover.values)].astype(int)
 )
 
 
-def load_image(var_ds, time, land_cover, x_range, y_range,
-               filter_fun_spatial=None):
+def load_image(var_ds, time, land_cover, x_range, y_range, filter_fun_spatial=None):
     """
     Callback Function Landcover.
 
@@ -189,9 +179,7 @@ def load_image(var_ds, time, land_cover, x_range, y_range,
 
     # Convert unfiltered data into Holoviews Image
     img = hv.Dataset(
-        (sig0_selected_ds["x"], sig0_selected_ds["y"], sig0_np),
-        ["x", "y"],
-        "sig0"
+        (sig0_selected_ds["x"], sig0_selected_ds["y"], sig0_np), ["x", "y"], "sig0"
     )
 
     if x_range and y_range:
@@ -200,8 +188,7 @@ def load_image(var_ds, time, land_cover, x_range, y_range,
     return hv.Image(img)
 
 
-def plot_variability(var_ds, filter_fun_spatial=None,
-                     filter_fun_temporal=None):
+def plot_variability(var_ds, filter_fun_spatial=None, filter_fun_temporal=None):
 
     robust_min = var_ds.sig0.quantile(0.02).item()
     robust_max = var_ds.sig0.quantile(0.98).item()
@@ -226,8 +213,7 @@ def plot_variability(var_ds, filter_fun_spatial=None,
     if filter_fun_temporal is not None:
         var_ds = filter_fun_temporal(var_ds)
         load_image_ = partial(
-            load_image, var_ds=var_ds, filter_fun_spatial=filter_fun_spatial,
-            time=None
+            load_image, var_ds=var_ds, filter_fun_spatial=filter_fun_spatial, time=None
         )
         dmap = (
             hv.DynamicMap(load_image_, kdims=["Landcover"], streams=[rangexy])
@@ -240,8 +226,7 @@ def plot_variability(var_ds, filter_fun_spatial=None,
             load_image, var_ds=var_ds, filter_fun_spatial=filter_fun_spatial
         )
         dmap = (
-            hv.DynamicMap(load_image_, kdims=["Time", "Landcover"],
-                          streams=[rangexy])
+            hv.DynamicMap(load_image_, kdims=["Time", "Landcover"], streams=[rangexy])
             .redim.values(Time=time, Landcover=land_cover)
             .hist(normed=True, bins=bin_edges)
         )

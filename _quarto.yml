@@ -16,7 +16,7 @@ book:
     - Davide Festa
     - Felix David Reuß
     - Luka Jovic
-  date: "10 January 2025"
+  date: "5 May 2025"
   chapters:
     - index.qmd
     - part: chapters/courses/microwave-remote-sensing.qmd
@@ -37,6 +37,7 @@ book:
     - part: chapters/tutorials/prereqs-tutorials.qmd
       chapters:
         - chapters/tutorials/floodmapping.qmd
+        - chapters/tutorials/harmonic-parameters.qmd
     - chapters/references.qmd
   navbar:
     logo: chapters/images/logos/tuw-geo_eodc_logo_horizontal.png
