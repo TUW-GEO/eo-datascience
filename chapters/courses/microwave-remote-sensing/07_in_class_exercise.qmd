@@ -337,3 +337,4 @@ plot_variability(fused_ds, filter_fun_temporal=temporal_filter)
 *Figure 4: Lake Neusiedl $\sigma^0_E$ with a temporal filter applied.*
 
 Let´s observe the histograms of the two plots. Especially in the region around the lake, it is clear that the distribution is now less dispersed and more centered around a central value.
+

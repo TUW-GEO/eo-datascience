@@ -295,3 +295,4 @@ fused_da.hvplot.image(robust=True, data_aspect=1, cmap="Greys_r", rasterize=True
 ```
 
 *Figure 3: Stacked array with ALOS-2 L-band and Sentinel-1 C-band $\gamma^0_T (dB)$.*
+

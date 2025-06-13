@@ -30,6 +30,9 @@ book:
         - chapters/courses/microwave-remote-sensing/07_in_class_exercise.qmd
         - chapters/courses/microwave-remote-sensing/08_in_class_exercise.qmd
         - chapters/courses/microwave-remote-sensing/09_in_class_exercise.qmd
+    - part: chapters/courses/environmental-remote-sensing.qmd
+      chapters:
+        - chapters/courses/environmental-remote-sensing/mozambique-droughts.qmd
   appendices:
     - part: chapters/templates/prereqs-templates.qmd
       chapters:

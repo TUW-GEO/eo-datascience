@@ -363,7 +363,7 @@ def harmonic_model(t, mean, *coef):
 
 ### Harmonic Function Fitting
 
-Now, the two time series can be selected and the coefficients can be estimated.
+Now, the two time series can be selected and the coefficients can be estimated. 
 We pick the VV polarisation for a land pixel and 3 harmonics (7 parameters).
 
 ```{python}
@@ -570,3 +570,4 @@ plot.opts(
     legend_position="top_left",
 )
 ```
+

@@ -1,0 +1,3 @@
+[submodule "notebooks/courses/environmental-remote-sensing"]
+	path = notebooks/courses/environmental-remote-sensing
+	url = https://github.com/TUW-GEO/environmental-remote-sensing.git

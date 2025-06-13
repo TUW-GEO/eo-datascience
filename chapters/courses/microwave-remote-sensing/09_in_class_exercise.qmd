@@ -423,3 +423,4 @@ In the following animation, we can capture the 3D displacement caused by the Rid
 
 ![](../../images/ridgecrest.gif)
 *Credits: NASA*
+

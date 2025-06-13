@@ -264,3 +264,4 @@ sig0_dc.VV.plot(col="time", robust=True, cmap="Greys_r", aspect=1, size=10)
 ```
 
 *Figure 3: Sentinel-1 microwave backscatter image for two timeslices.*
+
