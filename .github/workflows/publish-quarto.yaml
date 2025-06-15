@@ -20,7 +20,7 @@ jobs:
         with:
           fetch-depth: 0
           lfs: "true"
-          submodules: "true"
+          submodules: "recursive"
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
