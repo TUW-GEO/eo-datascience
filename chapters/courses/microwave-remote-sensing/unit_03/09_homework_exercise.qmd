@@ -1,0 +1,171 @@
+---
+title: 'Homework Exercise 9: Phase Unwrapping Exercise'
+jupyter: python3
+---
+
+
+Your task in this exercise is to read the provided data, plot it, unwrap and plot the phase, and calculate the displacement. Then interpret your results.
+The following data were acquired from Sentinel-1 on April 23, 2018, from 16:15:24 to 16:15:51 over the region of Hawaii (same data as 08_homework_exercise).
+
+
+```{python}
+# Imports
+import numpy as np
+import matplotlib.pyplot as plt  # noqa: F401
+import xarray as xr
+from pathlib import Path
+import cmcrameri as cmc  # noqa: F401
+import snaphu
+import seaborn as sns
+from IPython.display import clear_output
+```
+
+```{python}
+# Define Path to the data
+root = Path('~/shared/datasets/rs/datapool/mrs').expanduser()
+src_path = root / 's1-interferogram/08_complex_unwrapping/exercise'
+
+
+def _preprocess(X):
+    file_path = Path(X.encoding['source'])
+    file_name = file_path.name
+    name = file_name.split('_')[0]
+    X = X.rename({"band_data": name})
+    return X
+
+
+# Load the data
+ds = xr.open_mfdataset(
+    src_path.glob('**/*.tif'),
+    engine="rasterio",
+    preprocess=_preprocess,
+    combine="nested",
+    parallel=True
+    ).squeeze()
+
+# Set cyclic and linear colormaps
+cmap_cyc = sns.color_palette("hls", as_cmap=True)
+cmap_lin = "cmc.roma_r"
+cmap_disp = "cmc.vik"
+
+# Create a mask for the areas which have no data
+mask = (ds.phase != 0).astype(bool)
+
+ds
+```
+
+## Question 1
+
+Plot the above provided data. Please note that we are plotting images in Slant Range geometry (East-West flipped due to the descending acquisition pass).
+
+```{python}
+fig, axes = plt.subplots(1,3, figsize=(15,5))
+ds.phase.where(mask).plot.imshow(cmap=cmap_cyc, ax=axes[0]).axes.set_title('Phase')
+# YOUR CODE HERE -> (Plot intensity map)
+# YOUR CODE HERE -> (Plot coherence map)
+plt.tight_layout()
+```
+
+```{python}
+def unwrap_array(data: xr.DataArray,
+                 mask: xr.DataArray = True,
+                 coherence: xr.DataArray = None,
+                 mask_nodata_value: int = 0,
+                 coh_low_threshold: float = None,
+                 coh_high_threshold: float = None,
+                 nlooks=1.0, cost="smooth", init="mcf",
+                 **kwargs) -> xr.DataArray:
+    """
+    Unwraps the phase data using the snaphu algorithm.
+
+    data: xarray DataArray with complex numbers
+    mask: xarray DataArray with mask values
+    coherence: xarray DataArray with coherence values (optional)
+    mask_nodata_value: Value of the no data pixels in the mask
+    coh_low_threshold: Lower threshold for the coherence values
+    coh_high_threshold: Higher threshold for the coherence values
+
+    Return: xarray DataArray with the unwrapped phase
+    """
+
+    # Create a mask for areas with no data
+    if mask is True:
+        mask = (data.real != mask_nodata_value).astype(bool)
+
+    # Apply coherence thresholds if provided
+    if coherence is not None:
+        if coh_low_threshold is not None:
+            coh_mask = (coherence >= coh_low_threshold).astype(bool)
+            mask = mask & coh_mask
+        if coh_high_threshold is not None:
+            coh_mask = (coherence <= coh_high_threshold).astype(bool)
+            mask = mask & coh_mask
+
+    # Apply the mask to the data
+    data = data.where(mask)
+
+    if coherence is None:
+        coherence = np.ones_like(data.real)
+
+    # Unwrap the phase (already in complex form)
+    unw, _ = snaphu.unwrap(data,
+                           coherence, nlooks=nlooks,
+                           cost=cost, init=init,
+                           mask=mask, **kwargs)
+
+    # clear snaphu output
+    clear_output()
+
+    # Build xarray DataArray with the unwrapped phase
+    unw_da = xr.DataArray(unw, coords=data.coords, dims=data.dims)
+
+    # Mask the unwrapped phase
+    unw_da = unw_da.where(mask)
+    return unw_da
+```
+
+## Question 2
+
+Use the above function to unwrap the given interferogram and to plot your result.
+Use a coherence threshold of 0.2 for your unwrapping and use the provided lines of code below to coarsen the input (to fasten the process).
+Kernels with values higher than 3 might lead the unwrapping function to crash, therefore please do not change it.
+It might take up to 1 or 2 minutes to execute the function, let the code run, and the output be printed (it will be cleared out at the end).
+
+```{python}
+# coarsen
+kernel = 3
+ds = ds.coarsen(x=kernel, y=kernel, boundary="trim").mean()
+```
+
+```{python}
+unwrapped = ... # YOUR CODE HERE -> perform unwrapping function
+
+unwrapped.plot.imshow(cmap=cmap_cyc)
+```
+
+```{python}
+# Displacement Function
+def displacement(unwrapped, lambda_val: float = 0.056) -> xr.DataArray:
+    """
+    Calculates the displacement from the unwrapped phase
+
+    unw: xarray DataArray with the unwrapped phase
+    unw: xr.DataArray
+    lambda_val: Wavelength of the radar signal
+    lambda_val: float
+
+    Return: xarray DataArray with the displacement
+    """
+    disp = unwrapped * - lambda_val / (4 * np.pi)
+    return disp
+```
+
+## Question 3
+
+Use the above function to calculate the displacement from the unwrapped interferogram, then plot your result with the correct colormap.
+Can you guess which kind of phenomenon is responsible for the ground surface displacement that you observe?
+
+```{python}
+# YOUR CODE HERE -> perform displacement function
+# YOUR CODE HERE -> plot displacement map
+```

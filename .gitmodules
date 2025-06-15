@@ -1,0 +1,3 @@
+[submodule "notebooks/courses/microwave-remote-sensing"]
+	path = notebooks/courses/microwave-remote-sensing
+	url = git@github.com:TUW-GEO/microwave-remote-sensing.git

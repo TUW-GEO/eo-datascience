@@ -1,22 +1,11 @@
 ---
 title: Harmonic Parameters of Sentinel 1 Backscatter Time Series
-jupyter: harmonic-parameters
+jupyter:
+  kernelspec:
+    display_name: harmonic-parameters
+    language: python
+    name: harmonic-parameters
 ---
-
-
-In this notebook, we will show the concept of extracting coefficients that describe seasonal patterns in Sentinel 1 radar backscatter variability. Namely, sine and cosine functions as harmonic oscillators are used to describe periodicities in the time series of, either VV or VH polarisations, backscatter. Those can then be removed from time series and what is left would generally be the noise or transient events, for example floods, volcano erruptions, and whatever is possible to detect with radar Earth Observation data.
-
-## Prerequisites
-
-| Concepts | Importance | Notes |
-|---|---|---|
-| [Intro to xarray](https://foundations.projectpythia.org/core/xarray/xarray-intro.html) | Necessary | |
-| [Intro to Flood mapping](https://projectpythia.org/eo-datascience-cookbook/notebooks/tutorials/floodmapping.html)| Necessary| |
-| [Documentation hvPlot](https://hvplot.holoviz.org/)|Helpful|Interactive plotting|
-
-- **Time to learn**: 10 min
-
-## Imports
 
 ```{python}
 import folium

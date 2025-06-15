@@ -1,0 +1,178 @@
+---
+title: 'Homework Excercise 8: Generation and Interpretation of an Interferogram using Sentinel-1 Imagery'
+jupyter:
+  kernelspec:
+    display_name: interface-demo
+    language: python
+    name: interface-demo
+---
+
+
+The following data were acquired from Sentinel-1 on April 23, 2018, from 16:15:24 to 16:15:51 over the region of Hawaii. Use the provided code to load and plot the preprocessed SAR interferometric data.
+Observe, analyse, and visually interpret the results.
+
+
+```{python}
+from pathlib import Path
+import xarray as xr
+import matplotlib.pyplot as plt
+import hvplot.xarray  # noqa: F401
+import seaborn as sns
+import holoviews as hv  # noqa: F401
+import folium
+from matplotlib.colors import ListedColormap
+from io import BytesIO
+import base64
+```
+
+```{python}
+base_path = Path(
+    "~/shared/datasets/rs/datapool/mrs/s1-interferogram/07_exercise"
+).expanduser()
+```
+
+## Load the data
+
+```{python}
+def _preprocess(x):
+    min_x, max_x = -155.5, -154.7
+    min_y, max_y = 19.1, 20.14
+
+    x = x.sel(x=slice(min_x, max_x), y=slice(max_y, min_y))
+
+    variable_name = Path(x.encoding["source"]).stem.split("_")[-1]
+    x = x.rename({"band_data": variable_name})
+
+    return x.drop_vars("band").squeeze()
+
+
+ds = xr.open_mfdataset(
+    (base_path).glob("*.tif"),
+    engine="rasterio",
+    preprocess=_preprocess,
+    combine="by_coords",
+)
+```
+
+## Plotting the data
+
+```{python}
+step = 4
+
+cmap_hls = sns.color_palette("hls", n_colors=256).as_hex()
+
+ds = ds.where(ds != 0)
+igf_data = ds.PhaseBand.isel(x=slice(0, -1, step), y=slice(0, -1, step))
+coh_da = ds.CohBand.isel(x=slice(0, -1, step), y=slice(0, -1, step))
+
+igf_plot = igf_data.hvplot.image(
+    x="x",
+    y="y",
+    cmap=cmap_hls,
+    width=600,
+    height=600,
+    dynamic=False
+)
+
+
+coh_plot = coh_da.hvplot.image(
+    x="x",
+    y="y",
+    cmap="viridis",
+    width=600,
+    height=600,
+    dynamic=False,
+).opts(clim=(0, 1))
+
+(igf_plot + coh_plot).opts(shared_axes=True)
+```
+
+## Question 1
+
+Please refer to the above plots. Which of the following statements are correct?
+
+- [ ] The image on the left shows a phase interferogram.
+- [ ] The image on the right shows an amplitude interferogram, also called coherence.
+- [ ] The image on the right shows a RTC sigma nougth backscatter.
+
+Focus on the left plot. Which of the following statements are correct?
+
+- [ ] The fringe pattern could be indicative of both local surface topography and ground deformation.
+- [ ] The circular fringe pattern on the left indicates an uplifiting displacement.
+- [ ] The circular fringe pattern on the left indicates a sinking displacement.
+
+Don't change anything in the next cell, besides the step for sampling (skipping pixels in the plot), if the plotting takes too long to finish.
+
+```{python}
+cmap_hls = ListedColormap(sns.color_palette("hls", 256).as_hex())
+
+
+def array_to_img(data_array, cmap="viridis"):
+    """Convert an xarray DataArray to a base64-encoded PNG image."""
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=600)
+    data_array.plot(ax=ax, cmap=cmap, add_colorbar=False, add_labels=False)
+    ax.set_axis_off()
+    buf = BytesIO()
+    plt.savefig(
+        buf, format="png", bbox_inches="tight", pad_inches=0, transparent=True
+    )
+    plt.close(fig)
+    return base64.b64encode(buf.getvalue()).decode("utf-8")
+
+
+# Prepare data
+step = 1
+igf_image = array_to_img(
+    ds.PhaseBand.isel(x=slice(0, -1, step), y=slice(0, -1, step)),
+    cmap=cmap_hls,
+)
+coh_image = array_to_img(
+    ds.CohBand.isel(x=slice(0, -1, step), y=slice(0, -1, step))
+)
+
+# Map setup and overlay function
+bounds = [
+    [float(ds.y.min()), float(ds.x.min())],
+    [float(ds.y.max()), float(ds.x.max())],
+]
+m = folium.Map(location=[ds.y.median(), ds.x.median()], zoom_start=10)
+folium.TileLayer(
+    tiles=(
+        "https://server.arcgisonline.com/ArcGIS/rest/"
+        + "services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    ),
+    attr="Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ",
+    name="ESRI World Imagery",
+).add_to(m)
+
+
+def overlay_image(map_obj, img_base64, bounds, name):
+    folium.raster_layers.ImageOverlay(
+        image=f"data:image/png;base64,{img_base64}",
+        bounds=bounds,
+        opacity=0.65,
+        name=name,
+    ).add_to(map_obj)
+
+
+# Add images and controls
+overlay_image(m, igf_image, bounds, "IGF Data")
+overlay_image(m, coh_image, bounds, "Coherence Data")
+folium.LayerControl().add_to(m)
+
+m
+```
+
+## Question 2
+
+Please refer to the above plot, select the "IGF Data" layer, and select the correct statements:
+
+- [ ] The interferogram above depicts ground deformation due to an earthquake event.
+- [ ] The interferogram above depicts ground deformation due to a volcanic eruption event.
+- [ ] The interferogram above does not show evidence of ground deformation.
+
+Please refer to the above plot, select the "Coherence Data" layer, and select the correct statements:
+
+- [ ] The coherence is high (bright color) over urban areas.
+- [ ] The coherence is low (dark color) over forested areas.
+- [ ] The coherence is high over bare soil (non-forested areas).

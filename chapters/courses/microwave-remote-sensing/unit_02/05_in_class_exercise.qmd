@@ -1,21 +1,15 @@
 ---
 title: Wavelength and Polarization
-jupyter: microwave-remote-sensing
+jupyter:
+  kernelspec:
+    display_name: microwave-remote-sensing
+    language: python
+    name: microwave-remote-sensing
 ---
 
-
-
-In this notebook, we aim to demonstrate how C-band (4–8 GHz, wavelengths of approximately 3.75–7.5 cm) and L-band (1–2 GHz, wavelengths of approximately 15–30 cm) radio frequencies differ for different land covers and times of the year. In addition, we'll look at co- and cross-polarized backscattering:
-
-+ Sentinel-1 (C-band)
-    + VV
-    + VH
-+ Alos-2 (L-band):
-    + HH
-    + HV
-
-
 ```{python}
+from pathlib import Path
+
 import holoviews as hv
 import hvplot.xarray  # noqa: F401
 import intake
@@ -28,8 +22,8 @@ import numpy as np
 We load the data again with the help of `intake`.
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = Path("..") / "data" / "microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 fused_ds = cat.fused.read()
 fused_ds
 ```

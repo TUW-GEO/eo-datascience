@@ -1,13 +1,15 @@
 ---
 title: Backscattering Coefficients
-jupyter: microwave-remote-sensing
+jupyter:
+  kernelspec:
+    display_name: microwave-remote-sensing
+    language: python
+    name: microwave-remote-sensing
 ---
 
-
-In this notebook, we will introduce some of the steps involved in the processing of Sentinel-1 Level1 Ground Range Detected (`GRD`) data to $\sigma^0$ (`sig0`) and $\gamma^0$ (`gmr`). Moreover, the notebook illustrates the importance and impact of geometric and radiometric terrain correction. As the processing of SAR data is a very time and hardware-intense task, we won't perform the actual processing in this notebook. Instead, data at different processing steps is illustrated to highlight the impact of the processing steps.
-
-
 ```{python}
+from pathlib import Path
+
 import hvplot.xarray  # noqa: F401
 import intake
 import matplotlib.pyplot as plt  # noqa: F401
@@ -21,21 +23,11 @@ import xarray as xr
 We first load our data from the following [intake](https://intake.readthedocs.io/en/latest/) catalog. Intake is somewhat similar to STAC in that it makes it easy to discover and load data. More importantly, this package allows us to hide some of the complexities involved with getting the data in the right format, which are not of concern in this notebook.
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
-gtc_dc = cat.gtc.read().compute()
+uri = Path("..") / "data" / "microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
+gtc_dc = cat["gtc"].read().compute()
 gtc_dc
 ```
-
-## Geometric Terrain Correction
-
-Level 1 SAR data, such as the “GRD” product only takes into account the ellipsoidal model of the earth (i.e. slant-range distortion; script Chapter 4), without the description of the relief. This makes mountains appear to lean towards the radar system as visible in the below plot of the GRD scene. This latter distortion originates from the side-looking geometry of the SAR system. Due to this, the radar pulse reaches mountain slope facing the sensor before it reaches the base. Consequently, these slopes appear compressed and leaning toward the sensor. During processing to a level 1C product, these slant range distortions are partly corrected using a terrain correction algorithm and a Digital Elevation Model (DEM). The most common algorithm for this is the Range Doppler Terrain Correction.
-
-![](https://www.esri.com/arcgis-blog/wp-content/uploads/2024/05/emenezes-esriBlog-GP-tool-fig_Apply-Geometric-Terrain-Correction-detailed.png)
-
-*Figure 1: Geometric terrain correction. The lower bar shows the GRD without geometric terrain correction  in slant geometry. In areas where the ground is elevated, the time of the signal to travel to the earth’s surface and back to the sensor is distorted, causing geometric shifts (foreshortening, lengthening, etc). Using a DEM and the Range Doppler Terrain Correction, the distortions are corrected and the image is orthorectified. (Source: ESRI)*
-
-Let's visualize this geometric terrain correction (GTC) with some actual data using the `xarray` method `hvplot` of the `gtc_dc` object.
 
 ```{python}
 gtc_dc.hvplot.image(

@@ -1,25 +1,16 @@
 ---
 title: Phase Unwrapping
-jupyter: microwave-remote-sensing
+jupyter:
+  kernelspec:
+    display_name: microwave-remote-sensing
+    language: python
+    name: microwave-remote-sensing
 ---
-
-
-
-The goal of this notebook is to read an interferogram image (i.e., 2-D array of phase values) and unwrap it. Phase unwrapping is a critical process in interferometry, which involves recovering unambiguous phase data from the interferogram.
-
-A SAR interferogram represents the phase difference between two radar acquisitions (i.e., two SLC images). The phase difference is usually wrapped within a range of 0 to 2π, because the phase is inherently cyclical. When the true phase difference exceeds 2π, it gets "wrapped" into this range, creating a discontinuous phase signal. Phase unwrapping refers to the process of reconstructing the continuous phase field from the wrapped phase data.
-
-Unwrapping an interferogram is essential for extracting correct information contained in the phase such as surface topography and earth surface deformations.
-
-There are many approaches that tried to solve the unwrapping problem, tackling challenging scenarios involving noise or large phase discontinuities. Here we present the Network-flow Algorithm for phase unwrapping (C. W. Chen and H. A. Zebker, 2000), which is implemented in the `snaphu` package.
-
-## Loading Data
-The data is stored on the Jupyterhub server, so we need to load it using their respective paths.
-In this notebook we will use the resulting wrapped interferogram from notebook "Interferograms", but we need to process it in the radar geometry in order to unwrap it (while in notebook "Interferograms" we end the whole process by performing the geocoding, just for better visualization purposes).
-
 
 ```{python}
 # Imports
+from pathlib import Path
+
 import cmcrameri as cmc  # noqa: F401
 import intake
 import matplotlib.patches as patches
@@ -32,8 +23,8 @@ from IPython.display import clear_output
 ```
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = Path("..") / "data" / "microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 ds = cat.complex.read().compute()
 ds["cmplx"] = ds["real"] + ds["imag"] * 1j
 ```

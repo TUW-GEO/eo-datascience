@@ -1,32 +1,12 @@
 ---
 title: Reverend Bayes updates our Belief in Flood Detection
 subtitle: How an 275 year old idea helps map the extent of floods
-jupyter: floodmapping
+jupyter:
+  kernelspec:
+    display_name: floodmapping
+    language: python
+    name: floodmapping
 ---
-
-
-![Image from [wikipedia](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)](https://upload.wikimedia.org/wikipedia/commons/d/d4/Thomas_Bayes.gif)
-
-::: {.callout-note}
-This notebook contains interactive elements. The full interactive elements can only be viewed on Binder by clicking on the Binder badge or 🚀 button.
-:::
-
-## Overview
-
-This notebook explains how microwave ($\sigma^0$) backscattering can be used to map the extent of a flood. We replicate in this exercise the work of [@bauer-marschallinger_satellite-based_2022] on the TU Wien Bayesian-based flood mapping algorithm.
-
-## Prerequisites
-
-| Concepts | Importance | Notes |
-|---|---|---|
-| [Intro to xarray](https://foundations.projectpythia.org/core/xarray/xarray-intro.html) | Necessary | |
-| [Intro to Harmonic parameters](https://projectpythia.org/eo-datascience-cookbook/notebooks/tutorials/harmonic-parameters.html)| Necessary| |
-| [Documentation hvPlot](https://hvplot.holoviz.org/)|Helpful|Interactive plotting|
-| [Documentation odc-stac](https://odc-stac.readthedocs.io/en/latest/)|Helpful|Data access|
-
-- **Time to learn**: 10 min
-
-## Imports
 
 ```{python}
 import datetime

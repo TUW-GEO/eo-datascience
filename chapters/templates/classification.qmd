@@ -1,13 +1,12 @@
 ---
 title: Classification of Sentinel-2 imagery
 subtitle: Finding forests with satellite imagery
-jupyter: classification
+jupyter:
+  kernelspec:
+    display_name: classification
+    language: python
+    name: classification
 ---
-
-
-## Data Acquisition
-In this chapter, we will employ machine learning techniques to classify a scene using satellite imagery. Specifically, we will utilize ``scikit-learn`` to implement two distinct classifiers and subsequently compare their results. To begin, we need to import the following modules.
-
 
 ```{python}
 from datetime import datetime, timedelta
