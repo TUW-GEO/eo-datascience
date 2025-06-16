@@ -1,15 +1,13 @@
 ---
 title: Backscattering Coefficients
-jupyter:
-  kernelspec:
-    display_name: microwave-remote-sensing
-    language: python
-    name: microwave-remote-sensing
+jupyter: python3
 ---
 
-```{python}
-from pathlib import Path
 
+In this notebook, we will introduce some of the steps involved in the processing of Sentinel-1 Level1 Ground Range Detected (`GRD`) data to $\sigma^0$ (`sig0`) and $\gamma^0$ (`gmr`). Moreover, the notebook illustrates the importance and impact of geometric and radiometric terrain correction. As the processing of SAR data is a very time and hardware-intense task, we won't perform the actual processing in this notebook. Instead, data at different processing steps is illustrated to highlight the impact of the processing steps.
+
+
+```{python}
 import hvplot.xarray  # noqa: F401
 import intake
 import matplotlib.pyplot as plt  # noqa: F401
@@ -23,7 +21,7 @@ import xarray as xr
 We first load our data from the following [intake](https://intake.readthedocs.io/en/latest/) catalog. Intake is somewhat similar to STAC in that it makes it easy to discover and load data. More importantly, this package allows us to hide some of the complexities involved with getting the data in the right format, which are not of concern in this notebook.
 
 ```{python}
-uri = Path("..") / "data" / "microwave-remote-sensing.yml"
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
 cat = intake.open_catalog(uri)
 gtc_dc = cat["gtc"].read().compute()
 gtc_dc

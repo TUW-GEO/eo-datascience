@@ -1,12 +1,9 @@
 ---
 title: Reverend Bayes updates our Belief in Flood Detection
 subtitle: How an 275 year old idea helps map the extent of floods
-jupyter:
-  kernelspec:
-    display_name: floodmapping
-    language: python
-    name: floodmapping
+jupyter: floodmapping
 ---
+
 
 ```{python}
 import datetime

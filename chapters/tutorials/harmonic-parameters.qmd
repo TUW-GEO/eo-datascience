@@ -1,11 +1,8 @@
 ---
 title: Harmonic Parameters of Sentinel 1 Backscatter Time Series
-jupyter:
-  kernelspec:
-    display_name: harmonic-parameters
-    language: python
-    name: harmonic-parameters
+jupyter: harmonic-parameters
 ---
+
 
 ```{python}
 import folium

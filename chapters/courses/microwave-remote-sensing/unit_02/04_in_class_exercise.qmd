@@ -1,16 +1,44 @@
 ---
 title: Datacubes
-jupyter:
-  kernelspec:
-    display_name: microwave-remote-sensing
-    language: python
-    name: microwave-remote-sensing
+jupyter: python3
 ---
+
+
+
+In this notebook we discuss how we can easily compare images of two or more different time slices, satellites or other earth observation products. We limit our selves to products on a regular grid with an associated coordinate reference system (CRS), known as a raster. This means that each cell of the raster contains an attribute value and location coordinates. The process of combining such rasters to form datacubes is called raster stacking. We can have datacubes in many forms, such as the spatiotemporal datacube:
+
+$$Z = f(x,y,t) \quad \text{,}$$
+
+or when dealing with electromagnetic spectrum, the spectral wavelengths may form an additional dimension of a cube:
+
+$$Z = f(x,y,t, \lambda ) \quad \text{.} $$
+
+We also have already encountered the case where $Z$ consists of multiple variables, such as seen in the `xarray` dataset.
+
+$${Z_1,Z_2,...,Z_3} = f(x,y,t) $$
+
+To perform raster stacking, we generally follow a certain routine (see also Figure 1).
+
+1. Collect data (GeoTIFF, NetCDF, Zarr)
+2. Select an area of interest
+3. Reproject all rasters to the same projection, resolution, and region
+4. Stack the individual rasters
+
+To get the same projection, resolution, and region we have to resample one (or more) products. The desired projection, resolution, and region can be adopted from one of the original rasters or it can be a completely new projection of the data.
+
+![](https://eox.at/images/eodcaas-mosaic-data-cube-kopp.png)
+
+*Figure 1: Stacking of arrays to form datacubes (source: https://eox.at)*.
+
+In this notebook we will study two different SAR products. SAR data from the Advanced Land Observing Satellite (Alos-2), which is a Japanese platform with an L-band sensor from the Japan Aerospace Exploration Agency (JAXA), and C-band data from the Copernicus Sentinel-1 mission. It is our goal to compare C- with L-band, so we need to somehow stack these arrays.
+
 
 ```{python}
 from functools import partial
 from pathlib import Path
 
+import gitlab
+import urllib.parse
 import folium
 import hvplot.xarray  # noqa: F401
 import numpy as np
@@ -22,14 +50,32 @@ from shapely import affinity
 from shapely.geometry import box, mapping
 ```
 
+## Download Data
+
+For this exercise we will need to find the correct url to download each of the GeoTIFF files for both Sentinel-1 and Alos-2, where each image has it's own timestamp for the acquisition.
+
+```{python}
+def make_gitlab_urls(sensor):
+    gl = gitlab.Gitlab("https://git.geo.tuwien.ac.at")
+    gl_project = gl.projects.get(1264)
+    l = []
+    root = "https://git.geo.tuwien.ac.at/api/v4/projects/1264/repository/files/"
+    end = "/raw?ref=main&lfs=true"
+    for object in gl_project.repository_tree(
+        sensor, ref="main", recursive=True, iterator=True
+    ):
+        if object["path"].endswith(".tif"):
+            l.append(root + urllib.parse.quote_plus(object["path"]) + end)
+    return l
+```
+
 ## Loading Data
 
 Before loading the data into memory we will first look at the area covered by the Sentinel-1 dataset on a map. This way we can select a region of interest for our hypothetical study. We will extract and transform the bounds of the data to longitude and latitude.
 
 ```{python}
-uri = Path("..") / "data"
 bbox = xr.open_mfdataset(
-    (uri / "sentinel-1").glob("**/*.tif"),
+    make_gitlab_urls("sentinel-1"),
     engine="rasterio",
     combine="nested",
     concat_dim="band",
@@ -77,8 +123,8 @@ def s1_preprocess(x, bbox, scale):
     xarray.Dataset
     """
 
-    path = Path(x.encoding["source"])
-    filename = path.name
+    path = Path(urllib.parse.unquote_plus(x.encoding["source"]))
+    filename = path.parent.name
     x = x.rio.clip_box(*bbox, crs="EPSG:4326")
 
     date_str = filename.split("_")[0][1:]
@@ -88,7 +134,7 @@ def s1_preprocess(x, bbox, scale):
     x = x.expand_dims(dim={"time": [date]})
 
     x = (
-        x.rename({"band_data": "s1_" + path.parent.stem})
+        x.rename({"band_data": "s1_" + path.parent.parent.stem})
         .squeeze("band")
         .drop_vars("band")
     )
@@ -102,7 +148,7 @@ We load the data again with `open_mfdataset` and by providing the preprocess fun
 partial_ = partial(s1_preprocess, bbox=area_of_interest.bounds, scale=0.01)
 
 s1_ds = xr.open_mfdataset(
-    (uri / "sentinel-1").glob("**/*.tif"),
+    make_gitlab_urls("sentinel-1"),
     engine="rasterio",
     combine="nested",
     chunks=-1,
@@ -161,8 +207,8 @@ def alos_preprocess(x, bbox):
     xarray.Dataset
     """
 
-    path = Path(x.encoding["source"])
-    filename = path.name
+    path = Path(urllib.parse.unquote_plus(x.encoding["source"]))
+    filename = path.parent.name
     x = x.rio.clip_box(*bbox, crs="EPSG:4326")
 
     date_str = filename.split("_")[0][15:22]
@@ -170,7 +216,7 @@ def alos_preprocess(x, bbox):
     x = x.expand_dims(dim={"time": [date]})
 
     x = (
-        x.rename({"band_data": "alos_" + path.parent.stem})
+        x.rename({"band_data": "alos_" + path.parent.parent.stem})
         .squeeze("band")
         .drop_vars("band")
     )
@@ -186,7 +232,7 @@ area_of_interest = affinity.scale(area_of_interest, xfact=1.7, yfact=1.7)
 partial_ = partial(alos_preprocess, bbox=area_of_interest.bounds)
 
 alos_ds = xr.open_mfdataset(
-    (uri / "alos-2").glob("**/*.tif"),
+    make_gitlab_urls("alos-2"),
     engine="rasterio",
     combine="nested",
     chunks=-1,

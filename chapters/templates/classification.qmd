@@ -1,12 +1,9 @@
 ---
 title: Classification of Sentinel-2 imagery
 subtitle: Finding forests with satellite imagery
-jupyter:
-  kernelspec:
-    display_name: classification
-    language: python
-    name: classification
+jupyter: classification
 ---
+
 
 ```{python}
 from datetime import datetime, timedelta

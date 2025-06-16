@@ -1,15 +1,15 @@
 ---
 title: Dielectric Properties
-jupyter:
-  kernelspec:
-    display_name: microwave-remote-sensing
-    language: python
-    name: microwave-remote-sensing
+jupyter: microwave-remote-sensing
 ---
+
+
+
+In this notebook, we will investigate the varying backscatter values associated with different land surfaces like water bodies, forests, grasslands and urban areas. We will use backscatter data from the Sentinel-1 satellite and we will utilize the CORINE Land Cover dataset to classify and extrapolate these surfaces, enabling us to analyze how different land cover types influence backscatter responses.
+
 
 ```{python}
 import json
-from pathlib import Path
 
 import holoviews as hv
 import intake
@@ -29,7 +29,7 @@ hv.extension("bokeh")
 For our analysis we are using sigma naught backscatering data from Sentinel-1. The images we are analyzing cover the region south of Vienna and west of Lake Neusiedl. We load the data and and apply again a preprocessing function. Here we extract the scaling factor and the date the image was taken from the metadata. We will focus our attention to a smaller area containing a part of the Lake Neusiedl Lake and its surrounding land. The obtained`xarray` dataset and is then converted to an array, because we only have one variable, the VV backscatter values.
 
 ```{python}
-uri = Path("..") / "data" / "microwave-remote-sensing.yml"
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
 cat = intake.open_catalog(uri)
 sig0_da = cat.neusiedler.read().sig0.compute()
 ```
