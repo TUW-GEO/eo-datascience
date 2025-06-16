@@ -1,6 +1,6 @@
 ---
 title: Datacubes
-jupyter: python3
+jupyter: microwave-remote-sensing
 ---
 
 
