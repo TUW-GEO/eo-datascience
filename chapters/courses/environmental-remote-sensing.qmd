@@ -1,0 +1,22 @@
+---
+title: Environmental Remote Sensing
+jupyter: python3
+---
+
+
+These course materials where developed in the framework of the DrySat project: *Enhancing Drought Early Warning in Mozambique through Satellite Soil Moisture Data to support food security in the context of climate change*.
+
+## Prerequisites
+
+| Concepts | Importance | Notes |
+|---|---|---|
+| [Intro to Earth Observation Data Science](https://projectpythia.org/eo-datascience-cookbook/README.html) | Helpful | |
+| [Documentation hvPlot](https://hvplot.holoviz.org/)|Helpful|Interactive plotting|
+| [Documentation pandas](https://pandas.pydata.org/)|Helpful|Tabular data wrangling|
+
+- **Time to learn**: 90 min
+
+::: {.callout-note}
+These notebooks contain interactive elements. The full interactive elements can 
+only be viewed on Binder by clicking on the Binder badge or 🚀 button.
+:::

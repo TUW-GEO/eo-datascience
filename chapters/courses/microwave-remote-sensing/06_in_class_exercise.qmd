@@ -210,3 +210,4 @@ hist_opts = hv.opts.Histogram(width=350, height=555)
 
 dmap.opts(image_opts, hist_opts)
 ```
+

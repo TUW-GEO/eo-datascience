@@ -4,5 +4,5 @@ jupyter: python3
 ---
 
 
-This section of the Cookbook covers a wide range of topics. They showcase the
+This section of the Cookbook covers a wide range of topics. They showcase the 
 creation and usage of data products developed by TU Wien and EODC.
