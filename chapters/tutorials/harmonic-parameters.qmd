@@ -3,7 +3,6 @@ title: Harmonic Parameters of Sentinel 1 Backscatter Time Series
 jupyter: harmonic-parameters
 ---
 
-
 ```{python}
 import folium
 import holoviews as hv
@@ -556,3 +555,4 @@ plot.opts(
     legend_position="top_left",
 )
 ```
+
