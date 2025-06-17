@@ -120,8 +120,8 @@ We will now show two of the most common approaches: the temporal and the spatial
 We load a dataset that contains the CORINE land cover and Sentinel-1 $\sigma^0_E$ at a 20 meter resolution.  This is the same data presented in notebook 6.
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 fused_ds = cat.speckle.read().compute()
 fused_ds
 ```
@@ -337,4 +337,3 @@ plot_variability(fused_ds, filter_fun_temporal=temporal_filter)
 *Figure 4: Lake Neusiedl $\sigma^0_E$ with a temporal filter applied.*
 
 Let´s observe the histograms of the two plots. Especially in the region around the lake, it is clear that the distribution is now less dispersed and more centered around a central value.
-

@@ -1,0 +1,125 @@
+---
+title: 'Homework Exercise 3: Backscattering Coefficients'
+jupyter:
+  kernelspec:
+    display_name: 03_backscatter-coefficients
+    language: python
+    name: 03_backscatter-coefficients
+---
+
+
+To successfully finish this notebook, you have to answer/solve the following three questions.
+
+
+```{python}
+import xarray as xr
+
+import matplotlib.pyplot as plt  # noqa
+import hvplot.xarray  # noqa
+
+from pathlib import Path
+from functools import partial
+```
+
+```{python}
+#| editable: true
+#| slideshow: {slide_type: ''}
+#| tags: []
+def _preprocess(x, xlims, ylims, scale):
+    """
+    Preprocess file.
+
+    Parameters
+    ----------
+    x : xarray.Dataset
+    xlims: tuple
+    ylims: tuple
+
+    Returns
+    -------
+    xarray.Dataset
+    """
+    x = x * scale
+    x = x.sel(x=slice(*xlims), y=slice(*ylims))
+    x = x.assign_coords(band=[Path(x.encoding["source"]).parent.stem])
+    return x
+
+
+data_path = Path("~/shared/datasets/rs/sentinel-1").expanduser()
+
+# longitude and latitude
+xlims, ylims = (11.1, 11.6), (48, 47.5)
+partial_func = partial(_preprocess, xlims=xlims, ylims=ylims, scale=1)
+
+ex3_dc = xr.open_mfdataset(
+    (data_path / "ex3").glob("**/*.tif"),
+    engine="rasterio",
+    combine="nested",
+    concat_dim="band",
+    preprocess=partial_func,
+    parallel=True,
+    join="override",
+).compute()
+
+ex3_dc
+```
+
+## Question 1
+
+Execute the lines below to create the plot. You now see a SAR image with unknown processing level. Based on what you see, which pre-processing steps have been applied to the image?
+
+- [ ] no, it's a GRD scene
+- [ ] Geometric terrain correction
+- [ ] Radiometric terrain correction (terrain flattening)
+- [ ] Conversion to dB
+
+
+Select the answers you think are correct by editing the markdown text and putting an 'x' in the brackets. Note: One, several, or all answers are possible.
+
+```{python}
+ex3_dc.hvplot.image(
+    x="x",
+    y="y",
+    robust=True,
+    data_aspect=1,
+    cmap="Greys_r",
+    groupby="band",
+    rasterize=True,
+).opts(frame_height=600, framewise=False, aspect="equal")
+```
+
+## Question 2
+
+Name all types of radar image distortions, how they are caused, and how can we get rid of them?
+
+`Your answer here`
+
+## Question 3
+
+Use the figure below question 1 to identify areas that are affected by foreshortening and radar shadows. Use the mouseover to retrieve their x/y coordinates. Then use these coordinates to annotate the following `matplotlib` figure with labels by putting them in the lines indicated with # Your coordinates here.
+
+```{python}
+zoom = ex3_dc.sel(x=slice(11.25, 11.5), y=slice(47.75, 47.5)).band_data
+fig, ax = plt.subplots(figsize=(10, 8))
+
+bbox = dict(boxstyle="round", fc="0.8")
+
+ax.annotate(
+    "foreshortening",
+    xy=(..., ...),  # Your foreshortening coordinates here
+    xytext=(0.3, 0.25),
+    textcoords="subfigure fraction",
+    bbox=bbox,
+    arrowprops=dict(facecolor="white", shrink=0.05),
+)
+ax.annotate(
+    "shadows",
+    xy=(..., ...),  # Your radar shadow coordinates here
+    xytext=(0.47, 0.8),
+    textcoords="subfigure fraction",
+    bbox=bbox,
+    arrowprops=dict(facecolor="white", shrink=0.05),
+)
+
+zoom.sel(band="unknown1").plot(robust=True, cmap="Greys_r")
+```

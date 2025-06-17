@@ -28,8 +28,8 @@ import numpy as np
 We load the data again with the help of `intake`.
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 fused_ds = cat.fused.read()
 fused_ds
 ```
@@ -153,4 +153,3 @@ LAI_image + time_series
 Can you see some patterns when analyzing the different wavelengths and polarizations?
 
 Remember again that we deal with a logarithmic scale. A measurement of 10 dB is 10 times brighter than the intensity measured at 0 dB, and 100 times brighter at 20 dB. The most notable difference is that the offset between cross- and co-polarised signals becomes larger at low LAI and lower at higher LAI. This might indicate the effect of volume scattering in forested areas where co- and cross-polarization render backscattering values more equal. You will study the differences among cross- and co-polarized backscattering in more detail in the homework exercise.
-

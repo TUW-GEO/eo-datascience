@@ -22,14 +22,15 @@ More information about microwave backscattering and the fundamentals of surface 
 
 
 ```{python}
+from pathlib import Path
+
 import cartopy.crs as ccrs
 import holoviews as hv
 import hvplot.pandas  # noqa
+import matplotlib
 import numpy as np
 import pandas as pd
 from bokeh.models import FixedTicker
-
-from data.src.colours import SSM_CMAP  # TU Wien SSM colour map
 ```
 
 ## Surface Soil Moisture of Mozambique (2007 - 2025)
@@ -38,6 +39,19 @@ Let us start by having a look at monthly aggregated SSM derived from ASCAT micro
 
 ```{python}
 df = pd.read_csv("data/ascat-6_25_ssm_monthly.csv", index_col="time", parse_dates=True)
+
+
+def load_cmap(file: Path) -> matplotlib.colors.LinearSegmentedColormap:
+    def to_hex_str(c_str: str) -> str:
+        r_s, g_s, b_s = c_str.split()
+        return f"#{int(r_s):02x}{int(g_s):02x}{int(b_s):02x}"
+
+    ct_lines = Path(file).read_text().splitlines()
+    brn_yl_bu_colors = [to_hex_str(clr_str) for clr_str in ct_lines[:200]]
+    return matplotlib.colors.LinearSegmentedColormap.from_list("", brn_yl_bu_colors)
+
+
+SSM_CMAP = load_cmap("data/colour-tables/ssm-continuous.ct")
 
 locations = {
     "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
