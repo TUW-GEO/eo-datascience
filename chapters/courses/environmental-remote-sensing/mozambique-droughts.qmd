@@ -1,6 +1,6 @@
 ---
 title: Droughts of Mozambique
-jupyter: python3
+jupyter: environmental-remote-sensing
 ---
 
 **Observing Climate Change from Space**
