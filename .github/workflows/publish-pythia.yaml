@@ -49,7 +49,9 @@ jobs:
             ~/.cache/pip
             ./conda_envs
             ./chapters/courses/.jupyter_cache
-            ./chapters/courses/microwave-remote-sensing/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/unit_01/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/unit_02/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/unit_03/.jupyter_cache
             ./chapters/courses/environmental-remote-sensing/.jupyter_cache
             ./chapters/templates/.jupyter_cache
             ./chapters/tutorials/.jupyter_cache
