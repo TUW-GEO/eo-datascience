@@ -29,8 +29,8 @@ hv.extension("bokeh")
 For our analysis we are using sigma naught backscatering data from Sentinel-1. The images we are analyzing cover the region south of Vienna and west of Lake Neusiedl. We load the data and and apply again a preprocessing function. Here we extract the scaling factor and the date the image was taken from the metadata. We will focus our attention to a smaller area containing a part of the Lake Neusiedl Lake and its surrounding land. The obtained`xarray` dataset and is then converted to an array, because we only have one variable, the VV backscatter values.
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 sig0_da = cat.neusiedler.read().sig0.compute()
 ```
 
@@ -210,4 +210,3 @@ hist_opts = hv.opts.Histogram(width=350, height=555)
 
 dmap.opts(image_opts, hist_opts)
 ```
-

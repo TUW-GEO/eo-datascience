@@ -40,8 +40,8 @@ We introduce now another level-1 radar product type, which is called **Single Lo
     + SLC has larger file sizes compared to GRD
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 iw1_ds = cat.iw1.read()
 iw2_ds = cat.iw2.read()
 iw3_ds = cat.iw3.read()
@@ -270,4 +270,3 @@ folium.LayerControl().add_to(m)
 
 m
 ```
-

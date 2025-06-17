@@ -19,7 +19,6 @@ In this notebook we will use the resulting wrapped interferogram from notebook "
 
 
 ```{python}
-# Imports
 import cmcrameri as cmc  # noqa: F401
 import intake
 import matplotlib.patches as patches
@@ -32,8 +31,8 @@ from IPython.display import clear_output
 ```
 
 ```{python}
-url = "https://huggingface.co/datasets/martinschobben/microwave-remote-sensing/resolve/main/microwave-remote-sensing.yml"
-cat = intake.open_catalog(url)
+uri = "https://git.geo.tuwien.ac.at/public_projects/microwave-remote-sensing/-/raw/main/microwave-remote-sensing.yml"
+cat = intake.open_catalog(uri)
 ds = cat.complex.read().compute()
 ds["cmplx"] = ds["real"] + ds["imag"] * 1j
 ```
@@ -423,4 +422,3 @@ In the following animation, we can capture the 3D displacement caused by the Rid
 
 ![](../../images/ridgecrest.gif)
 *Credits: NASA*
-

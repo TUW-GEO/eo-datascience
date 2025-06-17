@@ -37,13 +37,14 @@ In this notebook we will study two different SAR products. SAR data from the Adv
 from functools import partial
 from pathlib import Path
 
+import gitlab
+import urllib.parse
 import folium
 import hvplot.xarray  # noqa: F401
 import numpy as np
 import pandas as pd
 import rioxarray  # noqa: F401
 import xarray as xr
-from huggingface_hub import snapshot_download
 from rasterio.enums import Resampling
 from shapely import affinity
 from shapely.geometry import box, mapping
@@ -51,15 +52,21 @@ from shapely.geometry import box, mapping
 
 ## Download Data
 
-For this exercise we will download a set of GeoTIFF files for both Sentinel-1 and Alos-2, where each image has it's own timestamp for the acquisition.
+For this exercise we will need to find the correct url to download each of the GeoTIFF files for both Sentinel-1 and Alos-2, where each image has it's own timestamp for the acquisition.
 
 ```{python}
-data_path = snapshot_download(
-    repo_id="martinschobben/microwave-remote-sensing",
-    repo_type="dataset",
-    allow_patterns="*.tif",
-)
-data_path = Path(data_path)
+def make_gitlab_urls(sensor):
+    gl = gitlab.Gitlab("https://git.geo.tuwien.ac.at")
+    gl_project = gl.projects.get(1264)
+    l = []
+    root = "https://git.geo.tuwien.ac.at/api/v4/projects/1264/repository/files/"
+    end = "/raw?ref=main&lfs=true"
+    for object in gl_project.repository_tree(
+        sensor, ref="main", recursive=True, iterator=True
+    ):
+        if object["path"].endswith(".tif"):
+            l.append(root + urllib.parse.quote_plus(object["path"]) + end)
+    return l
 ```
 
 ## Loading Data
@@ -68,7 +75,7 @@ Before loading the data into memory we will first look at the area covered by th
 
 ```{python}
 bbox = xr.open_mfdataset(
-    (data_path / "sentinel-1").glob("**/*.tif"),
+    make_gitlab_urls("sentinel-1"),
     engine="rasterio",
     combine="nested",
     concat_dim="band",
@@ -116,8 +123,8 @@ def s1_preprocess(x, bbox, scale):
     xarray.Dataset
     """
 
-    path = Path(x.encoding["source"])
-    filename = path.name
+    path = Path(urllib.parse.unquote_plus(x.encoding["source"]))
+    filename = path.parent.name
     x = x.rio.clip_box(*bbox, crs="EPSG:4326")
 
     date_str = filename.split("_")[0][1:]
@@ -127,7 +134,7 @@ def s1_preprocess(x, bbox, scale):
     x = x.expand_dims(dim={"time": [date]})
 
     x = (
-        x.rename({"band_data": "s1_" + path.parent.stem})
+        x.rename({"band_data": "s1_" + path.parent.parent.stem})
         .squeeze("band")
         .drop_vars("band")
     )
@@ -141,7 +148,7 @@ We load the data again with `open_mfdataset` and by providing the preprocess fun
 partial_ = partial(s1_preprocess, bbox=area_of_interest.bounds, scale=0.01)
 
 s1_ds = xr.open_mfdataset(
-    (data_path / "sentinel-1").glob("**/*.tif"),
+    make_gitlab_urls("sentinel-1"),
     engine="rasterio",
     combine="nested",
     chunks=-1,
@@ -200,8 +207,8 @@ def alos_preprocess(x, bbox):
     xarray.Dataset
     """
 
-    path = Path(x.encoding["source"])
-    filename = path.name
+    path = Path(urllib.parse.unquote_plus(x.encoding["source"]))
+    filename = path.parent.name
     x = x.rio.clip_box(*bbox, crs="EPSG:4326")
 
     date_str = filename.split("_")[0][15:22]
@@ -209,7 +216,7 @@ def alos_preprocess(x, bbox):
     x = x.expand_dims(dim={"time": [date]})
 
     x = (
-        x.rename({"band_data": "alos_" + path.parent.stem})
+        x.rename({"band_data": "alos_" + path.parent.parent.stem})
         .squeeze("band")
         .drop_vars("band")
     )
@@ -225,7 +232,7 @@ area_of_interest = affinity.scale(area_of_interest, xfact=1.7, yfact=1.7)
 partial_ = partial(alos_preprocess, bbox=area_of_interest.bounds)
 
 alos_ds = xr.open_mfdataset(
-    (data_path / "alos-2").glob("**/*.tif"),
+    make_gitlab_urls("alos-2"),
     engine="rasterio",
     combine="nested",
     chunks=-1,
@@ -295,4 +302,3 @@ fused_da.hvplot.image(robust=True, data_aspect=1, cmap="Greys_r", rasterize=True
 ```
 
 *Figure 3: Stacked array with ALOS-2 L-band and Sentinel-1 C-band $\gamma^0_T (dB)$.*
-

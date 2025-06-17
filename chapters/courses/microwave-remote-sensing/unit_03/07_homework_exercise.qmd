@@ -1,0 +1,72 @@
+---
+title: 'Homework Exercise 7: Speckle Statistics'
+jupyter: python3
+---
+
+
+During the in-class exercise, we learned about the origin of speckles and ways to mitigate it. In this exercise, your task will be to apply a Lee filter (spatial filter) with different kernel sizes to the same study area.
+
+
+```{python}
+import numpy as np
+import xarray as xr
+from pathlib import Path
+from scipy.ndimage import uniform_filter  #noqa
+import hvplot.xarray  # noqa
+```
+
+## Question 1
+
+We will use already known data, which consists of Sentinel-1 **sigma naught** $\sigma^0$ images focusing on Lake Neusiedl and the surrounding area, where the CORINE land cover is used for land cover-based visualization and analysis.
+
+```{python}
+data_path = Path("~/shared/datasets/rs/corine/fused_land_cover.zarr").\
+    expanduser()
+fused_ds = xr.open_dataset(data_path, decode_coords="all", engine="zarr")
+sig0_da = fused_ds.sig0.copy()
+sig0_da
+```
+
+Let's build up the Lee filter function:
+
+```{python}
+def lee_filter(raster, size=...):
+    """
+    Parameters:
+    raster: ndarray
+
+    size: int
+
+    Returns:
+    filtered_image (ndarray): The filtered image with reduced speckle noise
+    """
+
+    filtered_image = ...  # YOUR CODE HERE
+
+    return filtered_image
+```
+
+## Question 2
+
+Apply your function and compute the Lee filter for at least two different kernel sizes (size number must be odd).
+
+```{python}
+sig0_da.data = ...  # YOUR CODE HERE
+```
+
+Plot you results usign the following code:
+
+```{python}
+sig0_da.hvplot.image(
+    x="x", y="y", robust=True, data_aspect=1, cmap="Greys_r", rasterize=True
+).opts(frame_height=600, framewise=False, aspect="equal")
+```
+
+## Question 3
+
+Based on your plotted results, select which of the below statement is correct:
+
+- [ ] The larger the kernel size, the lower the resolution of the resulting image.
+- [ ] The smaller the kernel size, the more speckle noise is removed.
+- [ ] The choice of the kernel size has no impact on the speckle noise removal.
+- [ ] The larger the kernel size, the more speckle noise is removed.
