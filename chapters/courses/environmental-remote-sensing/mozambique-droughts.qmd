@@ -1,6 +1,6 @@
 ---
 title: Droughts of Mozambique
-jupyter: environmental-remote-sensing
+jupyter: python3
 ---
 
 **Observing Climate Change from Space**
@@ -22,8 +22,6 @@ More information about microwave backscattering and the fundamentals of surface 
 
 
 ```{python}
-from pathlib import Path
-
 import cartopy.crs as ccrs
 import holoviews as hv
 import hvplot.pandas  # noqa
@@ -38,20 +36,29 @@ from bokeh.models import FixedTicker
 Let us start by having a look at monthly aggregated SSM derived from ASCAT microwave backscattering over Mozambique. We can easily load the csv-file with `pandas` and then plot the results with `hvplot`. This creates an interactive plot whereby we can map the SSM values on an Open Street Map (OSM) and scroll through all months from 2007 to the present. For convenience, we added the locations of the in-situ sensors placed for each target district in the DrySAT project.
 
 ```{python}
-df = pd.read_csv("data/ascat-6_25_ssm_monthly.csv", index_col="time", parse_dates=True)
+ROOT = "https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/"
 
 
-def load_cmap(file: Path) -> matplotlib.colors.LinearSegmentedColormap:
-    def to_hex_str(c_str: str) -> str:
-        r_s, g_s, b_s = c_str.split()
-        return f"#{int(r_s):02x}{int(g_s):02x}{int(b_s):02x}"
+def make_url(file, lfs="true"):
+    return ROOT + file + f"/raw?ref=main&lfs={lfs}"
 
-    ct_lines = Path(file).read_text().splitlines()
-    brn_yl_bu_colors = [to_hex_str(clr_str) for clr_str in ct_lines[:200]]
+
+df = pd.read_csv(
+    make_url("ascat-6_25_ssm_monthly.csv"), index_col="time", parse_dates=True
+)
+
+
+def load_cmap(file):
+    def to_hex_str(x):
+        return f"#{int(x.R):02x}{int(x.G):02x}{int(x.B):02x}"
+
+    path = r"colour-tables%2Fssm-continuous.ct"
+    df = pd.read_fwf(make_url(path, "false"), names=["R", "G", "B"], nrows=200)
+    brn_yl_bu_colors = df.apply(to_hex_str, axis=1).to_list()
     return matplotlib.colors.LinearSegmentedColormap.from_list("", brn_yl_bu_colors)
 
 
-SSM_CMAP = load_cmap("data/colour-tables/ssm-continuous.ct")
+SSM_CMAP = load_cmap("colour-tables/ssm-continuous.ct")
 
 locations = {
     "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
@@ -92,13 +99,14 @@ df.hvplot.points(
 ) * points * labels
 ```
 
+
 ## Surface Soil Moisture Timeseries
 
 Now let us have a closer look at the five locations marked on the SSM map and plot the SSM values against time for these 5 locations—known as timeseries. To do this we will use the full dataset filtered down to the five locations. This SSM dataset is thus not aggregated monthly and shows the full temporal resolution of the product. To visualize this, we highlight the density of data points falling in a certain sector of the plot with blue shading—bluer values mark a higher density of data points.
 
 ```{python}
 ts = pd.read_csv(
-    "data/ascat-6_25_ssm_timeseries.csv", index_col="time", parse_dates=True
+    make_url("ascat-6_25_ssm_timeseries.csv"), index_col="time", parse_dates=True
 )
 
 p = hv.Layout(
