@@ -1,10 +1,6 @@
 ---
 title: Remotely Sensed Droughts in Mozambique
-jupyter:
-  kernelspec:
-    display_name: environmental-remote-sensing
-    language: python
-    name: environmental-remote-sensing
+jupyter: environmental-remote-sensing
 ---
 
 **Observing Climate Change from Space**
@@ -163,7 +159,7 @@ def zscore(x):
     return (x - x.mean()) / x.std()
 ```
 
-We exemplify this normalization step below. Here we can see two histograms for a simulated SSM dataset. The histogram on the right is still in the original "degree of saturation" units, whereas the graph on the left is given as the Z score. The value of the x axis of the right-hand figure can be translated as: "This point is so many standard deviations removed from the mean."
+We exemplify this normalization step below. Here we can see two histograms for a simulated SSM dataset. The histogram on the left is still in the original "degree of saturation" units, whereas the graph on the right is transformed to Z scores. The value of the x axis of the right-hand figure can be translated as: "This point is so many standard deviations removed from the mean."
 
 ```{python}
 np.random.seed(42)  # make example reproducible
@@ -221,6 +217,7 @@ df[df.zscore <= 0].hvplot.points(
     cmap="reds_r",
     clim=(-4, 0),
     frame_width=500,
+    clabel="Drought anomaly",
 ).opts(hv.opts.Image(colorbar_opts={**colorbar_opts})) * points * labels
 ```
 
