@@ -72,7 +72,7 @@ def separate_dependencies(dep: list[str]) -> tuple[set, dict]:
     return unique_deps, non_unique_deps
 
 
-def resolve_dependency_versions(unique_deps: list, non_unique_deps: dict) -> set:
+def resolve_dependency_versions(unique_deps: set, non_unique_deps: dict) -> set:
     """Add latest versions from the non-unique to the unique dependencies."""
     final_dependencies = set()
     for name in unique_deps:
@@ -84,10 +84,17 @@ def resolve_dependency_versions(unique_deps: list, non_unique_deps: dict) -> set
     return final_dependencies
 
 
+def resolve_versions(dep: list[str]) -> set:
+    unique, non_unique = separate_dependencies(dep)
+
+    # Update dependencies set with latest versions
+    return resolve_dependency_versions(unique, non_unique)
+
+
 def create_master_environment(
     final_dependencies: set,
     name: str = "eo-datascience-cookbook-dev",
-    pip_deps: list[str] | None = None,
+    pip_deps: set[str] | None = None,
 ) -> dict:
     """Put a list of dependencies into the conda yaml environment format."""
     deps = sorted(final_dependencies)
@@ -149,16 +156,13 @@ def main() -> None:
     env_dependencies: tuple[list[str], list[str]] = aggregate_env_dependencies(files)
     unrefined_dependencies, pip_dependencies = env_dependencies
 
-    separate: tuple[set, dict] = separate_dependencies(unrefined_dependencies)
-    unique_deps: set = separate[0]
-    non_unique_deps: dict = separate[1]
-
     # Update dependencies set with latest versions
-    final_dependencies: set = resolve_dependency_versions(unique_deps, non_unique_deps)
+    final_dependencies: set = resolve_versions(unrefined_dependencies)
+    final_pip_dependencies: set = resolve_versions(pip_dependencies)
 
     # Create master YAML file
     master_env: dict = create_master_environment(
-        final_dependencies, name=args.name, pip_deps=pip_dependencies
+        final_dependencies, name=args.name, pip_deps=final_pip_dependencies
     )
     dump_environment(Path(args.out), master_env)
 
