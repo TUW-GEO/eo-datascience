@@ -1,55 +1,83 @@
+"""Merges all individual environment yaml files into one."""
+
+from __future__ import annotations
+
 import argparse
 from pathlib import Path
-from typing import Dict, Iterable, List, Set, Tuple
 
-import yaml
+import yaml  # type: ignore
 from packaging.version import parse
 
 
-def collect_yaml_files(root: Path) -> List[Path]:
+def collect_yaml_files(root: Path) -> list[Path]:
+    """Grab all yaml files that are in the directory."""
     files = list(root.glob("**/*.yml"))
     files.append(root.parent / "environment.yml")
     return files
 
 
-def get_environment_from_yml(file: Path) -> Dict:
+def get_environment_from_yml(file: Path) -> dict:
+    """Load a yaml into a dictionary."""
     with file.open("r") as f:
-        environment = yaml.safe_load(f)
-    return environment
+        return yaml.safe_load(f)
 
 
-def aggregate_env_dependencies(files: List[Path]) -> List[str]:
-    unrefined_dependencies: List = []
+def aggregate_env_dependencies(files: list[Path]) -> tuple[list[str], list[str]]:
+    """Grabs all dependencies from the yaml files and combines them into a list.
+
+    The pip dependencies are extracted and returned separately.
+    """
+    unrefined_dependencies: list = []
+    pip_dependencies: list = []
     for file in files:
-        environment = get_environment_from_yml(file)
-        unrefined_dependencies.extend(environment.get("dependencies", []))
-    return unrefined_dependencies
+        environment: dict = get_environment_from_yml(file)
+        env_dependencies: list[str | dict] = environment.get("dependencies", [])
+        regular_deps, sub_deps = extract_sub_dependencies(env_dependencies)
+        unrefined_dependencies.extend(regular_deps)
+        pip_dependencies.extend(sub_deps)
+    return unrefined_dependencies, pip_dependencies
 
 
-def extract_unique_dependencies(dep: List[str]) -> Tuple[Set, Dict]:
-    dependencies = set()
-    multi_versions = dict()
+def extract_sub_dependencies(deps: list[str | dict]) -> tuple[list, list]:
+    """Remove pip dependecies from a list of dependencies."""
+    subdependencies: list = []
+    regular_deps: list = []
+    for dep in deps:
+        if isinstance(dep, dict) and "pip" in dep:
+            subdependencies.extend(dep["pip"])
+        elif isinstance(dep, dict):
+            # If it's a dict but not pip, we ignore it
+            continue
+        else:
+            regular_deps.append(dep)
+    return regular_deps, subdependencies
+
+
+def separate_dependencies(dep: list[str]) -> tuple[set, dict]:
+    """Separates all dependencies into unique and non-unique dependencies."""
+    unique_deps = set()
+    non_unique_deps: dict = {}
     for d in dep:
         parts = d.split("=")
         name = parts[0]
-        dependencies.add(name)
+        # NOTE: All dependencies are added to the unique's
+        unique_deps.add(name)
         # Check if version is specified
         if len(parts) > 1:
             version = parts[-1]
-            if name in multi_versions:
-                multi_versions[name].append(version)
+            if name in non_unique_deps:
+                non_unique_deps[name].append(version)
             else:
-                multi_versions[name] = [version]
-    return dependencies, multi_versions
+                non_unique_deps[name] = [version]
+    return unique_deps, non_unique_deps
 
 
-def resolve_dependency_versions(
-    unique_dependencies: Iterable, multi_versions: Dict
-) -> Set:
+def resolve_dependency_versions(unique_deps: list, non_unique_deps: dict) -> set:
+    """Add latest versions from the non-unique to the unique dependencies."""
     final_dependencies = set()
-    for name in unique_dependencies:
-        if name in multi_versions:
-            latest_version = max(multi_versions[name], key=parse)
+    for name in unique_deps:
+        if name in non_unique_deps:
+            latest_version = max(non_unique_deps[name], key=parse)
             final_dependencies.add(f"{name}={latest_version}")
         else:
             final_dependencies.add(name)
@@ -57,18 +85,24 @@ def resolve_dependency_versions(
 
 
 def create_master_environment(
-    final_dependencies: List | Set, name: str = "eo-datascience-cookbook-dev"
-) -> Dict:
-    master_env = {
+    final_dependencies: set,
+    name: str = "eo-datascience-cookbook-dev",
+    pip_deps: list[str] | None = None,
+) -> dict:
+    """Put a list of dependencies into the conda yaml environment format."""
+    deps = sorted(final_dependencies)
+    if pip_deps is not None:
+        deps.append({"pip": sorted(pip_deps)})
+    return {
         "name": name,
         "channels": ["conda-forge"],
-        "dependencies": sorted(final_dependencies),
+        "dependencies": deps,
     }
-    return master_env
 
 
-def dump_environment(output_file: str | Path, master_env: Dict) -> None:
-    with open(output_file, "w") as f:
+def dump_environment(output_file: Path, master_env: dict) -> None:
+    """Safe the environment dictionary as a yaml file."""
+    with output_file.open("w") as f:
         yaml.dump(
             master_env,
             f,
@@ -79,11 +113,12 @@ def dump_environment(output_file: str | Path, master_env: Dict) -> None:
         )
 
 
-def fix_yml_indentation(output_file):
-    with open(output_file, "r") as f:
+def fix_yml_indentation(output_file: Path) -> None:
+    """Fix the indentation of a file, which has been yaml dumped."""
+    with output_file.open() as f:
         lines = f.readlines()
 
-    with open(output_file, "w") as f:
+    with output_file.open("w") as f:
         for line in lines:
             if line.strip().startswith("-"):
                 f.write("  " + line)  # Add two spaces before the line
@@ -108,25 +143,27 @@ def main() -> None:
     args = parser.parse_args()
 
     root = Path("notebooks").resolve()
-    files = collect_yaml_files(root)
+    files: list[Path] = collect_yaml_files(root)
 
     # Collect all dependencies from all YAML files
-    unrefined_dependencies = aggregate_env_dependencies(files)
+    env_dependencies: tuple[list[str], list[str]] = aggregate_env_dependencies(files)
+    unrefined_dependencies, pip_dependencies = env_dependencies
 
-    unique_dependencies, multi_versions = extract_unique_dependencies(
-        unrefined_dependencies
-    )
+    separate: tuple[set, dict] = separate_dependencies(unrefined_dependencies)
+    unique_deps: set = separate[0]
+    non_unique_deps: dict = separate[1]
+
     # Update dependencies set with latest versions
-    final_dependencies = resolve_dependency_versions(
-        unique_dependencies, multi_versions
-    )
+    final_dependencies: set = resolve_dependency_versions(unique_deps, non_unique_deps)
 
     # Create master YAML file
-    master_env = create_master_environment(final_dependencies, name=args.name)
-    dump_environment(args.out, master_env)
+    master_env: dict = create_master_environment(
+        final_dependencies, name=args.name, pip_deps=pip_dependencies
+    )
+    dump_environment(Path(args.out), master_env)
 
     # Dirty fix: Read the file and add two spaces before
-    fix_yml_indentation(args.out)
+    fix_yml_indentation(Path(args.out))
     print("Environments have been merged.")
     print(f"{args.out} file created successfully.")
 

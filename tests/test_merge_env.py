@@ -2,7 +2,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest  # noqa
-from eo_datascience import merge_envs
+from eo_datascience import merge_envs  # type: ignore
 
 
 def test_create_master_environment_returns_correct():
@@ -30,26 +30,33 @@ def test_resolve_dependency_versions_returns_correct():
 
 
 def test_extract_unique_dependencies_returns_correct():
-    dependencies = ["numpy", "pandas", "matplotlib==3.2.2"]
+    dependencies = ["numpy", "pandas", "matplotlib==3.2.2", "matplotlib==3.1.1"]
     expected_result = (
         {"numpy", "pandas", "matplotlib"},
-        {"matplotlib": ["3.2.2"]},
+        {"matplotlib": ["3.2.2", "3.1.1"]},
     )
-    actual_result = merge_envs.extract_unique_dependencies(dependencies)
+    actual_result = merge_envs.separate_dependencies(dependencies)
     assert actual_result == expected_result
 
 
 @patch("eo_datascience.merge_envs.get_environment_from_yml")
 def test_aggregate_env_dependencies_returns_correct(mock_get_env):
     env1 = {"dependencies": ["numpy==3.2.1", "pandas", "xarray"]}
-    env2 = {"dependencies": ["numpy=3.4.5", "pandas", "seaborn"]}
+    env2 = {
+        "dependencies": [
+            "numpy=3.4.5",
+            "pandas",
+            "seaborn",
+            {"pip": ["pyyaml", "quarto"]},
+        ]
+    }
     # Setting the return values of calling `get_environment_from_yml` two times
     mock_get_env.side_effect = [env1, env2]
 
     # Create dummy file paths
     files = [Path("env1.yml"), Path("env2.yml")]
 
-    result = merge_envs.aggregate_env_dependencies(files)
+    result, pip = merge_envs.aggregate_env_dependencies(files)
 
     expected = [
         "numpy==3.2.1",
@@ -59,4 +66,7 @@ def test_aggregate_env_dependencies_returns_correct(mock_get_env):
         "pandas",
         "seaborn",
     ]
+
+    expected_pip = ["pyyaml", "quarto"]
     assert result == expected
+    assert pip == expected_pip
