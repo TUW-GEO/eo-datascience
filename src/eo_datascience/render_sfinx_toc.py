@@ -1,6 +1,5 @@
 import argparse
 from pathlib import Path
-from typing import Literal
 
 import yaml
 from eo_datascience.clean_nb import substitute_path
@@ -16,7 +15,7 @@ def render_toc(p, out="."):
 
 def _render_toc(toc):
     ls = [dict(caption="Preamble", chapters=[dict(file="notebooks/how-to-cite")])]
-    ls += transform_main(toc) + transform_appendix(toc)
+    ls += [transform_main(toc)] + transform_appendix(toc)
     ls += [dict(caption="References", chapters=[dict(file="notebooks/references")])]
     return dict(format="jb-book", root="README", parts=ls)
 
@@ -30,39 +29,40 @@ def extract_appendix(toc):
 
 
 def transform_main(toc):
-    return rename_keys_section(extract_main(toc), "main")
+    return rename_keys_sections_main(extract_main(toc))
 
 
 def transform_appendix(toc):
-    return rename_keys_section(extract_appendix(toc), "appendix")
+    return rename_keys_sections_appendix(extract_appendix(toc))
 
 
-def rename_keys_section(
-    sec,
-    part: Literal["main", "appendix"],
-):
-    sections = sec.copy()
+def rename_keys_sections_main(sections):
+    sections = sections.copy()
+    list_of_chapters_files = []
+    new_struct_toc = dict()
     for i, section in enumerate(sections):
         sections[i] = _rename_keys_section(section, ("part", "caption"))
-        if part == "main":
-            restructure_section_main(sections, i)
-        elif part == "appendix":
-            restructure_section_appendix(sections, i)
-        else:
-            sections[i]["caption"] = sections[i]["caption"][0]["file"]
+        restructure_section_main(sections, i, list_of_chapters_files)
+    new_struct_toc["caption"] = "Courses"
+    new_struct_toc["chapters"] = list_of_chapters_files
+    return new_struct_toc
 
+
+def rename_keys_sections_appendix(sections):
+    sections = sections.copy()
+    for i, section in enumerate(sections):
+        sections[i] = _rename_keys_section(section, ("part", "caption"))
+        restructure_section_appendix(sections, i)
     return sections
 
 
-def restructure_section_main(sections, i):
-    restruct = [
+def restructure_section_main(sections, i, list_of_chapters_files):
+    return list_of_chapters_files.append(
         {
-            "file": sections[i]["caption"][i]["file"],
+            "file": sections[i]["caption"][0]["file"],
             "sections": sections[i]["chapters"],
         }
-    ]
-    sections[i]["chapters"] = restruct
-    sections[i]["caption"] = "Courses"
+    )
 
 
 def restructure_section_appendix(sections, i):

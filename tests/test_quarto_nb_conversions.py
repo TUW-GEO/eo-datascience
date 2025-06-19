@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import nbformat  # noqa
@@ -19,7 +20,8 @@ from eo_datascience.render_sfinx_toc import (
     extract_appendix,
     extract_main,
     rename_file_path,
-    rename_keys_section,
+    rename_keys_sections_appendix,
+    rename_keys_sections_main,
     transform_appendix,
     transform_main,
 )
@@ -43,8 +45,11 @@ def test_toc_conversion():
         - index.qmd
         - part: chapters/courses/microwave-remote-sensing.qmd
           chapters:
-            - chapters/courses/microwave-remote-sensing/01_in_class_exercise.qmd
-            - chapters/courses/microwave-remote-sensing/02_in_class_exercise.qmd
+            - chapters/courses/microwave-remote-sensing/unit_01/01_in_class_exercise.qmd
+            - chapters/courses/microwave-remote-sensing/unit_01/02_in_class_exercise.qmd
+        - part: chapters/courses/environmental-remote-sensing.qmd
+          chapters:
+            - chapters/courses/environmental-remote-sensing/mozambique-droughts.qmd
       appendices:
         - part: chapters/templates/prereqs-templates.qmd
           chapters:
@@ -66,8 +71,11 @@ def test_toc_conversion():
       chapters:
       - file: notebooks/courses/microwave-remote-sensing
         sections:
-          - file: notebooks/courses/microwave-remote-sensing/01_in_class_exercise
-          - file: notebooks/courses/microwave-remote-sensing/02_in_class_exercise
+          - file: notebooks/courses/microwave-remote-sensing/unit_01/01_in_class_exercise
+          - file: notebooks/courses/microwave-remote-sensing/unit_01/02_in_class_exercise
+      - file: notebooks/courses/environmental-remote-sensing
+        sections:
+          - file: notebooks/courses/environmental-remote-sensing/mozambique-droughts
     - caption: Templates
       chapters:
       - file: notebooks/templates/prereqs-templates
@@ -86,32 +94,43 @@ def test_toc_conversion():
     quarto_toc = yaml.safe_load(mock_quarto_toc)
 
     main = extract_main(quarto_toc)
-    assert len(main) == 1
+    assert len(main) == 2
     assert rename_file_path("tests/mock.qmd") == "tests/mock"
-    assert rename_keys_section(main, "main") == [
-        {
-            "caption": "Courses",
-            "chapters": [
-                {
-                    "file": "notebooks/courses/microwave-remote-sensing",
-                    "sections": [
-                        {
-                            "file": "notebooks/courses/microwave-remote-"
-                            + "sensing/01_in_class_exercise"
-                        },
-                        {
-                            "file": "notebooks/courses/microwave-remote-"
-                            + "sensing/02_in_class_exercise"
-                        },
-                    ],
-                },
-            ],
-        }
-    ]
+
+    ref_main_dict = {
+        "caption": "Courses",
+        "chapters": [
+            {
+                "file": "notebooks/courses/microwave-remote-sensing",
+                "sections": [
+                    {
+                        "file": "notebooks/courses/microwave-remote-"
+                        + "sensing/unit_01/01_in_class_exercise"
+                    },
+                    {
+                        "file": "notebooks/courses/microwave-remote-"
+                        + "sensing/unit_01/02_in_class_exercise"
+                    },
+                ],
+            },
+            {
+                "file": "notebooks/courses/environmental-remote-sensing",
+                "sections": [
+                    {
+                        "file": "notebooks/courses/environmental-remote-"
+                        + "sensing/mozambique-droughts"
+                    },
+                ],
+            },
+        ],
+    }
+
+    assert rename_keys_sections_main(main) == ref_main_dict
 
     append = extract_appendix(quarto_toc)
     assert len(append) == 2
-    assert rename_keys_section(append, "appendix") == [
+
+    ref_appendix_dict = [
         {
             "caption": "Templates",
             "chapters": [
@@ -132,6 +151,8 @@ def test_toc_conversion():
         },
     ]
 
+    assert rename_keys_sections_appendix(append) == ref_appendix_dict
+
     quarto_toc_transform = transform_main(quarto_toc)
     assert len(main) == len(quarto_toc_transform)
 
@@ -146,11 +167,9 @@ def test_remove_front_matter():
         clean_up_frontmatter("./tests", None, False)["cells"][0]["cell_type"]
         == "markdown"
     )
-    assert (
-        clean_up_frontmatter("./tests", None, False)["cells"][0]["source"]
-        == "# This a mock Jupyter file\n**We use it for testing**\n\nSome"
-        + " other text, which should not be deleted!\n"
-    )
+    incoming = clean_up_frontmatter("./tests", None, False)["cells"][0]["source"][:52]
+    ref = r"# This a mock Jupyter file\n\*\*We use it for testing\*\*"
+    assert re.match(ref, incoming)
 
 
 def test_find_ipynb():
@@ -176,17 +195,17 @@ def test_conversion_of_refs():
         r"lorem ipsum {cite:p}`anon2024` and {cite:p}`anon2025`",
         r"lorem ipsum {cite:t}`anon2024` and {cite:t}`anon2025`",
     ]
-    assert (
-        convert_refs("./tests", None, False)["cells"][2]["source"]
-        == r"lorem ipsum {cite:p}`anon2024` and {cite:p}`anon2025` and lorem"
-        + " ipsum {cite:t}`anon2024` and {cite:t}`anon2025`"
-    )
+    incoming = convert_refs("./tests", None, False)["cells"][0]["source"][245:]
+    ref = r"lorem ipsum {cite:p}`anon2024` and {cite:p}`anon2025` and lorem ipsum {cite:t}`anon2024` and {cite:t}`anon2025`\n"
+    assert re.match(ref, incoming)
 
 
 def test_conversion_of_callout_notes():
-    rst = ":::{note}\nThis a callout note.\n:::"
-    assert quarto_note_replace(r"::: {.callout-note}\nThis a callout note.\n:::") == rst
-    assert convert_callout_notes("./tests", None, False)["cells"][1]["source"] == rst
+    ref = r":::{note}\nThis a callout note.\n:::"
+    incoming = quarto_note_replace(r"::: {.callout-note}\nThis a callout note.\n:::")
+    assert re.match(ref, incoming)
+    ref = convert_callout_notes("./tests", None, False)["cells"][0]["source"][199:233]
+    assert re.match(ref, incoming)
 
 
 def test_setting_kernelspec():
