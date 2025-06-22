@@ -20,6 +20,7 @@ jobs:
       - name: Checkout Quarto Book
         uses: actions/checkout@v4
         with:
+          submodules: "true"
           fetch-depth: 0
 
       - name: Checkout Pythia Book
@@ -48,14 +49,8 @@ jobs:
             ~/.local/share/jupyter/kernels
             ~/.cache/pip
             ./.conda_envs
-            ./chapters/courses/.jupyter_cache
-            ./chapters/courses/microwave-remote-sensing/unit_01/.jupyter_cache
-            ./chapters/courses/microwave-remote-sensing/unit_02/.jupyter_cache
-            ./chapters/courses/microwave-remote-sensing/unit_03/.jupyter_cache
-            ./chapters/courses/environmental-remote-sensing/.jupyter_cache
-            ./chapters/templates/.jupyter_cache
-            ./chapters/tutorials/.jupyter_cache
-          key: ${{ runner.os }}-env-${{ hashFiles('./environment.yml', './notebooks/**/*.yml') }}
+            './chapters/**/.jupyter_cache'
+          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
           restore-keys: ${{ runner.os }}-env-
 
       - name: Render and Publish
