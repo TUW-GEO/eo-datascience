@@ -4,6 +4,7 @@ jupyter: microwave-remote-sensing
 ---
 
 
+
 In this notebook, we are going to have a look at the conversion of units. Sentinel-1 data, and most other SAR data, is usually provided in decibels (dB). In this notebook, we will discover the advantages of displaying SAR data in decibels and why we need to convert the data to a linear scale in order to make meaningful calculations. Let's start with importing some libraries.
 
 $$
@@ -20,7 +21,6 @@ import numpy as np
 import odc.stac
 import pystac_client
 import rioxarray  # noqa: F401
-import xarray as xr
 ```
 
 ## Exploring the Data
@@ -60,14 +60,12 @@ print(len(items), "scenes found")
 
 ```{python}
 bands = "VV"
-crs = "EPSG:27704"  # Coordinate Reference System: EQUI7 Grid of Europe
-res = 20  # 20 meter
 
 sig0_dc = odc.stac.stac_load(
     items,
     bands=bands,
     bbox=bounds,
-    chunks={"time": 5, "x": 600, "y": 600},
+    chunks={"time": 5, "x": 1000, "y": 1000},
 )
 
 nodata = items[0].assets["VV"].extra_fields["raster:bands"][0]["nodata"]
@@ -238,11 +236,15 @@ sig0_monthly = lin2db(sig0_lin_monthly)
 sig0_monthly
 ```
 
-The dataset has now only 12 timestamps, one for each month. Next, we want to calculate the average $\sigma^0$ value across the scene for one month. We will do this again by converting the data to linear scale first and then calculating the average and converting it back to dB.
+The dataset has now only 12 timestamps, one for each month. Next, we want to calculate the average $\sigma^0$ value across a subset of the scene for one month. We will do this again by converting the data to linear scale first and then calculating the average and converting it back to dB.
 
 ```{python}
 # Lets take a data array with db values
-db_array = sig0_monthly.sel(time="2022-07-30", method="nearest")
+db_array = (
+    sig0_monthly.sel(time="2022-07-30", method="nearest")
+    .isel(x=slice(300, 400), y=slice(500, 600))
+    .compute()
+)
 
 # Compute the linear values
 lin_array = db2lin(db_array)
@@ -261,29 +263,3 @@ print(f"Average backscatter value in dB: {db_mean.values: .3f}")
 ```
 
 As you can see in the example, the mean values across the scene are different in dB and linear scale. Therefore, it is important to be aware in which scale the data is stored to perform the correct type of mathematical operation or always convert the data to linear scale before doing any calculations.
-
-## Save Mean Mosaic as Tif File
-
-Often we want to store the output of a computation permanently on a file system. The most common file format for this is a GeoTIFF (TIF file with additional information on the georeference). The following cell indicates how this can be easily done with Xarray. When we want to store the data as a GeoTIFF we need to make sure to provide a spatial reference to geolocate the data. The best way to check whether the Xarray has a coordinate reference system (CRS) is by using the rioxarray `rio.crs` accessor. More about this in notebook "Datacubes".
-
-```{python}
-# Select some data which we want to save
-data_2_save = sig0_monthly.sel(time="2022-07-30", method="nearest")
-data_2_save.rio.crs
-```
-
-In this case, the spatial reference is the EPSG Code `EPSG:27704`, which is the `Equi7Grid Europe`.
-As the output data array already has a spatial reference we now save it as a raster file
-
-```{python}
-# Save the data
-data_2_save.rio.to_raster(
-    "sig0_mean_mosaic_july.tif", tiled=True, driver="GTiff", compress="LZW"
-)
-```
-
-```{python}
-# Load the data again (for demonstration purposes)
-loaded_data = xr.open_dataset("sig0_mean_mosaic_july.tif", engine="rasterio")
-loaded_data
-```
