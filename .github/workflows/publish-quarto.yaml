@@ -37,15 +37,8 @@ jobs:
             ~/.local/share/jupyter/kernels
             ~/.cache/pip
             ./.conda_envs
-          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
-          restore-keys: ${{ runner.os }}-env-
-
-      - name: Cache Jupyter
-        uses: actions/cache@v4
-        with:
-          path: |
             './notebooks/**/*.ipynb'
-          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.ipynb') }}
+          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml', './notebooks/**/*.ipynb') }}
           restore-keys: ${{ runner.os }}-env-
 
       - name: Render and Publish
