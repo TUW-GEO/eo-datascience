@@ -38,7 +38,7 @@ jobs:
             ~/.local/share/jupyter/kernels
             ~/.cache/pip
             ./.conda_envs
-            './chapters/**/.jupyter_cache'
+            '**/.jupyter_cache/**'
           key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
           restore-keys: ${{ runner.os }}-env-
 
