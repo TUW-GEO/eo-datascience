@@ -1,0 +1,71 @@
+---
+title: Access to Near Real Time Soil Moisture Data
+jupyter: environmental-remote-sensing
+---
+
+**Downloading, Reading and Working with H SAF Surface Soil Moisture 6.25 km**
+
+
+## Overview
+
+
+## Imports
+
+
+```{python}
+import os
+from datetime import datetime, timedelta
+
+import cartopy.crs as ccrs
+import hvplot.pandas  # noqa
+from ascat.download.interface import hsaf_download
+from ascat.swath import SwathGridFiles
+from dotenv import dotenv_values
+```
+
+```{python}
+credentials = {
+    "user": dotenv_values(".env")["USER_HSAF"],
+    "password": dotenv_values(".env")["PASS_HSAF"],
+}
+local_path = "h130"
+remote_path = "h130/h130_cur_mon_data"
+start_date = datetime.now() - timedelta(days=5)
+end_date = datetime.now()
+```
+
+```{python}
+%%time
+
+if not os.path.isdir(local_path):
+    os.mkdir(local_path)
+
+hsaf_download(credentials, remote_path, local_path, start_date, end_date, limit=2)
+```
+
+```{python}
+h130_nrt = SwathGridFiles.from_product_id(local_path, product_id="H130")
+```
+
+```{python}
+df = h130_nrt.read(date_range=(start_date, end_date)).to_dataframe()
+```
+
+```{python}
+%run ./src/ssm_cmap.py
+
+df.hvplot.points(
+    x="longitude",
+    y="latitude",
+    c="surface_soil_moisture",
+    x_sampling=0.16,
+    y_sampling=0.16,
+    rasterize=True,
+    crs=ccrs.PlateCarree(),
+    tiles=True,
+    cmap=SSM_CMAP,  # noqa
+    clim=(0, 100),
+    frame_width=500,
+    clabel="Surface soil moisture (%)",
+)
+```

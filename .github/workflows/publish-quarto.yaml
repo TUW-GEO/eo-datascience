@@ -15,6 +15,16 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: Create .env file
+        env:
+          PREFIX: chapters/courses/environmental-remote-sensing/
+        run: |
+          touch $PREFIX.env
+          echo USER_HSAF = ${{ secrets.USER_HSAF }} >> $PREFIX.env
+          echo PASS_HSAF = ${{ secrets.PASS_HSAF }} >> $PREFIX.env
+          echo USER_WEKEO = ${{ secrets.USER_WEKEO }} >> $PREFIX.env
+          echo PASS_WEKEO = ${{ secrets.PASS_WEKEO }} >> $PREFIX.env
+
       - name: Checkout Quarto Book
         uses: actions/checkout@v4
         with:

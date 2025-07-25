@@ -6,7 +6,9 @@ dependencies:
   - pip
   - mamba
   - jupyter
+  - hda
   - pandas
+  - lxml
   - matplotlib
   - hvplot
   - datashader
@@ -14,3 +16,8 @@ dependencies:
   - cartopy
   - dask
   - jupyter_bokeh
+  - pip:
+      - ascat
+      - pdbufr
+      - python-dotenv
+      - pynetcf
