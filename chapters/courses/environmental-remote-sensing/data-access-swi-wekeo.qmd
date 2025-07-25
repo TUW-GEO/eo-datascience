@@ -49,6 +49,8 @@ print(matches)
 ```
 
 ```{python}
+%%capture
+
 local_path = "cgls_swi_12_5"
 
 if not os.path.isdir(local_path):
@@ -88,6 +90,6 @@ df.hvplot.points(
     cmap=SSM_CMAP,  # noqa
     clim=(0, 100),
     frame_width=500,
-    clabel="Surface Water Index",
+    clabel="Soil Water Index",
 )
 ```
