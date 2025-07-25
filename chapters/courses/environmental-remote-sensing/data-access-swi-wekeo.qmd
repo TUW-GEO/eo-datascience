@@ -1,6 +1,6 @@
 ---
 title: Access to Historic Soil Moisture Data
-jupyter: python3
+jupyter: environmental-remote-sensing
 ---
 
 **Downloading, Reading and Working with Copernicus WEKEO Soil Water Index 12.5 km**

@@ -1,10 +1,6 @@
 ---
 title: 'Homework Exercise 6: Dielectric Properties of Natural Media'
-jupyter:
-  kernelspec:
-    display_name: mrs-env
-    language: python
-    name: mrs-env
+jupyter: mrs-env
 ---
 
 
