@@ -27,7 +27,6 @@ More information about microwave backscattering and the fundamentals of surface 
 import cartopy.crs as ccrs
 import holoviews as hv
 import hvplot.pandas  # noqa
-import matplotlib
 import numpy as np
 import pandas as pd
 from bokeh.models import FixedTicker
@@ -38,29 +37,11 @@ from bokeh.models import FixedTicker
 Let us start by having a look at monthly aggregated SSM derived from ASCAT microwave backscattering over Mozambique. We can easily load the csv-file with `pandas` and then plot the results with `hvplot`. This creates an interactive plot whereby we can map the SSM values on an Open Street Map (OSM) and scroll through all months from 2007 to the present. For convenience, we added the locations of the in-situ sensors placed for each target district in the DrySAT project. Note, that the SSM values are reported as the degree of saturation, so, in other words, how much of the surface soil pore space is filled with water. This, unlike commonly used volumetric units, which records how much of the soil’s volume is water.
 
 ```{python}
-ROOT = "https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/"
-
-
-def make_url(file, lfs="true"):
-    return ROOT + file + f"/raw?ref=main&lfs={lfs}"
-
+%run ./src/ssm_cmap.py
 
 df = pd.read_csv(
-    make_url("ascat-6_25_ssm_monthly.csv"), index_col="time", parse_dates=True
+    make_url("ascat-6_25_ssm_monthly.csv"), index_col="time", parse_dates=True  # noqa
 )
-
-
-def load_cmap(file):
-    def to_hex_str(x):
-        return f"#{int(x.R):02x}{int(x.G):02x}{int(x.B):02x}"
-
-    path = r"colour-tables%2Fssm-continuous.ct"
-    df = pd.read_fwf(make_url(path, "false"), names=["R", "G", "B"], nrows=200)
-    brn_yl_bu_colors = df.apply(to_hex_str, axis=1).to_list()
-    return matplotlib.colors.LinearSegmentedColormap.from_list("", brn_yl_bu_colors)
-
-
-SSM_CMAP = load_cmap("colour-tables/ssm-continuous.ct")
 
 locations = {
     "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
@@ -94,7 +75,7 @@ df.hvplot.points(
     rasterize=True,
     crs=ccrs.PlateCarree(),
     tiles=True,
-    cmap=SSM_CMAP,
+    cmap=SSM_CMAP,  # noqa
     clim=(0, 100),
     frame_width=500,
     clabel="Surface soil moisture (%)",
@@ -107,7 +88,9 @@ Now let us have a closer look at the five locations marked on the SSM map and pl
 
 ```{python}
 ts = pd.read_csv(
-    make_url("ascat-6_25_ssm_timeseries.csv"), index_col="time", parse_dates=True
+    make_url("ascat-6_25_ssm_timeseries.csv"),  # noqa
+    index_col="time",
+    parse_dates=True,  # noqa
 )
 
 p = hv.Layout(

@@ -1,0 +1,93 @@
+---
+title: Access to Historic Soil Moisture Data
+jupyter: environmental-remote-sensing
+---
+
+**Downloading, Reading and Working with Copernicus WEKEO Soil Water Index 12.5 km**
+
+
+## Overview
+
+
+## Imports
+
+
+```{python}
+import os
+
+import cartopy.crs as ccrs
+import hvplot.pandas  # noqa
+import xarray as xr
+from dotenv import dotenv_values
+from hda import Client, Configuration
+```
+
+```{python}
+conf = Configuration(
+    user=dotenv_values(".env")["USER_WEKEO"],
+    password=dotenv_values(".env")["PASS_WEKEO"],
+)
+hda_client = Client(config=conf)
+```
+
+```{python}
+query = {
+    "dataset_id": "EO:CLMS:DAT:CLMS_GLOBAL_SWI_12.5KM_V3_TIME-SERIES_NETCDF",
+    "bbox": [
+        30.315105942117828,
+        -27.488474233587713,
+        41.07238227721744,
+        -10.203047702100717,
+    ],
+    "itemsPerPage": 200,
+    "startIndex": 0,
+}
+
+matches = hda_client.search(query)
+
+print(matches)
+```
+
+```{python}
+local_path = "cgls_swi_12_5"
+
+if not os.path.isdir(local_path):
+    os.mkdir(local_path)
+
+matches.download(download_dir=local_path)
+```
+
+```{python}
+def _preprocess(ds: xr.Dataset):
+    return ds.SWI_010
+
+
+df = xr.open_mfdataset(
+    "cgls_swi_12_5/*.nc",
+    combine="nested",
+    parallel=True,
+    chunks=-1,
+    preprocess=_preprocess,
+).to_dataframe()
+df
+```
+
+```{python}
+%run ./src/ssm_cmap.py
+
+df.hvplot.points(
+    x="lon",
+    y="lat",
+    c="SWI_010",
+    groupby="time",
+    x_sampling=0.16,
+    y_sampling=0.16,
+    rasterize=True,
+    crs=ccrs.PlateCarree(),
+    tiles=True,
+    cmap=SSM_CMAP,  # noqa
+    clim=(0, 100),
+    frame_width=500,
+    clabel="Surface Water Index",
+)
+```
