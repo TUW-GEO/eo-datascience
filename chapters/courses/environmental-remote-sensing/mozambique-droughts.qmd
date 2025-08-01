@@ -40,9 +40,51 @@ Let us start by having a look at monthly aggregated SSM derived from ASCAT micro
 %run ./src/ssm_cmap.py
 
 df = pd.read_csv(
-    make_url("ascat-6_25_ssm_monthly.csv"), index_col="time", parse_dates=True  # noqa
+    make_url("ascat-6_25_ssm_monthly.csv"),  # noqa
+    index_col="time",
+    parse_dates=True,  # noqa
 )
 
+locations = {
+    "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
+    "Chokwé": {"latitude": -24.5894393, "longitude": 33.0262595},
+    "Mabote": {"latitude": -22.0530427, "longitude": 34.1227842},
+    "Mabalane": {"latitude": -23.4258788, "longitude": 32.5448211},
+    "Buzi": {"latitude": -19.9747305, "longitude": 34.1391065},
+}
+
+df_locs = pd.DataFrame.from_dict(locations, "index").reset_index()
+
+points = df_locs.hvplot.points(
+    x="longitude", y="latitude", color="black", crs=ccrs.PlateCarree()
+)
+labels = df_locs.hvplot.labels(
+    x="longitude",
+    y="latitude",
+    text="index",
+    text_baseline="bottom",
+    text_color="black",
+    crs=ccrs.PlateCarree(),
+)
+
+df.hvplot.points(
+    x="longitude",
+    y="latitude",
+    c="surface_soil_moisture",
+    groupby="time",
+    x_sampling=0.08,
+    y_sampling=0.08,
+    rasterize=True,
+    crs=ccrs.PlateCarree(),
+    tiles=True,
+    cmap=SSM_CMAP,  # noqa
+    clim=(0, 100),
+    frame_width=500,
+    clabel="Surface soil moisture (%)",
+) * points * labels
+```
+
+```{python}
 locations = {
     "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
     "Chokwé": {"latitude": -24.5894393, "longitude": 33.0262595},
@@ -109,14 +151,16 @@ p = hv.Layout(
         for i in ts.name.unique()
     ]
 ).cols(1)
-p
+ts
 ```
 
 The cyclical seasonal pattern from dry to wet can be easily discerned from the timeseries. Note, however, again that we do not track precipitation, but the change from wet to dry soils. Moreover, we can see that the cyclical pattern breaks down on occasion as can be seen in the years 2015 and 2016. Especially Chokwé displays a complete lack of wet soils during the 2016 rainy season. We can remove some of the noise in the records by aggregating the values on a monthly basis, as can be seen in the following code chunk. Here, the `pandas` dataframe method `groupby` can group the timeseries for all successive months with the `pandas` function `Grouper(freq="ME")` and the location name.
 
 ```{python}
 ts_monthly = (
-    ts.groupby([pd.Grouper(freq="ME"), "name"]).mean().reset_index(level=["name"])
+    ts.groupby([pd.Grouper(freq="ME"), "name"])
+    .surface_soil_moisture.mean()
+    .reset_index(level="name")
 )
 ts_monthly.hvplot.line(
     x="time",
