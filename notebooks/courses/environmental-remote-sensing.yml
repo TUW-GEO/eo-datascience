@@ -1,3 +1,4 @@
+
 name: environmental-remote-sensing
 channels:
   - conda-forge
@@ -7,6 +8,7 @@ dependencies:
   - mamba
   - jupyter
   - hda
+  - folium
   - pandas
   - lxml
   - matplotlib
@@ -16,8 +18,12 @@ dependencies:
   - cartopy
   - dask
   - jupyter_bokeh
+  - requests
+  - aiohttp
+  - zarr=2.18.4
   - pip:
       - ascat
       - pdbufr
       - python-dotenv
       - pynetcf
+      - pre-commit
