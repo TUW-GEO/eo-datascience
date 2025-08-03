@@ -1,0 +1,143 @@
+---
+title: Remotely Sensed Vegetataion of Mozambique
+jupyter: python3
+---
+
+**Observing Vegetation Change from Space**
+
+## Overview
+
+In this notebook we will examine the Copernicus Global Land Service vegetation indices;
+
+1. fraction of absorbed photosynthetically activae radation (fAPAR)
+2. fraction of vegetation cover (fCOVER)
+3. leaf area index (LAI)
+
+TO DO: add short descriptions of the data.
+
+We will show here how we can use these products to track vegetation change throughout the year (phenology), whilst also spotting anomalous vegetation/land cover changes.
+
+## Imports
+
+
+```{python}
+import cartopy.crs as ccrs
+import folium
+import holoviews as hv
+import hvplot.xarray  # noqa
+import shapefile
+import xarray as xr
+from shapely.geometry import box, mapping
+```
+
+## Study Area
+
+For this study we will have a look at vegetation of the Corongosa National Park of Mozambiqure. The park has had a turbulent history where the park was the scene of military incursions and civilian flight in the previous decade and slash-and-burn methods of farming that impacted the region's biodiversity.
+
+Let's have a look at the study area which over laps with the western reaches of Gorongosa National Park [^1]. We use `folium` to visualize both the study area and the contours of the nationapark, like so:
+
+[^1]: UNEP-WCMC and IUCN (2025), Protected Planet: The World Database on Protected Areas (WDPA) and World Database on Other Effective Area-based Conservation Measures (WD-OECM) [Online], August 2025, Cambridge, UK: UNEP-WCMC and IUCN. Available at: www.protectedplanet.net.
+
+```{python}
+%run ./src/download_path.py
+
+BBOX = (
+    33.9493075668371915,
+    -19.0773671765950361,
+    34.3448644146108251,
+    -18.6512837222308221,
+)
+
+area_of_interest = box(*BBOX)
+
+map = folium.Map(
+    max_bounds=True,
+    location=[area_of_interest.centroid.y, area_of_interest.centroid.x],
+    scrollWheelZoom=False,
+)
+
+# bounds of area of interest
+folium.GeoJson(mapping(area_of_interest), name="Area of Interest", color="red").add_to(
+    map
+)
+
+url = "https://git.geo.tuwien.ac.at/public_projects/environmental-remote-sensing"
+park = shapefile.Reader(
+    url + "/-/raw/main/mozambique/corongosa.shp?ref_type=heads&inline=false"
+)  # noqa
+
+# Corongosa Nationalpark
+folium.GeoJson(mapping(park), name="Area of Interest").add_to(map)
+
+map
+```
+
+## Copernicus Vegetation Data
+
+Let us start by having a look at monthly aggregated LAI, fCOVER, fAPAR derived from Sentinel-3 over the study area. The data is divided further for three selected years; 2015, 2020, and 2025 (up to the present).  We will loaad the data with the following URL.
+
+```{python}
+url = make_url("harmonised-vegetation-300m.zarr.zip", zip="True")  # noqa
+```
+
+Loading the data is straightforward when using `xarray`. For convenience we will transform the LAI values to range between 0 and 1 to make it more easily comparable with the other indices when plotting the data.
+
+```{python}
+ds = xr.open_dataset(
+    url,
+    engine="zarr",
+    consolidated=False,
+).compute()
+ds["LAI"] = ds.LAI / 6
+ds
+```
+
+Now we plot the results with `hvplot`. This creates an interactive plot whereby we can map the vegetation indices on an Open Street Map (OSM) and scroll through all months for the selected years; 2015, 2020, and 2025.
+
+```{python}
+ds.to_array("variable").hvplot.image(
+    x="lon",
+    y="lat",
+    groupby=["year", "month", "variable"],
+    crs=ccrs.PlateCarree(),
+    tiles=True,
+    cmap="greens",
+    clim=(0, 1),
+    frame_width=700,
+)
+```
+
+If one scrolls throught the months once can easily spot the changes in vegetation cover for wet and dry seasons.
+
+## Timeseries of Vegetation Change
+
+We can also show the seasonal change by aggregating all data for each timeslice and plot it as a line. Here one can see that vegetation follows a cyclical pattern from wet to dry seasons.
+
+```{python}
+p = hv.Layout(
+    [
+        ds[i]
+        .median(("lat", "lon"))
+        .hvplot.line(
+            x="month",
+            by="year",
+            title=i,
+            frame_width=800,
+        )
+        for i in list(ds.variables.keys())[:3]
+    ]
+).cols(1)
+p
+```
+
+## Anomalous Vegetation Change
+
+By plotting the different years on top of each other, we can see that there also differences in the cyclical pattern and amplitude. For example some times it appears that the wet season starts later than other years. Also we can denote differences in the maximum amplitude of change, where especially 2025 appears to displays lower values for all variables.
+
+We can also display this another way by taking the maximum value for each pixel's timeseries and plotting this as a box-whisker plot (assuming that the minimum is relatively constant). Here we see that there appears to be a significant change to lower values for all vegetation indices with each subsequent year. One exception to this pattern is fAPAR which is higher in 2020 when compared to 2015, but 2025 is again lower than both 2015 and 2020.
+
+```{python}
+ds.to_array("variable", "vegetation").max("month").hvplot.box(
+    y="vegetation", by=["variable", "year"]
+)
+```
