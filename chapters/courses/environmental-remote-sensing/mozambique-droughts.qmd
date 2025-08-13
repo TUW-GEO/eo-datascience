@@ -103,23 +103,17 @@ ts = pd.read_csv(
     parse_dates=True,  # noqa
 )
 
-p = hv.Layout(
-    [
-        ts[ts.name == i].hvplot.scatter(
-            x="time",
-            y="surface_soil_moisture",
-            title=i,
-            rasterize=True,
-            dynspread=True,
-            threshold=1,
-            frame_width=800,
-            padding=(0.01, 0.1),
-            clabel="Density of data",
-        )
-        for i in ts.name.unique()
-    ]
-).cols(1)
-p
+ts.hvplot.scatter(
+    x="time",
+    y="surface_soil_moisture",
+    groupby="name",
+    rasterize=True,
+    dynspread=True,
+    threshold=1,
+    frame_width=800,
+    padding=(0.01, 0.1),
+    clabel="Density of data",
+)
 ```
 
 The cyclical seasonal pattern from dry to wet can be easily discerned from the timeseries. Note, however, again that we do not track precipitation, but the change from wet to dry soils. Moreover, we can see that the cyclical pattern breaks down on occasion as can be seen in the years 2015 and 2016. Especially Chokwé displays a complete lack of wet soils during the 2016 rainy season. We can remove some of the noise in the records by aggregating the values on a monthly basis, as can be seen in the following code chunk. Here, the `pandas` dataframe method `groupby` can group the timeseries for all successive months with the `pandas` function `Grouper(freq="ME")` and the location name.
@@ -130,6 +124,7 @@ ts_monthly = (
     .surface_soil_moisture.mean()
     .reset_index(level="name")
 )
+
 ts_monthly.hvplot.line(
     x="time",
     y="surface_soil_moisture",
@@ -160,7 +155,9 @@ We exemplify this normalization step below. Here we can see two histograms for a
 np.random.seed(42)  # make example reproducible
 mu, sigma = 50, 10  # mean and standard deviation
 random_ts = pd.Series(np.random.normal(mu, sigma, 100))
-(random_ts.hvplot.hist() + zscore(random_ts).hvplot.hist()).opts(shared_axes=False)
+(random_ts.hvplot.hist() + zscore(random_ts).hvplot.hist()).cols(1).opts(
+    shared_axes=False
+)
 ```
 
 ## Drought Anomaly Detection
