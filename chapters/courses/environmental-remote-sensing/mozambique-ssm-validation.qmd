@@ -5,6 +5,8 @@ jupyter: environmental-remote-sensing
 
 **Comparing H SAF ASCAT soil moisture estimates with in-situ sensors**
 
+![Source: [METER™](https://metergroup.com/solutions/climate-and-weather/agricultural-weather-networks/)](https://metergroup.com/app/uploads/2025/04/W-_Regional-SM-.jpg)
+
 ## Overview
 
 The aim of this notebook is to demonstrate and teach a workflow for validating ASCAT H SAF soil moisture data, sampled at 6.25$\,$km distances, using in-situ sensors strategically placed in Mozambique. Validation in this context assesses how well satellite-derived data aligns with the temporal patterns of in-situ measurements. Remember, temporal dynamics are also crucial for anomaly detection in soil moisture records, which in turn affects our ability to monitor droughts (as discussed in the previous notebook). Such validation processes help ensure the accuracy and reliability of weather data, essential for forecasting, climate research, and decision-making. By comparing different datasets, you can identify and address any inconsistencies, thereby improving the quality of meteorological records.
@@ -21,7 +23,7 @@ import pandas as pd
 
 ## In-situ Soil Moisture
 
-During the DrySat project we have placed 5 in-situ measuring stations (METER$^{(TM)}$) at strategic locations in Mozambique (Buzi, Chokwé, Mabalane, Mabote and Muanza). The locations are plotted on the following map for reference.
+During the DrySat project we have placed 5 in-situ measuring stations (METER™, see image at the top) at strategic locations in Mozambique (Buzi, Chokwé, Mabalane, Mabote and Muanza). The locations are plotted on the following map for reference.
 
 ```{python}
 locations = {
@@ -36,7 +38,7 @@ locations = {
 map = folium.Map(
     max_bounds=True,
     zoom_start=6,
-    location=[-19, 34],
+    location=[-20, 34],
     scrollWheelZoom=False,
 )
 
@@ -60,7 +62,7 @@ df_insitu = pd.read_csv(
     index_col="time",
     parse_dates=True,
 )
-df_insitu
+df_insitu.head()
 ```
 
 Now let's load the H SAF SSM 6.25$\,$km as we did in the previous notebook. But now we filter for the date range to include only dates that contain both ASCAT and in-situ measurements.
@@ -74,7 +76,7 @@ df_ascat = pd.read_csv(
 )
 mask = (df_ascat.index > RANGE[0]) & (df_ascat.index <= RANGE[1])
 df_ascat = df_ascat[mask]
-df_ascat
+df_ascat.head()
 ```
 
 Note, that the units of the in situ measurements differ when compared to the H SAF ASCAT SSM data. The in-situ sensors record soil moisture in volumetric units as cubic meters of water per cubic meters of soil [m$^3$ / m$^3$]. By contrast, the satellite derived estimates are presented as the degree of saturation in the pore spaces of the measured soil.
@@ -140,7 +142,7 @@ To apply this conversion to the HSAF dataset, we will first join the porosity va
 
 ```{python}
 df_ascat_porosity = df_ascat.merge(porosity_df, left_on="name", right_index=True)
-df_ascat_porosity
+df_ascat_porosity.head()
 ```
 
 We can again use the pandas `apply` method to convert the units.
@@ -153,7 +155,7 @@ def deg2vol(df):
 df_ascat_vol = df_ascat.copy()
 df_ascat_vol["unit"] = "m³/m³"
 df_ascat_vol["surface_soil_moisture"] = df_ascat_porosity.apply(deg2vol, axis=1)
-df_ascat_vol
+df_ascat_vol.head()
 ```
 
 ## Validation by Visual Inspection
@@ -164,7 +166,7 @@ To facilitate a clear overview, we will first concatenate the two datasets as fo
 
 ```{python}
 df = pd.concat([df_insitu, df_ascat_vol])
-df
+df.head()
 ```
 
 Next, we will use the `hvplot` extension for pandas to create interactive scatter plots for the time series.
@@ -183,7 +185,7 @@ df.hvplot.scatter(
 
 These plots already assure us that the trends in both data records align with the monotonic patterns characteristic of soil wetting during Mozambique's rainy season.
 
-# Going Quantitative with Correlation estimates
+## Quantitative Validation Metrics
 
 We can now move to a more quantitative estimate. Correlation analysis is a valuable tool for validating meteorological records by comparing different datasets to ensure consistency and accuracy. It measures the strength and direction of the relationship between two variables. In the context of meteorological records, it helps assess how well different datasets align with each other, serving as a quality assurance measure.
 
@@ -207,7 +209,7 @@ df_ascat_vol_daily = (
 df_combined = pd.merge(
     df_ascat_vol_daily, df_insitu_daily, left_index=True, right_index=True
 )
-df_combined
+df_combined.head()
 ```
 
 The data is now ready for correlation analysis. For time series analysis, if you're looking at trends and expect a linear relationship, Pearson correlation is straightforward and precise method.
@@ -231,3 +233,7 @@ hvplot.scatter_matrix(df_combined.reset_index(level=0), c="name", alpha=0.3).opt
 ```
 
 Here, we observe that the relationship between in-situ and remotely sensed values is not entirely linear. Additionally, it indicates that soil moisture data is generally not normally distributed.
+
+## Scale of Measurement
+
+We can only speculate about the reasons for these discrepancies, but it is important to note that the scale of in-situ measurements, which cover several centimeters around the device, compared to the averaged soil moisture value obtained by ASCAT, which encompasses about 50$\,$km$^2$, might be a significant factor in explaining these differences. One can wonder what an averaged signal over such a broad area encompasses, as it can include a range of geomorphological, hydrological, and geological settings. Additionally, weather patterns can be confined to scales smaller than this area.
