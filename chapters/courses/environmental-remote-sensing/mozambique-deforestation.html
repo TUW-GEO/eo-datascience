@@ -394,7 +394,7 @@ background: #006699;
 </section>
 <section id="imports" class="level2" data-number="12.2">
 <h2 data-number="12.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">12.2</span> Imports</h2>
-<div id="43a82451" class="cell" data-execution_count="1">
+<div id="43a82451" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> folium</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> holoviews <span class="im">as</span> hv</span>
@@ -1006,7 +1006,7 @@ if (window.Jupyter !== undefined) {
 <h2 data-number="12.3" class="anchored" data-anchor-id="study-area"><span class="header-section-number">12.3</span> Study Area</h2>
 <p>For this study we will have a look at vegetation of the Corongosa National Park of Mozambiqure. The park has had a turbulent history where the park was the scene of military incursions and civilian flight in the previous decade and slash-and-burn methods of farming that impacted the region’s biodiversity.</p>
 <p>Let’s have a look at the study area which over laps with the western reaches of Gorongosa National Park <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. We use <code>folium</code> to visualize both the study area and the contours of the nationapark, like so:</p>
-<div id="8f14ddd9" class="cell" data-execution_count="2">
+<div id="8f14ddd9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>run .<span class="op">/</span>src<span class="op">/</span>download_path.py</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>BBOX <span class="op">=</span> (</span>
@@ -1208,14 +1208,14 @@ if (window.Jupyter !== undefined) {
 <section id="copernicus-vegetation-data" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="copernicus-vegetation-data"><span class="header-section-number">12.4</span> Copernicus Vegetation Data</h2>
 <p>Let us start by having a look at monthly aggregated LAI, fCOVER, fAPAR derived from Sentinel-3 over the study area. The data is divided further for three selected years; 2015, 2020, and 2025 (up to the present). We will loaad the data with the following URL.</p>
-<div id="e810d257" class="cell" data-execution_count="3">
+<div id="e810d257" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> make_url(<span class="st">"harmonised-vegetation-300m.zarr.zip"</span>, <span class="bu">zip</span><span class="op">=</span><span class="st">"True"</span>)  <span class="co"># noqa</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/harmonised-vegetation-300m.zarr.zip/raw?ref=main&amp;lfs=true</code></pre>
 </div>
 </div>
 <p>Loading the data is straightforward when using <code>xarray</code>. For convenience we will transform the LAI values to range between 0 and 1 to make it more easily comparable with the other indices when plotting the data.</p>
-<div id="f9f31120" class="cell" data-execution_count="4">
+<div id="f9f31120" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> xr.open_dataset(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    url,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    engine<span class="op">=</span><span class="st">"zarr"</span>,</span>
@@ -1871,7 +1871,7 @@ Attributes:
 </div>
 </div>
 <p>Now we plot the results with <code>hvplot</code>. This creates an interactive plot whereby we can map the vegetation indices on an Open Street Map (OSM) and scroll through all months for the selected years; 2015, 2020, and 2025.</p>
-<div id="7a39086e" class="cell" data-execution_count="5">
+<div id="7a39086e" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ds.to_array(<span class="st">"variable"</span>).hvplot.image(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"lon"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"lat"</span>,</span>
@@ -1963,7 +1963,7 @@ Attributes:
 <section id="timeseries-of-vegetation-change" class="level2" data-number="12.5">
 <h2 data-number="12.5" class="anchored" data-anchor-id="timeseries-of-vegetation-change"><span class="header-section-number">12.5</span> Timeseries of Vegetation Change</h2>
 <p>We can also show the seasonal change by aggregating all data for each timeslice and plot it as a line. Here one can see that vegetation follows a cyclical pattern from wet to dry seasons.</p>
-<div id="a46c1142" class="cell" data-execution_count="6">
+<div id="a46c1142" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> hv.Layout(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    [</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        ds[i]</span>
@@ -2059,7 +2059,7 @@ Attributes:
 <h2 data-number="12.6" class="anchored" data-anchor-id="anomalous-vegetation-change"><span class="header-section-number">12.6</span> Anomalous Vegetation Change</h2>
 <p>By plotting the different years on top of each other, we can see that there also differences in the cyclical pattern and amplitude. For example some times it appears that the wet season starts later than other years. Also we can denote differences in the maximum amplitude of change, where especially 2025 appears to displays lower values for all variables.</p>
 <p>We can also display this another way by taking the maximum value for each pixel’s timeseries and plotting this as a box-whisker plot (assuming that the minimum is relatively constant). Here we see that there appears to be a significant change to lower values for all vegetation indices with each subsequent year. One exception to this pattern is fAPAR which is higher in 2020 when compared to 2015, but 2025 is again lower than both 2015 and 2020.</p>
-<div id="0743688c" class="cell" data-execution_count="7">
+<div id="0743688c" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ds.to_array(<span class="st">"variable"</span>, <span class="st">"vegetation"</span>).<span class="bu">max</span>(<span class="st">"month"</span>).hvplot.box(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"vegetation"</span>, by<span class="op">=</span>[<span class="st">"variable"</span>, <span class="st">"year"</span>]</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>

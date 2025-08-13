@@ -382,7 +382,7 @@ background: #006699;
 </section>
 <section id="imports" class="level2" data-number="14.2">
 <h2 data-number="14.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">14.2</span> Imports</h2>
-<div id="2a62ddab" class="cell" data-execution_count="1">
+<div id="2a62ddab" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
@@ -989,14 +989,14 @@ if (window.Jupyter !== undefined) {
 })(window);</script>
 </div>
 </div>
-<div id="92894a93" class="cell" data-execution_count="2">
+<div id="92894a93" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>conf <span class="op">=</span> Configuration(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    user<span class="op">=</span>dotenv_values(<span class="st">".env"</span>)[<span class="st">"USER_WEKEO"</span>],</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    password<span class="op">=</span>dotenv_values(<span class="st">".env"</span>)[<span class="st">"PASS_WEKEO"</span>],</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>hda_client <span class="op">=</span> Client(config<span class="op">=</span>conf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="074ecfb9" class="cell" data-execution_count="3">
+<div id="074ecfb9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> {</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dataset_id"</span>: <span class="st">"EO:CLMS:DAT:CLMS_GLOBAL_SWI_12.5KM_V3_TIME-SERIES_NETCDF"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bbox"</span>: [</span>
@@ -1016,7 +1016,7 @@ if (window.Jupyter !== undefined) {
 <pre><code>SearchResults[items=3,volume=312MB]</code></pre>
 </div>
 </div>
-<div id="7bbcab72" class="cell" data-execution_count="4">
+<div id="7bbcab72" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>capture</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>local_path <span class="op">=</span> <span class="st">"cgls_swi_12_5"</span></span>
@@ -1026,7 +1026,7 @@ if (window.Jupyter !== undefined) {
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>matches.download(download_dir<span class="op">=</span>local_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="90569b98" class="cell" data-execution_count="5">
+<div id="90569b98" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _preprocess(ds: xr.Dataset):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ds.SWI_010</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1137,7 +1137,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 </div>
-<div id="884e40ba" class="cell" data-execution_count="6">
+<div id="884e40ba" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>run .<span class="op">/</span>src<span class="op">/</span>ssm_cmap.py</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>df.hvplot.points(</span>

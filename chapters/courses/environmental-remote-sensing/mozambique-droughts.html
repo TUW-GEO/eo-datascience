@@ -427,7 +427,7 @@ window.Quarto = {
 </section>
 <section id="imports" class="level2" data-number="10.2">
 <h2 data-number="10.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">10.2</span> Imports</h2>
-<div id="599d7825" class="cell" data-execution_count="1">
+<div id="599d7825" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> holoviews <span class="im">as</span> hv</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hvplot.pandas  <span class="co"># noqa</span></span>
@@ -1037,7 +1037,7 @@ if (window.Jupyter !== undefined) {
 <section id="surface-soil-moisture-of-mozambique-2007---2025" class="level2" data-number="10.3">
 <h2 data-number="10.3" class="anchored" data-anchor-id="surface-soil-moisture-of-mozambique-2007---2025"><span class="header-section-number">10.3</span> Surface Soil Moisture of Mozambique (2007 - 2025)</h2>
 <p>Let us start by having a look at monthly aggregated SSM derived from ASCAT microwave backscattering over Mozambique. We can easily load the csv-file with <code>pandas</code> from the web, like so:</p>
-<div id="14b6346c" class="cell" data-execution_count="2">
+<div id="14b6346c" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>run .<span class="op">/</span>src<span class="op">/</span>download_path.py</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> make_url(<span class="st">"ascat-6_25_ssm_monthly.csv"</span>)  <span class="co"># noqa</span></span>
@@ -1121,7 +1121,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>Now we plot the results with <code>hvplot</code>. This creates an interactive plot whereby we can map the SSM values on an Open Street Map (OSM) and scroll through all months from 2007 to the present. For convenience, we added the locations of the in-situ sensors placed for each target district in the DrySAT project. Note, that the SSM values are reported as the degree of saturation, so, in other words, how much of the surface soil pore space is filled with water. This, unlike commonly used volumetric units, which records how much of the soil’s volume is water.</p>
-<div id="357d3bec" class="cell" data-execution_count="3">
+<div id="357d3bec" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">%</span>run .<span class="op">/</span>src<span class="op">/</span>ssm_cmap.py</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>locations <span class="op">=</span> {</span>
@@ -1241,7 +1241,7 @@ if (window.Jupyter !== undefined) {
 <section id="surface-soil-moisture-timeseries" class="level2" data-number="10.4">
 <h2 data-number="10.4" class="anchored" data-anchor-id="surface-soil-moisture-timeseries"><span class="header-section-number">10.4</span> Surface Soil Moisture Timeseries</h2>
 <p>Now let us have a closer look at the five locations marked on the SSM map and plot the SSM values against time for these 5 locations—known as timeseries. To do this we have already filtered down the full dataset to only contain the five locations. This filtered dataset shows the full temporal resolution of the product. To visualize this, we highlight the density of data points falling in a certain sector of the plot with blue shading—bluer values mark a higher density of data points.</p>
-<div id="e4f63715" class="cell" data-execution_count="4">
+<div id="e4f63715" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ts <span class="op">=</span> pd.read_csv(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    make_url(<span class="st">"ascat-6_25_ssm_timeseries.csv"</span>),  <span class="co"># noqa</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    index_col<span class="op">=</span><span class="st">"time"</span>,</span>
@@ -1339,7 +1339,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>The cyclical seasonal pattern from dry to wet can be easily discerned from the timeseries. Note, however, again that we do not track precipitation, but the change from wet to dry soils. Moreover, we can see that the cyclical pattern breaks down on occasion as can be seen in the years 2015 and 2016. Especially Chokwé displays a complete lack of wet soils during the 2016 rainy season. We can remove some of the noise in the records by aggregating the values on a monthly basis, as can be seen in the following code chunk. Here, the <code>pandas</code> dataframe method <code>groupby</code> can group the timeseries for all successive months with the <code>pandas</code> function <code>Grouper(freq="ME")</code> and the location name.</p>
-<div id="646336d2" class="cell" data-execution_count="5">
+<div id="646336d2" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ts_monthly <span class="op">=</span> (</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    ts.groupby([pd.Grouper(freq<span class="op">=</span><span class="st">"ME"</span>), <span class="st">"name"</span>])</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    .surface_soil_moisture.mean()</span>
@@ -1436,12 +1436,12 @@ if (window.Jupyter !== undefined) {
 <p>To filter out these differences between locations, and to emphasize how “unusual” certain periods are, we calculate Z score statistics.</p>
 <p><span class="math display">\[ z_i =  \frac{x_i - \bar{x}}{s^x} \]</span></p>
 <p>The Z score statistic is an approach to detect anomalies in timeseries, where one measures how far a datapoint (<span class="math inline">\(x_i\)</span>) is removed from the mean (<span class="math inline">\(\bar{x}\)</span>). This distance from the mean by itself is not all that useful, as it depends on the location’s average SSM. To circumvent, and to more easily compare timeseries of different locations, we divide the distance of the mean with a measure of variation of the timeseries, such as the standard deviation (<span class="math inline">\(s^x\)</span>). In the following code chunk we implement the Z score as a python function for a <code>pandas.Series</code>.</p>
-<div id="fdaf050e" class="cell" data-execution_count="6">
+<div id="fdaf050e" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> zscore(x):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (x <span class="op">-</span> x.mean()) <span class="op">/</span> x.std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We exemplify this normalization step below. Here we can see two histograms for a simulated SSM dataset. The histogram on the left is still in the original “degree of saturation” units, whereas the graph on the right is transformed to Z scores. The value of the x axis of the right-hand figure can be translated as: “This point is so many standard deviations removed from the mean.”</p>
-<div id="42ee257a" class="cell" data-execution_count="7">
+<div id="42ee257a" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)  <span class="co"># make example reproducible</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>mu, sigma <span class="op">=</span> <span class="dv">50</span>, <span class="dv">10</span>  <span class="co"># mean and standard deviation</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>random_ts <span class="op">=</span> pd.Series(np.random.normal(mu, sigma, <span class="dv">100</span>))</span>
@@ -1528,7 +1528,7 @@ if (window.Jupyter !== undefined) {
 <section id="drought-anomaly-detection" class="level2" data-number="10.6">
 <h2 data-number="10.6" class="anchored" data-anchor-id="drought-anomaly-detection"><span class="header-section-number">10.6</span> Drought Anomaly Detection</h2>
 <p>For our real time series, we will take it one step further by calculating the average for all months of January and comparing this to the monthly totals. This approach is repeated for all months. This operation is similar to the previous <code>groupby</code> operation but now we <code>transform</code> the panda’s column and use the <code>datetime</code> accessor <code>month</code> to accumulate monthly averages.</p>
-<div id="1e351436" class="cell" data-execution_count="8">
+<div id="1e351436" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ts_zscore <span class="op">=</span> ts_monthly.groupby(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    [ts_monthly.index.month, <span class="st">"name"</span>]</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>).surface_soil_moisture.transform(zscore)</span>
@@ -1621,7 +1621,7 @@ if (window.Jupyter !== undefined) {
 <section id="monitoring-drought-in-time-and-space" class="level2" data-number="10.7">
 <h2 data-number="10.7" class="anchored" data-anchor-id="monitoring-drought-in-time-and-space"><span class="header-section-number">10.7</span> Monitoring Drought in Time and Space</h2>
 <p>As a last step, we can now apply this approach to the whole of Mozambique. Here we have already calculated the Z scores and we just have to plot them.</p>
-<div id="328e9a47" class="cell" data-execution_count="9">
+<div id="328e9a47" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>colorbar_opts <span class="op">=</span> {</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"major_label_overrides"</span>: {</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span><span class="dv">4</span>: <span class="st">"Extreme"</span>,</span>
