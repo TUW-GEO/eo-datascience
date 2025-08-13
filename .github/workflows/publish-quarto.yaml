@@ -48,7 +48,12 @@ jobs:
             ~/.local/share/jupyter/kernels
             ~/.cache/pip
             ./.conda_envs
-            '**/.jupyter_cache/**'
+            ./chapters/.jupyter_cache
+            ./chapters/courses/.jupyter_cache
+            ./chapters/courses/environmental-remote-sensing/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/.jupyter_cache
+            ./chapters/templates/.jupyter_cache
+            ./chapters/tutorials/.jupyter_cache
           key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
           restore-keys: ${{ runner.os }}-env-
 
