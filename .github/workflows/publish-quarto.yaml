@@ -68,9 +68,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cache Binder Build on mybinder.org
+      - name: Binder build to GitHub Package repository
         uses: jupyterhub/repo2docker-action@master
         with:
-          NO_PUSH: true
-          MYBINDERORG_TAG: ${{ github.event.ref }}
-          REPO2DOCKER_EXTRA_ARGS: --subdir notebooks
+          DOCKER_USERNAME: ${{github.actor}}
+          DOCKER_PASSWORD: ${{secrets.GITHUB_TOKEN}}
+          DOCKER_REGISTRY: "ghcr.io"
+          IMAGE_NAME: "TUW-GEO/eo-datascience"
+          REPO2DOCKER_EXTRA_ARGS: '--subdir "./notebooks"'
