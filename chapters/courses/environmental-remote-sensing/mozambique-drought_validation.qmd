@@ -38,7 +38,7 @@ Despite this, SPEI indirectly accounts for soil water conditions (but also veget
 To summarize:
 
 - SPEI is a hydro-meteorological indicator for drought monitoring and thus indirectly measures soil moisture
-- Z scores are based on standardized anomalies derived from spaceborne microwave-retrieved surface soil moisture
+- Z scores are based on standardized anomalies derived from e.g., spaceborne microwave-retrieved surface soil moisture
 
 The purpose of this notebook is to compare both drought indicators, particularly focusing on the spatial extent of drought-affected areas. We will relate these indicators to recorded drought events in Mozambique between 2007 and 2021 ([The International Disaster Database](https://www.emdat.be/)).
 
@@ -50,7 +50,7 @@ The purpose of this notebook is to compare both drought indicators, particularly
 | **2021**              | Cabo Delgado, Tete (south), Manica (north)                  | ~1.56 million        |
 
 
-We first load the SPEI data in the following code cell.
+We first load monthly aggregated SPEI data in the following code cell.
 
 ```{python}
 %run ./src/download_path.py
@@ -64,7 +64,7 @@ df_spei = pd.read_csv(
 df_spei
 ```
 
-Now let's also load the H SAF ASCAT surface soil moisture data which we already used in notebook 1. For this exercise we will filter the data to have a comparable time range (up to the end of 2021) as we have for the SPEI data.
+Now let's also load monthly aggregated H SAF ASCAT surface soil moisture data which we already used in notebook 1. For this exercise we will filter the data to have a comparable time range (up to the end of 2021) as we have for the SPEI data.
 
 ```{python}
 url = make_url("ascat-6_25_ssm_monthly.csv")  # noqa
@@ -84,12 +84,6 @@ Now we will have to combine both datasets. Fortunately, both datasets are alread
 ![[Source: Pandas User Guide](https://pandas.pydata.org/docs/user_guide)](https://pandas.pydata.org/docs/_images/merging_concat_axis1_join_axes.png)
 
 The join operation is made easy here as we have already defined the same indexes in both datasets when loading the data.
-
-##
-
-merge() performs join operations similar to relational databases like SQL. Users who are familiar with SQL but new to pandas can reference a
-
-We use here the default operation which is "left join". THis is a type of join used to combine rows from two tables based on a related column between them. It returns all rows from the left table and includes matched rows from the right table. If there is no match, the result is `np.nan` for columns from the right table. Since we assigned indexes, where time and location_id define a unique observation, the join operations is based on this `pandas.MultIndex`. In other words, the left join ensures that all rows from the left table are included in the result set, even if there are no corresponding rows in the right table.
 
 ```{python}
 df_wide = df_spei.join(df_ascat)
