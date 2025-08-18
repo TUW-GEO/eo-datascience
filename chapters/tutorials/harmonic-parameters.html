@@ -308,20 +308,26 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../chapters/courses/environmental-remote-sensing/mozambique-drought_validation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Validation of Remotely Sensed Droughts</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../chapters/courses/environmental-remote-sensing/mozambique-deforestation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Remotely Sensed Vegetataion of Mozambique</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Remotely Sensed Vegetataion of Mozambique</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/courses/environmental-remote-sensing/data-access-hsaf-h130.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Access to Near Real Time Soil Moisture Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Access to Near Real Time Soil Moisture Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../chapters/courses/environmental-remote-sensing/data-access-swi-wekeo.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Access to Historic Soil Moisture Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Access to Historic Soil Moisture Data</span></span></a>
   </div>
 </li>
       </ul>
@@ -448,7 +454,7 @@ window.Quarto = {
 </section>
 <section id="imports" class="level2" data-number="C.2">
 <h2 data-number="C.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">C.2</span> Imports</h2>
-<div id="872e8354" class="cell" data-execution_count="1">
+<div id="872e8354" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> folium</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> holoviews <span class="im">as</span> hv</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hvplot.xarray  <span class="co"># noqa</span></span>
@@ -1056,7 +1062,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>Loading sigma nought time series.</p>
-<div id="789a72a6" class="cell" data-execution_count="2">
+<div id="789a72a6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>timeseries_dc <span class="op">=</span> xr.open_dataset(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"simplecache::zip:///::https://huggingface.co/datasets/martinschobben/tutorials/resolve/main/harmonic-parameters.zarr.zip"</span>,  <span class="co"># noqa</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    engine<span class="op">=</span><span class="st">"zarr"</span>,</span>
@@ -1537,7 +1543,7 @@ Data variables:
 </div>
 </div>
 <p>The data that is loaded represents VV and VH backsatter polarisations, as detected by Sentinel-1 radar instrument. The two points of interest are on Sicily, nearby Lentini and Catania.</p>
-<div id="61b77c45" class="cell" data-execution_count="3">
+<div id="61b77c45" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>latmin, latmax <span class="op">=</span> <span class="fl">37.283606</span>, <span class="fl">37.40621527385254</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>lonmin, lonmax <span class="op">=</span> <span class="fl">14.826223</span>, <span class="fl">15.109736519516783</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1765,7 +1771,7 @@ Data variables:
 </div>
 </div>
 <p>Let’s plot time series of those two points.</p>
-<div id="e801c3e9" class="cell" data-execution_count="4">
+<div id="e801c3e9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>event_date <span class="op">=</span> pd.to_datetime(<span class="st">"2018-05-17"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>lake_curve <span class="op">=</span> timeseries_dc.sel(point<span class="op">=</span><span class="st">"lake"</span>).VV.hvplot(</span>
@@ -1879,7 +1885,7 @@ Data variables:
 <p><span class="math display">\[ f(t) = A \cos \left( \frac{2\pi}{n} t + \phi \right) \]</span></p>
 <p>where: - $ A $ is the <strong>amplitude</strong> of the harmonic, - $ $ is the <strong>phase shift</strong> in radians, - $ n $ is the <strong>period</strong> in units of time, - $ 2/n $ <strong>angular frequency</strong>.</p>
 <p>The amplitude here can represent a physical quantitiy of interest, for instance temperature, radar backscatter, soil moisture, etc. In a way, anything can be represented as signal and signal processing can be therefore applied to many different scientific fields.</p>
-<div id="f217032f" class="cell" data-execution_count="5">
+<div id="f217032f" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A simple harmonic oscillator</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>time <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">300</span>, <span class="dv">2000</span>)</span>
@@ -1991,7 +1997,7 @@ Data variables:
 <li>$ c_i = A_i _i $ and $ s_i = - A_i _i $ are the <strong>harmonic coefficients</strong>.</li>
 </ul>
 <p>In this form different periodicities are covered, for example with $ i = 1, 2, … k $, we can have periods of $ , $, and so on.</p>
-<div id="390cf181" class="cell" data-execution_count="6">
+<div id="390cf181" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulation of complex signal with many harmonics</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">15</span>, <span class="dv">1000</span>)</span>
@@ -2070,7 +2076,7 @@ c_i, s_i &amp;\quad \text{are harmonic coefficients for } i = 1, 2, ..., k, \\
 k &amp;\quad \text{is the number of harmonic iterations}.
 \]</span></p>
 <p>Let’s define a function that will fit a model like this with a least squares method, on a <code>xarray</code> array. Of course, the initial harmonic parameters first need to be estimated or known and their number depends on <span class="math inline">\(k\)</span>.</p>
-<div id="0e735193" class="cell" data-execution_count="7">
+<div id="0e735193" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> build_initial_parameters(array, k):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Constructs initial parameters and their names for harmonic curve fitting</span></span>
@@ -2113,7 +2119,7 @@ k &amp;\quad \text{is the number of harmonic iterations}.
 <span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> param_names, p0</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="a556d36f" class="cell" data-execution_count="8">
+<div id="a556d36f" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> harmonic_model(t, mean, <span class="op">*</span>coef):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Harmonic model function for fitting periodic components in time series data.</span></span>
@@ -2170,7 +2176,7 @@ k &amp;\quad \text{is the number of harmonic iterations}.
 <section id="harmonic-function-fitting" class="level3" data-number="C.3.4">
 <h3 data-number="C.3.4" class="anchored" data-anchor-id="harmonic-function-fitting"><span class="header-section-number">C.3.4</span> Harmonic Function Fitting</h3>
 <p>Now, the two time series can be selected and the coefficients can be estimated. We pick the VV polarisation for a land pixel and 3 harmonics (7 parameters).</p>
-<div id="a3f850a6" class="cell" data-execution_count="9">
+<div id="a3f850a6" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>land_VV_series <span class="op">=</span> timeseries_dc.sel(point<span class="op">=</span><span class="st">"land"</span>).VH</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>param_names, p0 <span class="op">=</span> build_initial_parameters(land_VV_series, k<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2663,7 +2669,7 @@ Data variables:
 </div>
 </div>
 <p>Let’s extract and print estimated harmonic parameters for this pixel</p>
-<div id="91ffdbb2" class="cell" data-execution_count="10">
+<div id="91ffdbb2" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>estimated_params <span class="op">=</span> fit_result.curvefit_coefficients.values</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, val <span class="kw">in</span> <span class="bu">zip</span>(fit_result.param.values, estimated_params):</span>
@@ -2679,7 +2685,7 @@ Data variables:
 </div>
 </div>
 <p>Now, these coefficient can be used to construct a total harmonic signal.</p>
-<div id="753dbde0" class="cell" data-execution_count="11">
+<div id="753dbde0" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract estimated harmonic parameters and reconstruct a signal as xarray dataaray</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> estimated_params[<span class="dv">0</span>]</span>
@@ -2781,7 +2787,7 @@ Data variables:
 </div>
 </div>
 <p>We can see cycles that happen once a year, twice a year and three times a year, so it makes sense to work with time series over several years. Important parameter is a number of observations (NOBS) - the more observations the better. It directly relates to the uncertainty of our estimate. In this respect, the standard deviation is an important parameter, as it tells us how well our harmonic function fits the observations. It does not, however, tell us the uncertainty of the observations, just how well they align with seasonal patterns defined by the model.</p>
-<div id="c11e2718" class="cell" data-execution_count="12">
+<div id="c11e2718" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>residuals_land <span class="op">=</span> land_VV_series <span class="op">-</span> fitted_da</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sse <span class="op">=</span> np.<span class="bu">sum</span>(residuals_land.dropna(dim<span class="op">=</span><span class="st">"time"</span>).values <span class="op">**</span> <span class="dv">2</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2798,7 +2804,7 @@ Estimated standard deviation of the fit:  2.4799</code></pre>
 </div>
 </div>
 <p>Lets plot residuals that were used to calculate standard deviation and see the possible outliers that do not fit those seasonal patterns.</p>
-<div id="41da04d5" class="cell" data-execution_count="13">
+<div id="41da04d5" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>land_residuals_ts <span class="op">=</span> residuals_land.dropna(dim<span class="op">=</span><span class="st">"time"</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>land_residuals_ts.name <span class="op">=</span> <span class="st">"Residual"</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2891,7 +2897,7 @@ Estimated standard deviation of the fit:  2.4799</code></pre>
 <section id="lake-lentini-example" class="level4" data-number="C.3.4.1">
 <h4 data-number="C.3.4.1" class="anchored" data-anchor-id="lake-lentini-example"><span class="header-section-number">C.3.4.1</span> Lake Lentini Example</h4>
 <p>Lets see how time summed harmonic signal looks like for a lake pixel, where backscatter is more stable. Therefore, vegetation periodicities should be less pronounced over water.</p>
-<div id="4a57a3a6" class="cell" data-execution_count="14">
+<div id="4a57a3a6" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>lake_VV_series <span class="op">=</span> timeseries_dc.sel(point<span class="op">=</span><span class="st">"lake"</span>).VV</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>param_names_lake, p0_lake <span class="op">=</span> build_initial_parameters(lake_VV_series, k<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2913,7 +2919,7 @@ Estimated standard deviation of the fit:  2.4799</code></pre>
     s3:  0.0870</code></pre>
 </div>
 </div>
-<div id="ea63994f" class="cell" data-execution_count="15">
+<div id="ea63994f" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mean <span class="op">=</span> estimated_params_lake[<span class="dv">0</span>]</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>coeffs <span class="op">=</span> estimated_params_lake[<span class="dv">1</span>:]</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3010,7 +3016,7 @@ Estimated standard deviation of the fit:  2.4799</code></pre>
 })(window);</script>
 </div>
 </div>
-<div id="6e784337" class="cell" data-execution_count="16">
+<div id="6e784337" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>residuals_lake <span class="op">=</span> lake_VV_series <span class="op">-</span> fitted_da</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>sse <span class="op">=</span> np.<span class="bu">sum</span>(residuals_lake.dropna(dim<span class="op">=</span><span class="st">"time"</span>).values <span class="op">**</span> <span class="dv">2</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3026,7 +3032,7 @@ Estimated standard deviation of the fit:  2.4799</code></pre>
 Estimated standard deviation of the fit:  3.2212</code></pre>
 </div>
 </div>
-<div id="f983356e" class="cell" data-execution_count="17">
+<div id="f983356e" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lake_residuals_ts <span class="op">=</span> residuals_lake.dropna(dim<span class="op">=</span><span class="st">"time"</span>)</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>lake_residuals_ts.name <span class="op">=</span> <span class="st">"Residual"</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -3122,7 +3128,7 @@ Estimated standard deviation of the fit:  3.2212</code></pre>
 <section id="overfitting-problem---choosing-k-iterations" class="level3" data-number="C.3.5">
 <h3 data-number="C.3.5" class="anchored" data-anchor-id="overfitting-problem---choosing-k-iterations"><span class="header-section-number">C.3.5</span> Overfitting Problem - Choosing <span class="math inline">\(k\)</span> iterations</h3>
 <p>Parameter <span class="math inline">\(k\)</span> that governs the number of harmonic terms, is usually two or three. Higher order terms would lead to overfitting. A flood event in time series would be an impulse (jump in backscatter value) that would propagate as an artefact if higher order harmonics are fitted to years-long time series. Higher order terms would usually have low amplitude, an estimation of those would highly depend on noise level in signal. Therefore, those harmonics would not be of a physical nature, or in other words, they wouldn’t represent seasonal vegetation cycles.</p>
-<div id="32dcfcd3" class="cell" data-execution_count="18">
+<div id="32dcfcd3" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ks <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">10</span>]</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>fitted_das <span class="op">=</span> []</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
