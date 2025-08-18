@@ -75,4 +75,4 @@ jobs:
           DOCKER_PASSWORD: ${{secrets.GITHUB_TOKEN}}
           DOCKER_REGISTRY: "ghcr.io"
           IMAGE_NAME: "tuw-geo/eo-datascience"
-          REPO2DOCKER_EXTRA_ARGS: '--subdir "./notebooks"'
+          REPO2DOCKER_EXTRA_ARGS: "--subdir ./notebooks"
