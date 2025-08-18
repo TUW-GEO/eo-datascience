@@ -187,13 +187,13 @@ As a last step, we can now apply this approach to the whole of Mozambique. Here 
 ```{python}
 colorbar_opts = {
     "major_label_overrides": {
-        -4: "Extreme",
-        -3: "Severe",
-        -2: "Moderate",
+        -2.5: "Extreme",
+        -2: "Severe",
+        -1.5: "Moderate",
         -1: "Mild",
         0: "Normal",
     },
-    "ticker": FixedTicker(ticks=[-4, -3, -2, -1, 0]),
+    "ticker": FixedTicker(ticks=[-2.5, -1, -1.5, -1, 0]),
 }
 
 df[df.zscore <= 0].hvplot.points(

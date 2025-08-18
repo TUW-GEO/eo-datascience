@@ -1,0 +1,323 @@
+---
+title: Validation of Remotely Sensed Droughts
+jupyter: environmental-remote-sensing
+---
+
+**Comparing Various Drought Indicators**
+
+![Source [BBC](https://www.bbc.com/news/world-africa-36037414)](https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/3431/production/_89216331_031662282-1.jpg.webp)
+
+## Overview
+
+This notebook continues the evaluation of drought indicators introduced in notebook 1. The H SAF ASCAT sensors onboard the MetOp series of polar-orbiting satellites supply near real-time surface soil moisture (SSM) estimates, with data extending back to 2007. This extensive record allows us to compute temporal anomalies from the SSM data, using the long-term mean as a baseline. These anomalies are then standardized as deviations, or Z scores.
+
+As noted in notebook 1, ASCAT SSM is measured in degrees of saturation, making spatial patterns reliant on soil characteristics such as porosity. However, the relative changes used for drought anomaly detection with Z scores can provide insights into spatial patterns of drought conditions without requiring auxiliary soil data.
+
+We will leverage this feature to compare the H SAF ASCAT SSM-based drought indicators with other drought indicators, notably the [Standardized Precipitation-Evapotranspiration Index](https://climatedataguide.ucar.edu/climate-data/standardized-precipitation-evapotranspiration-index-spei)[^1].
+
+[^1]: S. M. Vicente-Serrano, S. Begueri­a, and J. I.López-Moreno,A Multiscalar Drought Index Sensitive to Global Warming: The Standardized Precipitation Evapotranspiration Index, Journal of Climate, vol. 23, no. 7, pp. 1696-1718, Apr. 2010, doi: [10.1175/2009JCLI2909.1](https://doi.org/10.1175/2009JCLI2909.1).
+
+## Imports
+
+
+```{python}
+import cartopy.crs as ccrs
+import datashader as ds
+import holoviews as hv
+import hvplot.pandas  # noqa
+import numpy as np
+import pandas as pd
+```
+
+## Standardized Precipitation-Evapotranspiration Index
+
+Historically, many studies on drought monitoring have used hydro-meteorological indicators such as the Standardized Precipitation Index (SPI) and the more comprehensive Standardized Precipitation-Evapotranspiration Index (SPEI). SPEI is seen as the more robust metric for drought monitoring as it uses the difference between precipitation and potential evapotranspiration ($P – ETo$), rather than precipitation ($P$) as an input alone, and, where the potential evapotranspiration can be calculated from weather data. However, satellite-based soil moisture estimates and linked drought anomaly indices might be more suitable for agricultural drought monitoring as they focus more directly on plant water requirements by directly measuring the soil's water content.
+
+Despite this, SPEI indirectly accounts for soil water conditions (but also vegetation, physiological mechanisms and climate) by combining both precipitation and potential evapotranspiration, which measures the atmospheric demand for water. Both SPEI and standardized soil moisture drought anomalies, such as Z scores, allow for direct comparisons across different regions and time scales.
+
+To summarize:
+
+- SPEI is a hydro-meteorological indicator for drought monitoring and thus indirectly measures soil moisture
+- Z scores are based on standardized anomalies derived from spaceborne microwave-retrieved surface soil moisture
+
+The purpose of this notebook is to compare both drought indicators, particularly focusing on the spatial extent of drought-affected areas. We will relate these indicators to recorded drought events in Mozambique between 2007 and 2021 ([The International Disaster Database](https://www.emdat.be/)).
+
+| **Year/Period**       | **Affected Provinces**                                     | **Estimated Affected People**              |
+|-----------------------|-------------------------------------------------------------|---------------------------------------------|
+| **2008 (Early)**      | Maputo, Gaza, Inhambane, Manica, Sofala, Tete               | ~1.2 million         |
+| **2010**              | Maputo, Gaza, Inhambane                                     | ~460,000             |
+| **2015–2016 (El Niño)**| Maputo, Gaza, Inhambane, Sofala, Tete                      | ~2.3 million         |
+| **2021**              | Cabo Delgado, Tete (south), Manica (north)                  | ~1.56 million        |
+
+
+We first load the SPEI data in the following code cell.
+
+```{python}
+%run ./src/download_path.py
+
+url = make_url("spei-6_25_monthly.csv")  # noqa
+df_spei = pd.read_csv(
+    url,
+    index_col=["time", "location_id"],
+    parse_dates=["time"],
+)
+df_spei
+```
+
+Now let's also load the H SAF ASCAT surface soil moisture data which we already used in notebook 1. For this exercise we will filter the data to have a comparable time range (up to the end of 2021) as we have for the SPEI data.
+
+```{python}
+url = make_url("ascat-6_25_ssm_monthly.csv")  # noqa
+df_ascat = pd.read_csv(
+    url,
+    index_col=["time", "location_id"],
+    parse_dates=["time"],
+)[["zscore"]]
+df_ascat = df_ascat[df_ascat.index <= df_spei.index.max()]
+df_ascat
+```
+
+## Merging Drought Indicator Data
+
+Now we will have to combine both datasets. Fortunately, both datasets are already projected on the same grid, so this task does not involve any reprojection and resampling of the data. We can combine the data with a SQL-style left join. A left join in pandas merges two `DataFrame`s while keeping all rows from the left `DataFrame` and adding matching rows from the right `DataFrame`. If there's no match, it fills with NaN (see the figure for a schematic overview).
+
+![[Source: Pandas User Guide](https://pandas.pydata.org/docs/user_guide)](https://pandas.pydata.org/docs/_images/merging_concat_axis1_join_axes.png)
+
+The join operation is made easy here as we have already defined the same indexes in both datasets when loading the data.
+
+##
+
+merge() performs join operations similar to relational databases like SQL. Users who are familiar with SQL but new to pandas can reference a
+
+We use here the default operation which is "left join". THis is a type of join used to combine rows from two tables based on a related column between them. It returns all rows from the left table and includes matched rows from the right table. If there is no match, the result is `np.nan` for columns from the right table. Since we assigned indexes, where time and location_id define a unique observation, the join operations is based on this `pandas.MultIndex`. In other words, the left join ensures that all rows from the left table are included in the result set, even if there are no corresponding rows in the right table.
+
+```{python}
+df_wide = df_spei.join(df_ascat)
+df_wide
+```
+
+This operation produced a “record” or “wide” format dataset, typically there is one row for each subject, in this case the indicators "spei" and "zscores" as well as the coordinates.
+
+## Simplifying Drought Severity with Data Binning
+
+We will convert the numeric data of the drought indicators `"spei"` and `"zscore"` into discrete categories using the pandas `cut` method. In pandas, binning data—also known as discretization or quantization—involves dividing continuous numerical data into discrete bins or intervals. This process is beneficial for simplifying data, managing outliers, creating histograms, and preparing data for machine learning algorithms that require categorical input. Additionally, we will label the binned data, thereby transforming the columns into pandas categorical data types. Pandas categorical data types are used to represent data that takes on a limited and usually fixed number of possible values (categories or classes). This type is particularly useful for categorical variables such as gender, days of the week, or survey responses. It offers efficient storage and operations for categorical data, including handling category ordering and missing values.
+
+The process of binning and labeling drought data based on intensity is somewhat subjective, as the bin thresholds are often arbitrarily assigned and subject to debate. Here, we adhere to the guidelines provided by the World Meteorological Organization and the definitions by McKee et al. (1993)[^2] for standardized Soil Moisture (SM) based drought indices, where a "moderate" drought is defined as starting at -1 unit of standard deviations.
+
+[^2]: T. B. McKee, N. J. Doesken, and J. Kleist, The Relationship Of Drought Frequency and Duration to the Timescale. Eighth Conference on Applied Climatology, 17-22 January 1993, Anaheim, California
+
+```{python}
+drought_labels = np.array(["extreme", "severe", "moderate", "mild", "normal"])
+zscore_thresholds = [df_wide["zscore"].min(), -2, -1.5, -1, 0, df_wide["zscore"].max()]
+spei_thresholds = [df_wide["spei"].min(), -2, -1.5, -1, 0, df_wide["spei"].max()]
+```
+
+Now we can use the labels and thresholds to bin the columns of the drought indicators. We make a copy of the original data so that we preserve the original dataset.
+
+```{python}
+df_wide_cat = df_wide.copy()
+df_wide_cat["zscore"] = pd.cut(df_wide.zscore, zscore_thresholds, labels=drought_labels)
+df_wide_cat["spei"] = pd.cut(df_wide.spei, spei_thresholds, labels=drought_labels)
+df_wide_cat
+```
+
+The simplified labeled drought indicators now enable us to take the first step in assessing the spatial extent.
+
+To perform a sanity check on our results, we will recreate the plot from notebook 1, but this time using categorical data types for the drought indicators. However, before we can plot this data, we need to reshape it into a "long" or "stacked" format. This format will allow us to use the `groupby` parameter of the `hvplot` extension for pandas. We will reshape the data using the pandas `melt` method, keeping the indexes and coordinates unchanged while stacking the indicator values. The variable column will identify the drought indicator.
+
+![[Source: Pandas User Guide](https://pandas.pydata.org/docs/user_guide)](https://pandas.pydata.org/docs/_images/reshaping_melt.png)
+
+```{python}
+df_long = df_wide_cat.melt(id_vars=["latitude", "longitude"], ignore_index=False)
+df_long
+```
+
+Now we can plot the data, where we the `datashader` method `by` and `any` to deal with the new categorical data type.
+
+```{python}
+color_key = {
+    "extreme": "#bb0c0c",
+    "severe": "#c57b19",
+    "moderate": "#b1bb29",
+    "mild": "#1cd87a",
+    "normal": "#ffffff",
+}
+
+df_long.hvplot.points(
+    x="longitude",
+    y="latitude",
+    c="value",
+    groupby=["variable", "time"],
+    x_sampling=0.1,
+    y_sampling=0.1,
+    aggregator=ds.by("value", ds.any()),
+    rasterize=True,
+    crs=ccrs.PlateCarree(),
+    tiles=True,
+    frame_width=500,
+    clabel="Drought anomaly",
+    color_key=color_key,
+    colorbar=False,
+)
+```
+
+## Spatial Drought Extent Through Time
+
+Now that we have classified drought intensity into categories, let's calculate the spatial extent of droughts over time. This will enable us to compare how the two standardized drought indices relate to each other. Conveniently, we can use the pandas `value_count` method on the new categorical columns `"spei"` and `"zscore"`, and also employ the `normalize` parameter to get relative frequencies. This provides an understanding of how many data points fall into each drought class relative to the total number of observations for a certain month.
+
+```{python}
+col_spei = df_wide_cat.groupby(level=0)["spei"].value_counts(normalize=True).unstack()
+col_zscore = (
+    df_wide_cat.groupby(level=0)["zscore"].value_counts(normalize=True).unstack()
+)
+```
+
+We combine these relative frequencies results.
+
+```{python}
+new_keys = pd.Index(["spei", "zscore"], name="indicator")
+df_drought_extend = pd.concat(
+    [col_spei, col_zscore],
+    keys=new_keys,
+)
+df_drought_extend
+```
+
+As a final step we will plot the timeseries of the relative spatial extend of the upper three drought clases ("moderate", "severe", and "extreme"). We compare these results to recorded drought events that had a severe impact on food security and destabelized Mozambique.
+
+```{python}
+mozambique_droughts = [
+    {"time": "2008-01-01", "people_affected": 1.02},
+    {"time": "2010-01-01", "people_affected": 0.46},
+    {"time": "2016-01-01", "people_affected": 2.30},
+    {"time": "2021-01-01", "people_affected": 1.56},
+]
+
+df_droughts = pd.DataFrame(mozambique_droughts).assign(y=1)
+df_droughts["time"] = pd.to_datetime(df_droughts["time"], format="%Y-%M-%d")
+df_droughts.set_index("time", inplace=True)
+labels = df_droughts.hvplot.labels(
+    x="time",
+    y="y",
+    text="{people_affected} mill. people",
+    text_baseline="bottom_left",
+    hover=False,
+    angle=85,
+    text_font_size="14px",
+)
+offset = hv.dim("y") - 0.1
+points = df_droughts.hvplot.points(
+    x="time", y="y", color="black", hover=False, transforms={"y": offset}
+)
+df_drought_extend.hvplot.area(
+    x="time",
+    y=drought_labels[::-1][2:],
+    groupby="indicator",
+    hover=False,
+    frame_width=800,
+    padding=((0.1, 0.1), (0, 0.9)),
+) * labels * points
+```
+
+We observe significant differences between the two drought indicators. The SPEI drought information shows much higher variability compared to the Z-scores derived from H SAF ASCAT SSM data. Additionally, we find that the spatial extent of the most severe drought classes, as indicated by the Z-scores, aligns well with recorded drought disasters.
+
+The higher variability in SPEI might be due to the more variable precipitation input, while soil moisture changes more gradually. A single rain event does not necessarily create the moist soil conditions needed for plant growth, and conversely, it takes time for wet soil to completely dry out. Therefore, deviations from the norm are likely more subdued in soil moisture data than in SPEI. Furthermore, soil wetness is intricately linked to agricultural practices that are crucial for food security in Mozambique.
+
+## A Comprehensive Comparison of Drought Indicators
+
+To obtain a more comprehensive and accurate overview of H SAF ASCAT SSM in detecting agriculturally relevant drought events, we will compare it with an additional set of drought indicators. These indicators are monthly Z-scores calculated from soil moisture estimates. The estimates are derived from in-situ observations, remotely sensed retrievals, or hydro-meteorological models
+
+| Dataset        | Description                                                                                                                                                                                                                       | Key Features                                                                                                                                          | Applications                                                                                                                                                                              |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **ERA5**       | ERA5 is a reanalysis dataset produced by ECMWF that provides comprehensive global climate and weather data, including soil moisture.                                                                                               | - High spatial and temporal resolution<br>- Derived from model simulations and observational inputs<br>- Global coverage                              | - Climate research<br>- Hydrological modeling<br>- Agricultural applications<br>- Drought monitoring<br>- Water resource management                    |
+| **GLDAS**      | The Global Land Data Assimilation System (GLDAS) soil moisture dataset provides global estimates of soil moisture based on satellite observations, ground measurements, and model simulations.                                     | - High-resolution and temporally consistent<br>- Integrates various data sources<br>- Developed by NASA and NOAA                                       | - Hydrological modeling<br>- Climate studies<br>- Agricultural monitoring<br>- Drought assessment<br>- Water resource management<br>- Environmental sustainability |
+| **ESA CCI**    | The ESA CCI (European Space Agency Climate Change Initiative) Soil Moisture project aims to provide long-term, consistent datasets of global soil moisture derived from satellite observations.                                     | - Long-term and consistent datasets<br>- Derived from satellite observations<br>- Supports scientific research and policy-making                        | - Climate research<br>- Hydrological modeling<br>- Agricultural monitoring<br>- Environmental sustainability<br>- Food security studies                   |
+
+We have already prepared a dataset that includes all these drought indicators, along with the previously introduced SPEI and ASCAT data (previously labeled `"zscore"`).
+
+```{python}
+url = make_url("drought_indices-6_25_monthly.csv")  # noqa
+df_drought_indices = pd.read_csv(
+    url,
+    index_col=["time", "location_id"],
+    parse_dates=["time"],
+)
+df_drought_indices
+```
+
+To simplify the calculation of relative drought spatial extent, we will create two functions that loops over the different columns to perform the same analysis as before: 1) set the categorical drought type and 2) calculate relative drought extent.
+
+```{python}
+def set_drought_cat_type(df):
+    col_names = df.drop(columns=["longitude", "latitude"]).columns
+    for name in col_names:
+        min_border = df[name].min()
+        max_border = df[name].max()
+        thresholds = np.array(
+            [
+                min_border if min_border < -2 else -2.1,
+                -2,
+                -1.5,
+                -1,
+                0,
+                max_border if max_border > 0 else 0.1,
+            ]
+        )
+        df[name] = pd.cut(df[name], thresholds, labels=drought_labels)
+    return df
+
+
+def calc_drought_areal_extend(df):
+    col_names = df.drop(columns=["longitude", "latitude"]).columns
+    new_df = pd.concat(
+        [
+            df.groupby(level=0)[col].value_counts(normalize=True).unstack()
+            for col in col_names
+        ],
+        keys=pd.Index(col_names, name="indicator"),
+    )
+    return new_df
+
+
+df_drought_indices_cat = set_drought_cat_type(df_drought_indices.copy())
+df_drought_extend = calc_drought_areal_extend(df_drought_indices_cat)
+df_drought_extend.hvplot.area(
+    x="time",
+    y=drought_labels[::-1][2:],
+    groupby="indicator",
+    hover=False,
+    frame_width=800,
+    padding=((0.1, 0.1), (0, 0.9)),
+) * labels * points
+```
+
+The additional drought indicators share the characteristic of directly measuring or estimating the soil's water content by modeling soil geophysical conditions. This comparison validates the earlier observation that the SPEI-inferred drought extent exhibits greater variability compared to indicators based on soil moisture. However, with the exception of the H SAF ASCAT SSM-derived Z scores, all indicators show significant discrepancies in their estimates of drought extent for the five major drought events.
+
+## Close-up of the 2015–2016 (El Niño) Drought Event
+
+Let's now zoom in on one of the most significant drought disasters of recent history in Mozambique. The 2015-2016 drought event which has been related to El Niño significantly impacted agriculture, food security, and water resources. This drought was characterized by reduced rainfall and elevated temperatures, exacerbating conditions for farming and livestock. Estimated numbers for people affected by this events are ~2.3 million.
+
+We filter this event from the loaded dataset and plot as before with `hvplot`.
+
+```{python}
+df_drought_indices_cat.loc["2016-01-01"].melt(
+    id_vars=["latitude", "longitude"], ignore_index=False
+).hvplot.points(
+    x="longitude",
+    y="latitude",
+    c="value",
+    groupby=["variable"],
+    x_sampling=0.1,
+    y_sampling=0.1,
+    aggregator=ds.by("value", ds.any()),
+    rasterize=True,
+    crs=ccrs.PlateCarree(),
+    tiles=True,
+    frame_width=500,
+    clabel="Drought anomaly",
+    color_key=color_key,
+    colorbar=False,
+)
+```
+
+A visual inspection of the map displaying various drought indicators reveals broad similarities, with most indicators highlighting drought conditions in the southern provinces of Maputo and Gaza, as well as in Sofala, Tete, and Zambezia. However, the spatial patterns also exhibit significant differences in their finer details. These discrepancies are likely influenced by the inherently coarser resolutions of ERA5 (9 km), ESA CCI, and GLDAS (~25 km).
