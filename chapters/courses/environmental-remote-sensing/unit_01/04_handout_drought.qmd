@@ -22,19 +22,15 @@ The first three phenomena often follow in a cascasiding sequence, whereas all of
 
 
 ```{python}
-%matplotlib inline
-
 import hvplot.pandas  # noqa
-import matplotlib
 import pandas as pd
 import statsmodels.formula.api as smf
 import statsmodels.tsa.stattools as smt
 
-matplotlib.use("TkAgg")
-%run ./src/corr_plots.py
+%run ../src/corr_plots.py
 ```
 
-## Motiroing Drought Dynamics
+## Monitoring Drought Dynamics
 
 The following dataset combines the HSAF ASCAT 6.25 surface soil moisture with data for precipitation, CHIRPS, and data for vegetation, NDVI (see table).
 
@@ -53,7 +49,7 @@ In summary, NDVI indicates plant health based on the assumption that plants lose
 Let's load the data as prepared for the notebook.
 
 ```{python}
-%run ./src/download_path.py
+%run ../src/download_path.py
 
 url = make_url("drought_indices-6_25_dekadal.csv")  # noqa
 df = (
@@ -95,7 +91,7 @@ df.hvplot.line(
 
 By examining the three variables—CHIRPS precipitation (`precip`), H SAF surface soil moisture (`surface_soil_moisture`), and NDVI (`ndvi`)—we observe a strong temporal correlation among them. This correlation is logical, as we expect rain to wet the soil, which in turn nourishes plant life, and vice versa. The most significant changes in these variables appear to be linked to transitions between dry and wet seasons.
 
-## Linear Regression with Ordinary Least Squares as an Exploration Tool
+## Exploration with Linear Regression
 
 Let's delve deeper into the relationships among these three variables. Linear regression, specifically Ordinary Least Squares (OLS) regression, is a powerful tool for explanatory data analysis. OLS is a good starting point for your analysis as it is easy to interpret; the coefficients directly relate changes in the response variable to one-unit changes in the predictor variables, with the sign and magnitude reflecting the model's effects. In an OLS regression, these effects refer to the impact of the independent variables on the dependent variable.
 
@@ -130,7 +126,7 @@ print("Parameters: \n", res_precip.params, sep="")
 print("R2: ", res_precip.rsquared)
 ```
 
-We can see that the model fit with CHIRPS precipitation as independent variable is limited. Now let's do the same for the second predefined relationship, where we translate ($\text{NDVI} = \alpha + \beta \text{SSM} + \epislon$) into an `statsmodels` formula and asses it's fit, like so:
+We can see that the model fit with CHIRPS precipitation as independent variable is limited. Now let's do the same for the second predefined relationship, where we translate ($\text{NDVI} = \alpha + \beta \text{SSM} + \epsilon$) into an `statsmodels` formula and asses it's fit, like so:
 
 ```{python}
 df_buzi = df[df.name == "Buzi"]
@@ -193,7 +189,7 @@ smt.ccf(df_buzi.ndvi, df_buzi.surface_soil_moisture, nlags=4)  # for example
 
 ## Lagged Variable Regression
 
-armed with this new infomation we can return to our OLS regression. We now can simply use this lag information to shift `precip` and `surface_soil_moisture` and perform the `statsmodels` OLS regression on this new dataset. We can simply use pandas `shift` to achieve this.
+Now that we’ve determined the appropriate lag, we can revisit the OLS regression. By using pandas’ `shift` function, we adjust `precip` and `surface_soil_moisture` accordingly and then apply the `statsmodels` OLS regression to the lagged dataset.
 
 ```{python}
 df_buzi = df[df.name == "Buzi"]

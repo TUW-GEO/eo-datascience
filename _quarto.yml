@@ -32,13 +32,12 @@ book:
         - chapters/courses/microwave-remote-sensing/unit_03/09_in_class_exercise.qmd
     - part: chapters/courses/environmental-remote-sensing.qmd
       chapters:
-        - chapters/courses/environmental-remote-sensing/mozambique-droughts.qmd
-        - chapters/courses/environmental-remote-sensing/mozambique-ssm-validation.qmd
-        - chapters/courses/environmental-remote-sensing/mozambique-drought_validation.qmd
-        - chapters/courses/environmental-remote-sensing/mozambique-drought-model.qmd
-        - chapters/courses/environmental-remote-sensing/mozambique-deforestation.qmd
-        - chapters/courses/environmental-remote-sensing/data-access-hsaf-h130.qmd
-        - chapters/courses/environmental-remote-sensing/data-access-swi-wekeo.qmd
+        - chapters/courses/environmental-remote-sensing/unit_01/01_handout_drought.qmd
+        - chapters/courses/environmental-remote-sensing/unit_01/02_handout_drought.qmd
+        - chapters/courses/environmental-remote-sensing/unit_01/03_handout_drought.qmd
+        - chapters/courses/environmental-remote-sensing/unit_01/04_handout_drought.qmd
+        - chapters/courses/environmental-remote-sensing/unit_01/05_supplement_drought.qmd
+        - chapters/courses/environmental-remote-sensing/unit_01/06_supplement_drought.qmd
   appendices:
     - part: chapters/templates/prereqs-templates.qmd
       chapters:

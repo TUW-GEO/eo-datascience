@@ -8,6 +8,7 @@ dependencies:
   - jupyter
   - hda
   - folium
+  - ffmpeg
   - pandas
   - lxml
   - matplotlib
