@@ -41,13 +41,17 @@ jobs:
           cache: "pip"
       - run: pip install jupyter jupyter-cache
 
-      - name: Cache Environment
+      - name: Conda Cache Environment
+        uses: actions/cache@v4
+        with:
+          path: ./.conda_envs
+          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
+          restore-keys: ${{ runner.os }}-env-
+
+      - name: Jupyter Cache Environment
         uses: actions/cache@v4
         with:
           path: |
-            ~/.local/share/jupyter/kernels
-            ~/.cache/pip
-            ./.conda_envs
             ./chapters/.jupyter_cache
             ./chapters/courses/.jupyter_cache
             ./chapters/courses/environmental-remote-sensing/.jupyter_cache
@@ -57,8 +61,8 @@ jobs:
             ./chapters/courses/microwave-remote-sensing/unit_03/.jupyter_cache
             ./chapters/templates/.jupyter_cache
             ./chapters/tutorials/.jupyter_cache
-          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
-          restore-keys: ${{ runner.os }}-env-
+          key: ${{ runner.os }}-jupyter-${{ hashFiles('./chapters/**/*.qmd') }}
+          restore-keys: ${{ runner.os }}-jupyter-
 
       - name: Render and Publish
         id: setup-python
