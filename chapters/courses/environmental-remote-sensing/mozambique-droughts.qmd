@@ -206,7 +206,7 @@ colorbar_opts = {
         -1: "Mild",
         0: "Normal",
     },
-    "ticker": FixedTicker(ticks=[-2.5, -1, -1.5, -1, 0]),
+    "ticker": FixedTicker(ticks=[-2.5, -2, -1.5, -1, 0]),
 }
 
 df[df.zscore <= 0].hvplot.points(

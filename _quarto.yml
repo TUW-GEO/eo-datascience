@@ -35,6 +35,7 @@ book:
         - chapters/courses/environmental-remote-sensing/mozambique-droughts.qmd
         - chapters/courses/environmental-remote-sensing/mozambique-ssm-validation.qmd
         - chapters/courses/environmental-remote-sensing/mozambique-drought_validation.qmd
+        - chapters/courses/environmental-remote-sensing/mozambique-drought-model.qmd
         - chapters/courses/environmental-remote-sensing/mozambique-deforestation.qmd
         - chapters/courses/environmental-remote-sensing/data-access-hsaf-h130.qmd
         - chapters/courses/environmental-remote-sensing/data-access-swi-wekeo.qmd
