@@ -58,6 +58,7 @@ convert:
 	$(foreach f, $(QN), \
 		quarto convert $(f); \
 		mv $(subst .ipynb,.qmd, $(f)) $(subst notebooks,chapters,$(subst .ipynb,.qmd,$(f))); )
+		pre-commit run --all-files
 
 preview: $(CONDA_ENV_DIR) $(KERNEL_DIR)
 	- mkdir -p _preview/notebooks

@@ -30,7 +30,7 @@ credentials = {
 }
 local_path = "h130"
 remote_path = "h130/h130_cur_mon_data"
-start_date = datetime.now() - timedelta(days=15)
+start_date = datetime.now() - timedelta(days=30)
 end_date = datetime.now()
 ```
 
