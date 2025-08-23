@@ -53,7 +53,7 @@ df
 ```
 
 ```{python}
-%run ./src/ssm_cmap.py
+%run ../src/ssm_cmap.py
 
 df.hvplot.points(
     x="longitude",

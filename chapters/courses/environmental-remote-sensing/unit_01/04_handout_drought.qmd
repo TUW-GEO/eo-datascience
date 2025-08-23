@@ -3,20 +3,20 @@ title: Leads and lags in Drought Dynamics
 jupyter: environmental-remote-sensing
 ---
 
-**Meterological, Agricultural, and Hydrological Droughts**
+**Meteorological, Agricultural, and Hydrological Droughts**
 
-![Laura Crocetti et al., 2020[^1]](https://www.researchgate.net/publication/344947662/figure/fig1/AS:951872072450048@1603955395551/Types-of-drought-meteorological-agricultural-hydrological-and-socio-economic-drought.png)
+![Source: Laura Crocetti et al., 2020[^1]](https://www.researchgate.net/publication/344947662/figure/fig1/AS:951872072450048@1603955395551/Types-of-drought-meteorological-agricultural-hydrological-and-socio-economic-drought.png)
 
 ## Overview
 
 In this notebook we will examine the propagation of precipitation deficits, to soil water deficits, and finally there lagged effect on plants. This cascading effect of drought development is important to study in areas where rain-fed agricultural practices are of importance, such as Mozambique.
 
-- Metoereological drought is described as the lack of precipitation and/or increased atmospheric demand (evapotranspiration)
+- Meteorological drought is described as the lack of precipitation and/or increased atmospheric demand (evapotranspiration)
 - Agricultural drought is also a physical phenomenon where soils become replete of moisture
 - Hydrological drought follows when ongoing drought can then cause deficits in ground and surface reservoirs of
 - Socioeconomic drought impacts society through crop loss, food insecurity, shortages of fresh water resources
 
-The first three phenomena often follow in a cascasiding sequence, whereas all of them can have a direct impact on society.
+The first three phenomena often follow in a cascading sequence, whereas all of them can have a direct impact on society.
 
 [^1]: L. Crocetti et al., Earth Observation for agricultural drought monitoring in the Pannonian Basin (southeastern Europe): current state and future directions, Reg Environ Change, vol. 20, no. 4, p. 123, Dec. 2020, doi: [10.1007/s10113-020-01710-w](http://link.springer.com/10.1007/s10113-020-01710-w).
 

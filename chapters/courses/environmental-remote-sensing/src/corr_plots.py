@@ -1,9 +1,40 @@
+import json
+import os
+import subprocess
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.tsa.stattools as smt
 from IPython.display import HTML
 from matplotlib.animation import FuncAnimation
+
+
+def get_git_repo_name():
+    try:
+        toplevel_path = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+
+        return os.path.basename(toplevel_path)
+    except subprocess.CalledProcessError:
+        return None
+
+
+def get_conda_env_path():
+    result = subprocess.run(["conda", "info", "--json"], capture_output=True, text=True)
+    info = json.loads(result.stdout)
+    envs = [s for s in info.get("envs") if "environmental-remote-sensing" in s]
+    return [s for s in envs if f"{get_git_repo_name()}/.conda_envs" in s]
+
+
+ffmpeg_path = Path(get_conda_env_path()[0]) / Path("bin/ffmpeg")
+print(f"Resolve path ffmpeg: {ffmpeg_path}")
+
+plt.rcParams["animation.ffmpeg_path"] = str(ffmpeg_path)
 
 
 def plot_predicted_values(df, variables, suffix=None, **kwargs):

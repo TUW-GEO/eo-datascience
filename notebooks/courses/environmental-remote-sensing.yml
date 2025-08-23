@@ -2,13 +2,13 @@ name: environmental-remote-sensing
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.13
   - pip
   - mamba
   - jupyter
   - hda
-  - folium
   - ffmpeg
+  - folium
   - pandas
   - lxml
   - matplotlib

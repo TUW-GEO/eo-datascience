@@ -23,7 +23,7 @@ jobs:
 
       - name: Create .env file
         env:
-          PREFIX: ./chapters/courses/environmental-remote-sensing/
+          PREFIX: ./chapters/courses/environmental-remote-sensing/unit_01
         run: |
           touch $PREFIX.env
           echo USER_HSAF = ${{ secrets.USER_HSAF }} >> $PREFIX.env
