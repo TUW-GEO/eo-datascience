@@ -3,11 +3,13 @@ title: Access to Historic Soil Moisture Data
 jupyter: environmental-remote-sensing
 ---
 
-**Downloading, Reading and Working with Copernicus WEKEO Soil Water Index 12.5 km**
+**Downloading, Reading and Working with Copernicus WEkEO Soil Water Index 12.5 km**
 
+![Source: [Copernicus WEkEO](https://wekeo.copernicus.eu/)](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwekeo.copernicus.eu%2F_next%2Fimage%3Furl%3D%252Fpages%252Fhome%252Fwekeo-homepage-bg-desktop.webp%26w%3D3840%26q%3D75&f=1&nofb=1&ipt=742bb5f4855344bc9114d980ee07a1baf8cb3be88d9d5d9ad734b027f4cad372)
 
 ## Overview
 
+In this notebook we will examine how one can obtain historic soil moisture data. We will do this by looking into the [Copernicus WEkEO portal](https://wekeo.copernicus.eu/).
 
 ## Imports
 
@@ -17,10 +19,63 @@ import os
 
 import cartopy.crs as ccrs
 import hvplot.pandas  # noqa
+import hvplot.xarray  # noqa
+import numpy as np
+import pandas as pd
 import xarray as xr
 from dotenv import dotenv_values
 from hda import Client, Configuration
+from numpy.lib.recfunctions import unstructured_to_structured
+from pyswi.swi_ts import calc_swi_ts
 ```
+
+## Copernicus WEkEO
+
+The name WEkEO (pronounced [wikio]) refer to the four key organisations – EUMETSAT, ECMWF, EEA, and Mercator Ocean International, which link to the broader user community (“WE”), with the purpose of knowledge advancement and sharing (“k”), focussing Earth and Environmental Observation (“EO”).
+
+The platform is a web-based service that helps people easily access and use Earth observation data. Its main goal is to make it simple for researchers, companies, and decision-makers to get the data they need and analyze it without needing advanced tools or a lot of technical knowledge. It is essentially a tool for EO data exploration and EO data science.
+
+## Registration
+
+Similarly to H SAF FTP server, we need to register a user to make full use of WEkEO, although some features are available without an account. We can follow these steps:
+
+1. Go to the [homepage of WEkEO](https://wekeo.copernicus.eu/).
+
+<div style="text-align: center">
+<a href="https://wekeo.copernicus.eu/"><img width="600px" src="../images/home-wekeo-website.png"></a>
+</div>
+
+2. Click on top right ["Login" button](https://identity.prod.wekeo2.eu/authenticationendpoint/login.do?client_id=kNvwaJ1xMQx3zk3Kort05m3D95ca&commonAuthCallerPath=%2Foauth2%2Fauthorize&forceAuth=false&passiveAuth=false&redirect_uri=https%3A%2F%2Fwekeo.copernicus.eu%2Flogin&response_type=code&scope=openid+email+profile+address&sessionDataKey=004043a7-c28f-41d7-bb80-65f072c60185&relyingParty=kNvwaJ1xMQx3zk3Kort05m3D95ca&type=oidc&sp=portallobelia&isSaaSApp=false&authenticators=BasicAuthenticator%3ALOCAL), whereafter we select "Create an account" and fill out the form.
+
+<div style="text-align: center">
+<a href="https://identity.prod.wekeo2.eu/authenticationendpoint/login.do?client_id=kNvwaJ1xMQx3zk3Kort05m3D95ca&commonAuthCallerPath=%2Foauth2%2Fauthorize&forceAuth=false&passiveAuth=false&redirect_uri=https%3A%2F%2Fwekeo.copernicus.eu%2Flogin&response_type=code&scope=openid+email+profile+address&sessionDataKey=004043a7-c28f-41d7-bb80-65f072c60185&relyingParty=kNvwaJ1xMQx3zk3Kort05m3D95ca&type=oidc&sp=portallobelia&isSaaSApp=false&authenticators=BasicAuthenticator%3ALOCAL"><img width="600px" src="../images/login-wekeo-website.png"></a>
+</div>
+
+3. Now we can login and, for example, look at the available data by clicking on "Go" in the Data Viewer field in the middle of the screen.
+
+<div style="text-align: center">
+<a href="https://wekeo.copernicus.eu/my-wekeo"><img width="600px" src="../images/portal-wekeo-website.png"></a>
+</div>
+
+4. This shows us a data viewer where we can select from many different data products.
+
+<div style="text-align: center">
+<a href="https://wekeo.copernicus.eu/data?view=catalogue"><img width="600px" src="../images/dataviewer-wekeo-website.png"></a>
+</div>
+
+We will use the latter step to find the dataset we need and create the query string that we will use in a Python environment.
+
+## Harmonized Data Access
+
+The Copernicus WEkEO platform has as straightfoward way to access data, as it has a application programming interface (API). APIs allow different programming language to commincate and share information with each other. It essentially provides a bridge for programs to use and extent each other functionalities. In the case of WEkEO the API is named the Harmonized Data Access (HDA) API, which allows uniform access to the whole WEkEO catalogue, including subsetting and downloading functionalities. We will be using the [Python HDA client](https://hda.readthedocs.io/en/latest/usage.html) to talk to the API.
+
+Install with either pip or conda:
+
+```
+pip install hda
+conda install -c conda-forge hda
+```
+We now need to authenticate with the `Configuration` object and provide your account's username and password. In accordance with the prvious notebook, we use again a dotenv environment. TO use the dotenv you need to add the username to `USER_WEKEO` and your password to `PASS_WEKEO` of the `.env`-file.
 
 ```{python}
 conf = Configuration(
@@ -30,14 +85,30 @@ conf = Configuration(
 hda_client = Client(config=conf)
 ```
 
+## Finding Soil Moisture Data
+
+To find the SWI 12.5 km dataset in time series format, we have to return to the data viewer in the browser. Click in the "Layers" field on the + sign, and search for "Soil Water Index" in the "Free Text Search".
+
+<div style="text-align: center">
+<a href="https://wekeo.copernicus.eu/data?view=catalogue"><img width="600px" src="../images/swi-search-wekeo-website.png"></a>
+</div>
+
+Then select the fourth dataset from the top; "Soil Water Index Time Series 2007-present (discrete global grid), global, daily - version 3". Click on the download button in the layers field, which unfolds a form which allows sub setting of the data. We can enter here a bounding box (bbox) for Mozambique. Scroll further down and click on "Show API request(s)".
+
+<div style="text-align: center">
+<a href="https://wekeo.copernicus.eu/data?view=catalogue"><img width="600px" src="../images/api-swi-search-wekeo-website.png"></a>
+</div>
+
+We will copy this query to our Python environment and use the `hda_client` to search for the files.
+
 ```{python}
 query = {
     "dataset_id": "EO:CLMS:DAT:CLMS_GLOBAL_SWI_12.5KM_V3_TIME-SERIES_NETCDF",
     "bbox": [
-        30.315105942117828,
-        -27.488474233587713,
-        41.07238227721744,
-        -10.203047702100717,
+        30.315,
+        -27.49,
+        41.07,
+        -10.20,
     ],
     "itemsPerPage": 200,
     "startIndex": 0,
@@ -47,6 +118,8 @@ matches = hda_client.search(query)
 
 print(matches)
 ```
+
+If you are content with the results then you can start the downloading process. Here we again create a directory to contain the downloaded files. The downloaded file with be in NetCDF format. NetCDF is a data formats that is tailored to multi-dimensional array-oriented scientific data with many options to label the data.
 
 ```{python}
 %%capture
@@ -59,6 +132,8 @@ if not os.path.isdir(local_path):
 matches.download(download_dir=local_path)
 ```
 
+The downloaded data is projected on a regular longitude/latitude ([WGS84](https://epsg.io/4326)) grid, as opposed to the H SAF ASCAT 6.25 km surface soil moisture (see notebook 1). Hence we will use another package to read the data. We use [`xarray`](https://docs.xarray.dev/en/stable/index.html), which is optimised to work with multi-dimensional arrays. We will introduce this package into more detail later on.
+
 ```{python}
 def _preprocess(ds: xr.Dataset):
     return ds.SWI_010
@@ -70,9 +145,13 @@ df = xr.open_mfdataset(
     parallel=True,
     chunks=-1,
     preprocess=_preprocess,
+    compat="no_conflicts",
+    join="left",
 ).to_dataframe()
 df
 ```
+
+The same as for pandas, xarray has a `hvplot` extension, which makes it easy to generate an interactive plot to explore the data.
 
 ```{python}
 %run ../src/ssm_cmap.py
@@ -91,5 +170,76 @@ df.hvplot.points(
     clim=(0, 100),
     frame_width=500,
     clabel="Soil Water Index",
+)
+```
+
+## What is the Soil Water Index?
+
+We have not yet talked about what the data exactly represents. The Soil Water Index is derived from surface soil moisture. The current dataset is derived from H SAF ASCAT 12.5 km and represents modelled approximation of soil water content at deeper layers of the soil. In the above plot we selected moisture content at a 10 cm depth interval. Remember that ASCAT can only probe the surface of soils.
+
+The Soil Water Index provides a measure of how wet or dry the soil is over a specific area, ranging between 0 and 1. It is often derived using a combination of satellite data and modeling techniques. One commonly used approach to derive the SWI is through the TU Wien model[^1]
+
+The equation to derive the SWI typically involves a convolution of surface soil moisture observations with an exponential filter. This process helps in estimating the root-zone soil moisture, which is more relevant for agricultural and hydrological applications. The general form of the equation can be described as follows:
+
+\[ SWI = \frac{\sum_{i=0}^{n} w_i \cdot SSM_i}{\sum_{i=0}^{n} w_i} \]
+
+Where:
+- \( SWI \) is the Soil Water Index.
+- \( SSM_i \) represents the surface soil moisture at time step \( i \).
+- \( w_i \) is the weight assigned to the surface soil moisture at time step \( i \).
+- \( n \) is the number of time steps considered in the convolution.
+
+The weights \( w_i \) are often determined using an exponential decay function, which gives more importance to recent observations. The exponential decay function can be expressed as:
+
+\[ w_i = e^{-\frac{t_i}{T}} \]
+
+Where:
+- \( t_i \) is the time difference between the current time step and the time step \( i \).
+- \( T \) is a characteristic time scale that determines the rate of decay of the weights.
+
+This approach allows the SWI to reflect the cumulative effect of surface soil moisture over a period, providing a more stable and representative measure of the soil moisture conditions in the root zone.
+
+One will observe that the SWI at depth is often less variable (more stable) than contemporaneous surface soil moisture - with only delayed and dampened responses to external forcing (e.g. precipitation). We can visualize this by applying the SWI algorithm to one of the five timeseries introduced in notebook 1.
+
+Let's select only 2024 from the ASCAT 6.25 km surface soil moisture for this example:
+
+```{python}
+%run ../src/download_path.py
+
+sm_ts = (
+    pd.read_csv(
+        make_url("ascat-6_25_ssm_timeseries.csv"),  # noqa
+        index_col="time",
+        parse_dates=True,  # noqa
+    )
+    .loc["2024"]
+    .dropna()
+)
+
+sm_ts = sm_ts[sm_ts.name == "Buzi"].sort_index()
+sm_ts.head()
+```
+
+Now we can use the TU Wien developed package `pyswi` to calculate time series SWI. Here we calculate it for depth intervals of 5, 50, and 100 cm.
+
+```{python}
+t_value = np.array([5, 50, 100], dtype=np.int32)
+swi_jd = sm_ts.index.to_julian_date().values.astype(np.float64)
+sm = sm_ts["surface_soil_moisture"].values
+
+dtype = np.dtype([("sm_jd", np.float64), ("sm", np.float32)])
+ssm_ts = unstructured_to_structured(
+    np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype
+)
+
+swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
+
+swi_ts = pd.DataFrame(swi_ts)
+swi_ts["time"] = pd.to_datetime(swi_ts["swi_jd"] - 2440587.5, unit="D")
+
+ts = pd.merge_asof(sm_ts, swi_ts.set_index("time"), left_index=True, right_index=True)
+
+ts.hvplot.line(
+    y=["surface_soil_moisture", "swi_5", "swi_50", "swi_100"], frame_width=800
 )
 ```
