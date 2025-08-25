@@ -1,6 +1,10 @@
 ---
 title: 'Homework Exercise 5: SAR Wavelength and Polarization'
-jupyter: mrs-env
+jupyter:
+  kernelspec:
+    display_name: mrs-env
+    language: python
+    name: mrs-env
 ---
 
 
