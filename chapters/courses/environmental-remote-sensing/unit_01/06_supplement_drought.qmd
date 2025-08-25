@@ -3,7 +3,7 @@ title: Access to Historic Soil Moisture Data
 jupyter: environmental-remote-sensing
 ---
 
-**Downloading, Reading and Working with Copernicus WEkEO Soil Water Index 12.5 km**
+**Downloading, Reading, and Working with Copernicus WEkEO Soil Water Index 12.5 km**
 
 ![Source: [Copernicus WEkEO](https://wekeo.copernicus.eu/)](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwekeo.copernicus.eu%2F_next%2Fimage%3Furl%3D%252Fpages%252Fhome%252Fwekeo-homepage-bg-desktop.webp%26w%3D3840%26q%3D75&f=1&nofb=1&ipt=742bb5f4855344bc9114d980ee07a1baf8cb3be88d9d5d9ad734b027f4cad372)
 
@@ -19,7 +19,6 @@ import os
 
 import cartopy.crs as ccrs
 import hvplot.pandas  # noqa
-import hvplot.xarray  # noqa
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -31,13 +30,13 @@ from pyswi.swi_ts import calc_swi_ts
 
 ## Copernicus WEkEO
 
-The name WEkEO (pronounced [wikio]) refer to the four key organisations – EUMETSAT, ECMWF, EEA, and Mercator Ocean International, which link to the broader user community (“WE”), with the purpose of knowledge advancement and sharing (“k”), focussing Earth and Environmental Observation (“EO”).
+The name WEkEO (pronounced [wikio]) refer to the four key organisations – EUMETSAT, ECMWF, Copernicus Programme, and Mercator Ocean International, which link to the broader user community (“WE”), with the purpose of knowledge advancement and sharing (“k”), focussing Earth and Environmental Observation (“EO”).
 
-The platform is a web-based service that helps people easily access and use Earth observation data. Its main goal is to make it simple for researchers, companies, and decision-makers to get the data they need and analyze it without needing advanced tools or a lot of technical knowledge. It is essentially a tool for EO data exploration and EO data science.
+The platform is a web-based service that helps people easily access and use Earth observation data. Its main goal is to make it simple for researchers, companies, and decision-makers to get the data they need and analyze it without needing advanced tools or a lot of technical knowledge.
 
 ## Registration
 
-Similarly to H SAF FTP server, we need to register a user to make full use of WEkEO, although some features are available without an account. We can follow these steps:
+Similarly to H SAF FTP server, we need to register as an user to make full use of WEkEO, although some features are available without an account. We can follow these steps:
 
 1. Go to the [homepage of WEkEO](https://wekeo.copernicus.eu/).
 
@@ -51,7 +50,7 @@ Similarly to H SAF FTP server, we need to register a user to make full use of WE
 <a href="https://identity.prod.wekeo2.eu/authenticationendpoint/login.do?client_id=kNvwaJ1xMQx3zk3Kort05m3D95ca&commonAuthCallerPath=%2Foauth2%2Fauthorize&forceAuth=false&passiveAuth=false&redirect_uri=https%3A%2F%2Fwekeo.copernicus.eu%2Flogin&response_type=code&scope=openid+email+profile+address&sessionDataKey=004043a7-c28f-41d7-bb80-65f072c60185&relyingParty=kNvwaJ1xMQx3zk3Kort05m3D95ca&type=oidc&sp=portallobelia&isSaaSApp=false&authenticators=BasicAuthenticator%3ALOCAL"><img width="600px" src="../images/login-wekeo-website.png"></a>
 </div>
 
-3. Now we can login and, for example, look at the available data by clicking on "Go" in the Data Viewer field in the middle of the screen.
+3. Now we can login and, for example, look at the available data by clicking on "Go" in the "Data Catalogue" field in the middle of the screen.
 
 <div style="text-align: center">
 <a href="https://wekeo.copernicus.eu/my-wekeo"><img width="600px" src="../images/portal-wekeo-website.png"></a>
@@ -63,19 +62,24 @@ Similarly to H SAF FTP server, we need to register a user to make full use of WE
 <a href="https://wekeo.copernicus.eu/data?view=catalogue"><img width="600px" src="../images/dataviewer-wekeo-website.png"></a>
 </div>
 
-We will use the latter step to find the dataset we need and create the query string that we will use in a Python environment.
+We will use the latter step to find the datasets we need and create query strings that we will use in a Python environment.
 
 ## Harmonized Data Access
 
-The Copernicus WEkEO platform has as straightfoward way to access data, as it has a application programming interface (API). APIs allow different programming language to commincate and share information with each other. It essentially provides a bridge for programs to use and extent each other functionalities. In the case of WEkEO the API is named the Harmonized Data Access (HDA) API, which allows uniform access to the whole WEkEO catalogue, including subsetting and downloading functionalities. We will be using the [Python HDA client](https://hda.readthedocs.io/en/latest/usage.html) to talk to the API.
+The Copernicus WEkEO platform offers a straightforward way to access data through its Application Programming Interface (API). APIs enable different programming languages to communicate and exchange information, effectively serving as a bridge for programs to utilize and extend each other's functionalities. In the case of WEkEO, the API is called the Harmonized Data Access (HDA) API, which provides uniform access to the entire WEkEO catalogue, including subsetting and downloading capabilities. We will use the [Python HDA client](https://hda.readthedocs.io/en/latest/index.html) to interact with this API.
 
-Install with either pip or conda:
+Install with either pip:
 
 ```
 pip install hda
+```
+or conda:
+
+```
 conda install -c conda-forge hda
 ```
-We now need to authenticate with the `Configuration` object and provide your account's username and password. In accordance with the prvious notebook, we use again a dotenv environment. TO use the dotenv you need to add the username to `USER_WEKEO` and your password to `PASS_WEKEO` of the `.env`-file.
+
+Now, we need to authenticate using the `Configuration` object and provide your account's username and password. As in the previous notebook, we will use a dotenv environment for this purpose. To utilize dotenv, you need to add your username to the `USER_WEKEO` variable and your password to the `PASS_WEKEO` variable in the `.env` file.
 
 ```{python}
 conf = Configuration(
@@ -87,13 +91,13 @@ hda_client = Client(config=conf)
 
 ## Finding Soil Moisture Data
 
-To find the SWI 12.5 km dataset in time series format, we have to return to the data viewer in the browser. Click in the "Layers" field on the + sign, and search for "Soil Water Index" in the "Free Text Search".
+To find the SWI 12.5 km dataset in time series format, we have to return to the data viewer in the browser. Click in the "Layers" field on the `+` sign, and search for "Soil Water Index" in the "Free Text Search".
 
 <div style="text-align: center">
 <a href="https://wekeo.copernicus.eu/data?view=catalogue"><img width="600px" src="../images/swi-search-wekeo-website.png"></a>
 </div>
 
-Then select the fourth dataset from the top; "Soil Water Index Time Series 2007-present (discrete global grid), global, daily - version 3". Click on the download button in the layers field, which unfolds a form which allows sub setting of the data. We can enter here a bounding box (bbox) for Mozambique. Scroll further down and click on "Show API request(s)".
+Then select the fourth dataset from the top; "Soil Water Index Time Series 2007-present (discrete global grid), global, daily - version 3". Click on the download button in the layers field, which unfolds a form which allows subsetting of the data. We can enter here a bounding box (bbox) for Mozambique. Scroll further down and click on "Show API request(s)".
 
 <div style="text-align: center">
 <a href="https://wekeo.copernicus.eu/data?view=catalogue"><img width="600px" src="../images/api-swi-search-wekeo-website.png"></a>
@@ -132,7 +136,7 @@ if not os.path.isdir(local_path):
 matches.download(download_dir=local_path)
 ```
 
-The downloaded data is projected on a regular longitude/latitude ([WGS84](https://epsg.io/4326)) grid, as opposed to the H SAF ASCAT 6.25 km surface soil moisture (see notebook 1). Hence we will use another package to read the data. We use [`xarray`](https://docs.xarray.dev/en/stable/index.html), which is optimised to work with multi-dimensional arrays. We will introduce this package into more detail later on.
+The downloaded data is projected on the same Fibonacci grid as the H SAF ASCAT 6.25 km surface soil moisture (see notebook 1). But the NetCDF data format requires another solution to read the data. Hence we will use another package to read the data. We use [`xarray`](https://docs.xarray.dev/en/stable/index.html), which is optimised to work with multi-dimensional arrays. We will introduce this package into more detail later on. We will call the method `to_dataframe()` to turn the `xarray.Dataset` into a `pandas.DataFrame`.
 
 ```{python}
 def _preprocess(ds: xr.Dataset):
@@ -146,12 +150,13 @@ df = xr.open_mfdataset(
     chunks=-1,
     preprocess=_preprocess,
     compat="no_conflicts",
-    join="left",
+    join="outer",
 ).to_dataframe()
-df
+
+df.head()
 ```
 
-The same as for pandas, xarray has a `hvplot` extension, which makes it easy to generate an interactive plot to explore the data.
+We use again `hvplot` to validate our search results.
 
 ```{python}
 %run ../src/ssm_cmap.py
@@ -181,27 +186,38 @@ The Soil Water Index provides a measure of how wet or dry the soil is over a spe
 
 The equation to derive the SWI typically involves a convolution of surface soil moisture observations with an exponential filter. This process helps in estimating the root-zone soil moisture, which is more relevant for agricultural and hydrological applications. The general form of the equation can be described as follows:
 
-\[ SWI = \frac{\sum_{i=0}^{n} w_i \cdot SSM_i}{\sum_{i=0}^{n} w_i} \]
+$$ \text{SWI} = \frac{\sum_{i=0}^{n} w_i \cdot SSM_i}{\sum_{i=0}^{n} w_i} $$
 
 Where:
-- \( SWI \) is the Soil Water Index.
-- \( SSM_i \) represents the surface soil moisture at time step \( i \).
-- \( w_i \) is the weight assigned to the surface soil moisture at time step \( i \).
-- \( n \) is the number of time steps considered in the convolution.
 
-The weights \( w_i \) are often determined using an exponential decay function, which gives more importance to recent observations. The exponential decay function can be expressed as:
+$$
+\begin{aligned}
+\text{SWI} &\quad \text{: Soil Water Index} \\
+\text{SSM}_i &\quad \text{: surface soil moisture at time step} i \\
+w_i &\quad \text{: the weight assigned to the surface soil moisture at time step} i \\
+n &\quad \text{: number of time steps considered in the convolution}
+\end{aligned}
+$$
 
-\[ w_i = e^{-\frac{t_i}{T}} \]
+The weights $w_i$ are often determined using an exponential decay function, which gives more importance to recent observations. The exponential decay function can be expressed as:
+
+$$ w_i = e^{-\frac{t_i}{T}} $$
 
 Where:
-- \( t_i \) is the time difference between the current time step and the time step \( i \).
-- \( T \) is a characteristic time scale that determines the rate of decay of the weights.
+$$
+\begin{aligned}
+t_i &\quad \text{: the time difference between the current time step and the time step} i \\
+T  &\quad \text{: a characteristic time scale that determines the rate of decay of the weights}
+\end{aligned}
+$$
 
 This approach allows the SWI to reflect the cumulative effect of surface soil moisture over a period, providing a more stable and representative measure of the soil moisture conditions in the root zone.
 
-One will observe that the SWI at depth is often less variable (more stable) than contemporaneous surface soil moisture - with only delayed and dampened responses to external forcing (e.g. precipitation). We can visualize this by applying the SWI algorithm to one of the five timeseries introduced in notebook 1.
+One will observe that the SWI at depth is often less variable (more stable) than contemporaneous surface soil moisture with only delayed and dampened responses to external forcing (e.g. precipitation). We can visualize this by applying the SWI algorithm to one of the five timeseries introduced in notebook 1.
 
-Let's select only 2024 from the ASCAT 6.25 km surface soil moisture for this example:
+Let's select only the year 2024 from the H SAF ASCAT 6.25 km surface soil moisture for Buzi:
+
+[^1]: W. Wagner, Lemoine, G., Rott, H., 1999, A Method for Estimating Soil Moisture from ERS Scatterometer and Soil Data, Remote Sensing of Environment, Volume 70-2, pp. 191-207, doi: [S0034-4257(99)00036-X](https://doi.org/10.1016/S0034-4257(99)00036-X)
 
 ```{python}
 %run ../src/download_path.py
@@ -220,10 +236,11 @@ sm_ts = sm_ts[sm_ts.name == "Buzi"].sort_index()
 sm_ts.head()
 ```
 
-Now we can use the TU Wien developed package `pyswi` to calculate time series SWI. Here we calculate it for depth intervals of 5, 50, and 100 cm.
+Now we can use the TU Wien developed package `pyswi` to calculate time series SWI. First we have to prepare the `numpy` arrays for the SSM and Julian time stamps[^2], like so:
+
+[^2]: Julian time stamps, also known as Julian dates, are continuous counts of days and fractions of days since a specific starting point, commonly used in astronomy and scientific applications to measure time intervals precisely.
 
 ```{python}
-t_value = np.array([5, 50, 100], dtype=np.int32)
 swi_jd = sm_ts.index.to_julian_date().values.astype(np.float64)
 sm = sm_ts["surface_soil_moisture"].values
 
@@ -231,14 +248,26 @@ dtype = np.dtype([("sm_jd", np.float64), ("sm", np.float32)])
 ssm_ts = unstructured_to_structured(
     np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype
 )
+```
 
+Now we can calculate the SWI. Here we calculate it for depth intervals of 5, 50, and 100 cm.
+
+```{python}
+t_value = np.array([5, 50, 100], dtype=np.int32)
 swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
+```
 
+After which, we convert the `numpy` arrays back to a pandas `DataFrame` and merge it with the original SSM data. This requires the Julian time steps to be converted back to a normal pandas `datetime` type.
+
+```{python}
 swi_ts = pd.DataFrame(swi_ts)
 swi_ts["time"] = pd.to_datetime(swi_ts["swi_jd"] - 2440587.5, unit="D")
-
 ts = pd.merge_asof(sm_ts, swi_ts.set_index("time"), left_index=True, right_index=True)
+```
 
+Finally, we plot the results where see the lagged and dampened response of soil moisture content with increasing depth.
+
+```{python}
 ts.hvplot.line(
     y=["surface_soil_moisture", "swi_5", "swi_50", "swi_100"], frame_width=800
 )
