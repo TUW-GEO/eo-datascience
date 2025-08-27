@@ -145,11 +145,12 @@ def _preprocess(ds: xr.Dataset):
 
 df = xr.open_mfdataset(
     "cgls_swi_12_5/*.nc",
+    engine="h5netcdf",
+    concat_dim="location_id",
     combine="nested",
     parallel=True,
-    chunks=-1,
+    chunks={},
     preprocess=_preprocess,
-    compat="no_conflicts",
     join="outer",
 ).to_dataframe()
 

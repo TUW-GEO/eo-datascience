@@ -230,8 +230,8 @@ $$
 \begin{aligned}
 n &\quad \text{: number of data points} \\
 x_i  \; \text{and} \; y_i &\quad \text{: individual sample points} \\
-\bar{x} &\quad \text{: mean of the} x \text{values} \\
-\bar{y} &\quad \text{:  mean of the} y  \text{values}
+\bar{x} &\quad \text{: mean of the} \; x \; \text{values} \\
+\bar{y} &\quad \text{:  mean of the} \; y \;  \text{values}
 \end{aligned}
 $$
 

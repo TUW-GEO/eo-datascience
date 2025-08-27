@@ -153,7 +153,17 @@ In these aggregated timeseries we can more easily see differences in the average
 
 To filter out these differences between locations, and to emphasize how "unusual" certain periods are, we calculate Z score statistics.
 
-$$ z_i =  \frac{x_i - \bar{x}}{s^x} $$
+$$ z_{k,i} = \frac{\text{SM}_{k,i} - \bar{\text{SM}}_i}{s^{\bar{\text{SM}}_i}} $$
+
+where:
+
+$$
+\begin{align}
+\text{SM}_{k,i} &\quad \text{:soil moisture for specific period (e.g., month) (} \; i \; \text{) and year (} \; k \; \text{)}\\
+\bar{\text{SM}}_i &\quad \text{: long-term mean soil moisture for specific period (e.g., month) (} \; i \; \text{)} \\
+s^{\bar{\text{SM}}_i} &\quad \text{: long-term standard deviation soil moisture for specific period (e.g., month) (} \; i \; \text{)}
+\end{align}
+$$
 
 The Z score statistic is an approach to detect anomalies in timeseries, where one measures how far a datapoint ($x_i$) is removed from the mean ($\bar{x}$). This distance from the mean by itself is not all that useful, as it depends on the location’s average SSM. To circumvent, and to more easily compare timeseries of different locations, we divide the distance of the mean with a measure of variation of the timeseries, such as the standard deviation ($s^x$). In the following code chunk we implement the Z score as a python function for a `pandas.Series`.
 
@@ -178,11 +188,10 @@ random_ts = pd.Series(np.random.normal(mu, sigma, 100))
 For our real time series, we will take it one step further by calculating the average for all months of January and comparing this to the monthly aggregated SSM value. This approach is repeated for all months. This operation is similar to the previous `groupby` operation but now we `transform` the panda's column and use the `datetime` accessor `month` to accumulate monthly averages.
 
 ```{python}
-ts_zscore = ts_monthly.groupby(
+ts_monthly["zscore"] = ts_monthly.groupby(
     [ts_monthly.index.month, "name"]
 ).surface_soil_moisture.transform(zscore)
-ts_zscore = ts_monthly.assign(zscore=ts_zscore)
-ts_zscore.hvplot.line(
+ts_monthly.hvplot.line(
     x="time",
     y="zscore",
     by="name",
