@@ -196,11 +196,10 @@ random_ts = pd.Series(np.random.normal(mu, sigma, 100))
 For our time series, we will now calculate the Z-scores per month. First, we must calculate the average for all months of January and compare this to the monthly aggregated SSM value, then for February, and so on for every month. This operation is like the previous `groupby` operation, but now we use the datetime accessor month to accumulate monthly averages. Then we use the `transform` to calculate the Z score on the panda’s column with our previously defined function `zscore`.
 
 ```{python}
-ts_zscore = ts_monthly.groupby(
+ts_monthly["zscore"] = ts_monthly.groupby(
     [ts_monthly.index.month, "name"]
 ).surface_soil_moisture.transform(zscore)
-ts_zscore = ts_monthly.assign(zscore=ts_zscore)
-ts_zscore.hvplot.line(
+ts_monthly.hvplot.line(
     x="time",
     y="zscore",
     by="name",

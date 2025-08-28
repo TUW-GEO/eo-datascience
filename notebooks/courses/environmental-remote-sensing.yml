@@ -17,10 +17,13 @@ dependencies:
   - geoviews
   - cartopy
   - dask
+  - pyogrio
+  - rioxarray
   - jupyter_bokeh
   - requests
   - statsmodels
   - aiohttp
+  - scikit-learn
   - zarr=2.18.4
   - pip:
       - ascat
