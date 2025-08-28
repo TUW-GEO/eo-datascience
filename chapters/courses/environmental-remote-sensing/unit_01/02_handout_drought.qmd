@@ -236,6 +236,7 @@ x_i  \; \text{and} \; y_i &\quad \text{: individual sample points} \\
 $$
 
 The Pearson correlation coefficient ranges from -1 to 1:
+
 - $r = 1$  indicates a perfect positive linear relationship.
 - $r = -1$ indicates a perfect negative linear relationship.
 - $r = 0$ indicates no linear relationship.
