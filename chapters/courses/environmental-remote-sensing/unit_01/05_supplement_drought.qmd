@@ -15,14 +15,16 @@ This notebook demonstrates how to access the H SAF soil moisture products in nea
 
 
 ```{python}
-import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import cartopy.crs as ccrs
 import hvplot.pandas  # noqa
 from ascat.download.interface import hsaf_download
 from ascat.swath import SwathGridFiles
 from dotenv import dotenv_values
+
+from envrs.ssm_cmap import SSM_CMAP
 ```
 
 ## H SAF
@@ -73,8 +75,8 @@ The `ascat` package has a download interface `hsaf_download`. The interface need
 ```{python}
 local_path = "h130"
 remote_path = "h130/h130_cur_mon_data"
-start_date = datetime.now() - timedelta(days=30)
-end_date = datetime.now()
+start_date = datetime.now() - timedelta(days=30)  # noqa: DTZ005
+end_date = datetime.now()  # noqa: DTZ005
 ```
 
 You also need to provide your credentials to authenticate with the FTP server, which you obtained when registering as an user (see above). It is always a good practice to "not" store your credentials, tokens, and other secrets in scripts or notebooks. Hence, we will use a dotenv (`.env`). Dotenv is a tool that helps load environment variables from an `.env`-file into your application's environment, allowing you to manage configuration settings separately from your code.
@@ -105,8 +107,8 @@ In the following code cell, we create the location to store the downloaded data 
 ```{python}
 %%time
 
-if not os.path.isdir(local_path):
-    os.mkdir(local_path)
+if not Path(local_path).is_dir():
+    Path(local_path).mkdir()
 
 hsaf_download(credentials, remote_path, local_path, start_date, end_date, limit=5)
 ```
@@ -134,8 +136,8 @@ Let's have a look at the downloaded swath data. For this we can use again the `a
 
 ```{python}
 h130_nrt = SwathGridFiles.from_product_id(local_path, product_id="H130")
-df = h130_nrt.read(date_range=(start_date, end_date)).to_dataframe()
-df.head()
+df_h130 = h130_nrt.read(date_range=(start_date, end_date)).to_dataframe()
+df_h130.head()
 ```
 
 ## Data Quality Flags
@@ -155,9 +157,7 @@ We will plot the obtained soil moisture data without applying any filters. We us
 *Note, that one can stack swath format data to obtain cell format data. This functionality is available in the `ascat` package, but this is beyond the scope of this notebook.*
 
 ```{python}
-%run ../src/ssm_cmap.py
-
-df.hvplot.points(
+df_h130.hvplot.points(
     x="longitude",
     y="latitude",
     c="surface_soil_moisture",
@@ -166,7 +166,7 @@ df.hvplot.points(
     rasterize=True,
     crs=ccrs.PlateCarree(),
     tiles=True,
-    cmap=SSM_CMAP,  # noqa
+    cmap=SSM_CMAP,
     clim=(0, 100),
     frame_width=500,
     clabel="Surface soil moisture (%)",

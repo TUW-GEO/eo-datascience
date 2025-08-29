@@ -30,6 +30,9 @@ import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
 from bokeh.models import FixedTicker
+
+from envrs.download_path import make_url
+from envrs.ssm_cmap import SSM_CMAP
 ```
 
 ## Plotting of Spatial Soil Moisture Maps
@@ -38,9 +41,7 @@ Let us start by having a look at monthly aggregated SSM derived from ASCAT micro
 
 
 ```{python}
-%run ../src/download_path.py
-
-url = make_url("ascat-6_25_ssm_monthly.csv")  # noqa
+url = make_url("ascat-6_25_ssm_monthly.csv")
 df = pd.read_csv(
     url,
     index_col=["time", "location_id"],
@@ -72,8 +73,6 @@ SSM values are reported as the degree of saturation, indicating how much of the 
     Á. González, 2010, Measurement of Areas on a Sphere Using Fibonacci and Latitude-Longitude Lattices, Math Geosci, vol. 42, no. 1, pp. 49-64, doi: [10.1007/s11004-009-9257-x](https://doi.org/10.1007/s11004-009-9257-x).
 
 ```{python}
-%run ../src/ssm_cmap.py
-
 locations = {
     "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
     "Chokwé": {"latitude": -24.5894393, "longitude": 33.0262595},
@@ -106,7 +105,7 @@ df.hvplot.points(
     rasterize=True,
     crs=ccrs.PlateCarree(),
     tiles=True,
-    cmap=SSM_CMAP,  # noqa
+    cmap=SSM_CMAP,
     clim=(0, 100),
     frame_width=500,
     clabel="Surface soil moisture (%)",
@@ -119,9 +118,9 @@ Now let us have a closer look at the five locations marked on the SSM map and pl
 
 ```{python}
 ts = pd.read_csv(
-    make_url("ascat-6_25_ssm_timeseries.csv"),  # noqa
+    make_url("ascat-6_25_ssm_timeseries.csv"),
     index_col="time",
-    parse_dates=True,  # noqa
+    parse_dates=True,
 )
 
 ts.hvplot.scatter(
@@ -176,18 +175,32 @@ $$
 The Z score statistic is an approach to detect anomalies in timeseries, where one measures how far a datapoint ($\text{SM}_{k,i}$) is removed from the long-term mean ($\bar{\text{SM}}$). This distance from the mean by itself is not all that useful, as it depends on the location’s average SSM. To circumvent, and to more easily compare timeseries of different locations, we divide the distance of the mean with a measure of variation of the timeseries, such as the standard deviation ($s^{\bar{\text{SM}}_i}$).
 
 ```{python}
-def zscore(x):
+def zscore(x: pd.Series) -> pd.Series:
+    """Z Score.
+
+    Parameters
+    ----------
+    x : pd.Series
+        Monthly aggregated surface soil moisture values
+
+
+    Returns
+    -------
+    Z scores : pd.Series
+
+    """
     return (x - x.mean()) / x.std()
 ```
 
-We exemplify this normalization step below. Here we can see two histograms for a simulated SSM dataset. The histogram on the left is still in the original "degree of saturation" units, whereas the graph on the right is transformed to Z scores. The value of the x axis of the right-hand figure can be translated as: "This point is so many standard deviations removed from the mean."
+We exemplify this normalization step below. Here we can see two histograms for a simulated SSM dataset. The histogram on the top is still in the original "degree of saturation" units, whereas the graph on the bottom is transformed to Z scores. The value of the x axis of the lower histogram can be translated as: "This point is so many standard deviations removed from the mean."
 
 ```{python}
-np.random.seed(42)  # make example reproducible
+rng = np.random.default_rng()  # make reproducible
 mu, sigma = 50, 10  # mean and standard deviation
-random_ts = pd.Series(np.random.normal(mu, sigma, 100))
+random_ts = pd.Series(rng.normal(mu, sigma, 100))
 (
-    random_ts.hvplot.hist(xlabel="SSM") + zscore(random_ts).hvplot.hist(xlabel="SSM")
+    random_ts.hvplot.hist(xlabel="SSM (%)")
+    + zscore(random_ts).hvplot.hist(xlabel="Z score")
 ).cols(1).opts(shared_axes=False)
 ```
 
@@ -237,7 +250,7 @@ df[df.zscore <= 0].hvplot.points(
     crs=ccrs.PlateCarree(),
     tiles=True,
     cmap="reds_r",
-    clim=(-4, 0),
+    clim=(-3, 0),
     frame_width=500,
     clabel="Drought anomaly",
 ).opts(hv.opts.Image(colorbar_opts={**colorbar_opts})) * points * labels

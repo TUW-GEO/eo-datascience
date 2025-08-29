@@ -15,7 +15,7 @@ In this notebook we will examine how one can obtain historic soil moisture data.
 
 
 ```{python}
-import os
+from pathlib import Path
 
 import cartopy.crs as ccrs
 import hvplot.pandas  # noqa
@@ -26,6 +26,9 @@ from dotenv import dotenv_values
 from hda import Client, Configuration
 from numpy.lib.recfunctions import unstructured_to_structured
 from pyswi.swi_ts import calc_swi_ts
+
+from envrs.download_path import make_url
+from envrs.ssm_cmap import SSM_CMAP
 ```
 
 ## Copernicus WEkEO
@@ -82,6 +85,7 @@ conda install -c conda-forge hda
 Now, we need to authenticate using the `Configuration` object and provide your account's username and password. As in the previous notebook, we will use a dotenv environment for this purpose. To utilize dotenv, you need to add your username to the `USER_WEKEO` variable and your password to the `PASS_WEKEO` variable in the `.env` file.
 
 ```{python}
+#| error: true
 conf = Configuration(
     user=dotenv_values(".env")["USER_WEKEO"],
     password=dotenv_values(".env")["PASS_WEKEO"],
@@ -106,6 +110,7 @@ Then select the fourth dataset from the top; "Soil Water Index Time Series 2007-
 We will copy this query to our Python environment and use the `hda_client` to search for the files.
 
 ```{python}
+#| error: true
 query = {
     "dataset_id": "EO:CLMS:DAT:CLMS_GLOBAL_SWI_12.5KM_V3_TIME-SERIES_NETCDF",
     "bbox": [
@@ -126,12 +131,12 @@ print(matches)
 If you are content with the results then you can start the downloading process. Here we again create a directory to contain the downloaded files. The downloaded file with be in NetCDF format. NetCDF is a data formats that is tailored to multi-dimensional array-oriented scientific data with many options to label the data.
 
 ```{python}
-%%capture
+#| error: true
 
 local_path = "cgls_swi_12_5"
 
-if not os.path.isdir(local_path):
-    os.mkdir(local_path)
+if not Path(local_path).is_dir():
+    Path(local_path).mkdir()
 
 matches.download(download_dir=local_path)
 ```
@@ -139,11 +144,24 @@ matches.download(download_dir=local_path)
 The downloaded data is projected on the same Fibonacci grid as the H SAF ASCAT 6.25 km surface soil moisture (see notebook 1). But the NetCDF data format requires another solution to read the data. Hence we will use another package to read the data. We use [`xarray`](https://docs.xarray.dev/en/stable/index.html), which is optimised to work with multi-dimensional arrays. We will introduce this package into more detail later on. We will call the method `to_dataframe()` to turn the `xarray.Dataset` into a `pandas.DataFrame`.
 
 ```{python}
-def _preprocess(ds: xr.Dataset):
+#| error: true
+def _preprocess(ds: xr.Dataset) -> xr.DataArray:
+    """Preprocess Dataset.
+
+    Parameters
+    ----------
+    ds: Xarray.Dataset
+        Individually loaded NetCDF
+
+    Returns
+    -------
+    Xarray.DataArray: _Data array containing only SWI from depth 10 cm
+
+    """
     return ds.SWI_010
 
 
-df = xr.open_mfdataset(
+df_wekeo = xr.open_mfdataset(
     "cgls_swi_12_5/*.nc",
     engine="h5netcdf",
     concat_dim="location_id",
@@ -154,15 +172,14 @@ df = xr.open_mfdataset(
     join="outer",
 ).to_dataframe()
 
-df.head()
+df_wekeo.head()
 ```
 
 We use again `hvplot` to validate our search results.
 
 ```{python}
-%run ../src/ssm_cmap.py
-
-df.hvplot.points(
+#| error: true
+df_wekeo.hvplot.points(
     x="lon",
     y="lat",
     c="SWI_010",
@@ -172,7 +189,7 @@ df.hvplot.points(
     rasterize=True,
     crs=ccrs.PlateCarree(),
     tiles=True,
-    cmap=SSM_CMAP,  # noqa
+    cmap=SSM_CMAP,
     clim=(0, 100),
     frame_width=500,
     clabel="Soil Water Index",
@@ -221,13 +238,11 @@ Let's select only the year 2024 from the H SAF ASCAT 6.25 km surface soil moistu
 [^1]: W. Wagner, Lemoine, G., Rott, H., 1999, A Method for Estimating Soil Moisture from ERS Scatterometer and Soil Data, Remote Sensing of Environment, Volume 70-2, pp. 191-207, doi: [S0034-4257(99)00036-X](https://doi.org/10.1016/S0034-4257(99)00036-X)
 
 ```{python}
-%run ../src/download_path.py
-
 sm_ts = (
     pd.read_csv(
-        make_url("ascat-6_25_ssm_timeseries.csv"),  # noqa
+        make_url("ascat-6_25_ssm_timeseries.csv"),
         index_col="time",
-        parse_dates=True,  # noqa
+        parse_dates=True,
     )
     .loc["2024"]
     .dropna()
@@ -242,8 +257,8 @@ Now we can use the TU Wien developed package `pyswi` to calculate time series SW
 [^2]: Julian time stamps, also known as Julian dates, are continuous counts of days and fractions of days since a specific starting point, commonly used in astronomy and scientific applications to measure time intervals precisely.
 
 ```{python}
-swi_jd = sm_ts.index.to_julian_date().values.astype(np.float64)
-sm = sm_ts["surface_soil_moisture"].values
+swi_jd = sm_ts.index.to_julian_date().to_numpy().astype(np.float64)
+sm = sm_ts["surface_soil_moisture"].to_numpy()
 
 dtype = np.dtype([("sm_jd", np.float64), ("sm", np.float32)])
 ssm_ts = unstructured_to_structured(

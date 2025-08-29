@@ -17,8 +17,10 @@ The aim of this notebook is to demonstrate and teach a workflow for validating A
 ```{python}
 import folium
 import hvplot
-import hvplot.pandas  # noqa
+import hvplot.pandas
 import pandas as pd
+
+from envrs.download_path import make_url
 ```
 
 ## In-situ Soil Moisture Sensors
@@ -35,7 +37,7 @@ locations = {
 }
 
 
-map = folium.Map(
+map = folium.Map(  # noqa: A001
     max_bounds=True,
     zoom_start=6,
     location=[-20, 34],
@@ -57,10 +59,9 @@ It's interesting to learn that the current in situ reference datasets are heavil
 We load the data again as a `pandas.DataFrame`, like so:
 
 ```{python}
-%run ../src/download_path.py
 RANGE = ("2023-09-30", "2025-05-06")
 df_insitu = pd.read_csv(
-    make_url("insitu_ssm_timeseries.csv"),  # noqa
+    make_url("insitu_ssm_timeseries.csv"),
     index_col="time",
     parse_dates=True,
 )
@@ -73,7 +74,7 @@ Next, we will load the H SAF SSM 6.25$\,$km data as we did in the previous noteb
 
 ```{python}
 df_ascat = pd.read_csv(
-    make_url("ascat-6_25_ssm_timeseries.csv"),  # noqa
+    make_url("ascat-6_25_ssm_timeseries.csv"),
     index_col="time",
     parse_dates=True,
 )
@@ -117,7 +118,19 @@ density_df
 We can now calculate the soil porosity from the bulk and particle density using the pandas `transform` method. After that, we will rename the column to "porosity".
 
 ```{python}
-def calc_porosity(x):
+def calc_porosity(x: pd.Series) -> pd.Series:
+    """Calculate Porosity.
+
+    Parameters
+    ----------
+    x: Pandas.Series
+        Bulk Density
+
+    Returns
+    -------
+        Pandas.Series: Porosity
+
+    """
     return 1 - x / 2.65
 
 
@@ -155,7 +168,19 @@ df_ascat_porosity.head()
 We can now use the pandas `apply` method to convert the units. This method takes the whole `DataFrame` as input allowing us to compute on two columns, while returning one column as output.
 
 ```{python}
-def deg2vol(df):
+def deg2vol(df: pd.DataFrame) -> pd.Series:
+    """Degree of Saturation to Volumetric Units.
+
+    Parameters
+    ----------
+    df: Pandas.DataFrame
+        Degree of Saturation
+
+    Returns
+    -------
+        Pandas.Series: Volumetric Units
+
+    """
     return df["porosity"] * df["surface_soil_moisture"] / 100
 
 
@@ -172,14 +197,14 @@ The first step is to visually compare the time series. Visual inspection is esse
 To facilitate a clear overview, we will first concatenate the two datasets as follows:
 
 ```{python}
-df = pd.concat([df_insitu, df_ascat_vol])
-df.head()
+df_combined = pd.concat([df_insitu, df_ascat_vol])
+df_combined.head()
 ```
 
 Next, we will use the `hvplot` extension for pandas to create interactive scatter plots for the time series.
 
 ```{python}
-df.hvplot.scatter(
+df_combined.hvplot.scatter(
     x="time",
     y="surface_soil_moisture",
     by="type",
@@ -213,10 +238,9 @@ df_ascat_vol_daily = (
     .to_frame("ascat")
 )
 
-df_combined = pd.merge(
-    df_ascat_vol_daily, df_insitu_daily, left_index=True, right_index=True
-)
-df_combined.dropna().head()
+df_resampled = df_ascat_vol_daily.join(df_insitu_daily)
+df_resampled = df_resampled.dropna()
+df_resampled.head()
 ```
 
 The data is now ready for correlation analysis. For time series analysis, if you're looking at trends and expect a linear relationship, Pearson correlation is straightforward and precise method.
@@ -244,7 +268,7 @@ The Pearson correlation coefficient ranges from -1 to 1:
 We implement this with pandas, as follows:
 
 ```{python}
-df_combined.groupby("name").corr(method="pearson")
+df_resampled.groupby("name").corr(method="pearson")
 ```
 
 Use Spearman correlation when the relationship between your time series is not necessarily linear but generally moves in the same direction (monotonic).
@@ -263,12 +287,12 @@ $$
 The interpretation of $\rho$ is the same as for the Pearson's correlation ($r$) coefficient. Spearman is great for data where the ranking of values is important and is less affected by outliers and non-normal distributions. This makes it a robust choice for various types of data. It's also easy to interpret because it focuses on the overall trend.
 
 ```{python}
-df_combined.groupby("name").corr(method="spearman")
+df_resampled.groupby("name").corr(method="spearman")
 ```
 
 The correlation coefficients for both Pearson and Spearman methods range between 0.6 and 0.8 across different locations, indicating moderate to high positive correlations between the ASCAT HSAF 6.25$\,$km data and the in-situ soil moisture estimates.
 
-So far, we have only evaluated relative temporal trends in the two data sources. However, it is clear from the visual comparison of HSAF ASCAT SSM and in situ soil moisture that there are also absolute differences. To quantify these differences, we will first calculate the bias between in situ and remotely sensed soil moisture. Using Pandas, this involves comparing the mean of the predicted values to the mean of the actual values. Bias is determined by the difference between these means.
+So far, we have only evaluated relative temporal trends in the two data sources. However, it is clear from the visual comparison of HSAF ASCAT SSM and in situ soil moisture that there are also absolute differences. To quantify these differences, we will first calculate the bias between in situ and remotely sensed soil moisture. Using Pandas, this involves comparing the mean of the target values (remotely sensed SSM) to the mean of the reference values (in situ SSM). Bias is determined by the difference between these means.
 
 $$ \text{Bias} = \bar{x}_i - \bar{y}_i $$
 
@@ -285,12 +309,12 @@ Which we can easily implement, like so:
 
 ```{python}
 (
-    df_combined.groupby("name")["in-situ"].mean()
-    - df_combined.groupby("name")["ascat"].mean()
+    df_resampled.groupby("name")["in-situ"].mean()
+    - df_resampled.groupby("name")["ascat"].mean()
 )
 ```
 
-Above, we observe the systematic error (in m$^3$/m$^3$) for each location. The H SAF ASCAT values are generally lower than the paired in situ observations, with the exception of Chokwé. However, these differences are relatively small.
+Above, we observe the systematic error (in m$^3$/m$^3$) for each location. The H SAF ASCAT values are generally lower than the paired in situ observations, with the exception of Chokwé and Buzi. However, these differences are relatively small.
 
 An interrelated yet distinct statistic is the Root Mean Square Error (RMSE).
 
@@ -319,17 +343,29 @@ $$ \text{Total Error (RMSE)} = \text{Bias}^2+\text{Variance}+\text{Irreducible E
 This can be implemented, as follows:
 
 ```{python}
-def RMSE(df):
+def rmse(df: pd.DataFrame) -> pd.Series:
+    """Root Mean Square Error.
+
+    Parameters
+    ----------
+    df: Pandas.DataFrame
+        Target "ascat" and reference "in situ" columns
+
+    Returns
+    -------
+        Pandas.Series: Root Mean Square Error
+
+    """
     return ((df["ascat"] - df["in-situ"]) ** 2).mean() ** 0.5
 
 
-df_combined.groupby("name").apply(RMSE)
+df_resampled.groupby("name").apply(rmse)
 ```
 
 Here, we see that the RMSE ranges between 0.06 and 0.08 [m$^3$ / m$^3$], which is small compared to the total range of H SAF ASCAT SSM. As a final step, we can visualize the relation of target (remotely sensed SSM) and reference values (in situ soil moisture) using `hvplot`.
 
 ```{python}
-hvplot.scatter_matrix(df_combined.reset_index(level=0), c="name", alpha=0.3).opts(
+hvplot.scatter_matrix(df_resampled.reset_index(level=0), c="name", alpha=0.3).opts(
     plot_size=300
 )
 ```

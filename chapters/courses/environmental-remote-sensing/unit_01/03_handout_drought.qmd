@@ -27,6 +27,8 @@ import holoviews as hv
 import hvplot.pandas  # noqa
 import numpy as np
 import pandas as pd
+
+from envrs.download_path import make_url
 ```
 
 ## Standardized Precipitation-Evapotranspiration Index
@@ -53,9 +55,7 @@ The purpose of this notebook is to compare both drought indicators, particularly
 We first load monthly aggregated SPEI data in the following code cell.
 
 ```{python}
-%run ../src/download_path.py
-
-url = make_url("spei-6_25_monthly.csv")  # noqa
+url = make_url("spei-6_25_monthly.csv")
 df_spei = pd.read_csv(
     url,
     index_col=["time", "location_id"],
@@ -67,7 +67,7 @@ df_spei
 Now let's also load monthly aggregated H SAF ASCAT SSM Z scores which we already prepared for notebook 1. For this exercise we will filter the data to have a comparable time range (up to the end of 2021) as we have for the SPEI data.
 
 ```{python}
-url = make_url("ascat-6_25_ssm_monthly.csv")  # noqa
+url = make_url("ascat-6_25_ssm_monthly.csv")
 df_ascat = pd.read_csv(
     url,
     index_col=["time", "location_id"],
@@ -148,7 +148,7 @@ legend = (
 )
 
 
-map = df_long.hvplot.points(
+map = df_long.hvplot.points(  # noqa: A001
     x="longitude",
     y="latitude",
     c="value",
@@ -172,9 +172,11 @@ legend * map
 Now that we have classified drought intensity into categories, let's calculate the spatial extent of droughts over time. This will enable us to compare how the two standardized drought indices relate to each other. Conveniently, we can use the pandas `value_count` method on the new categorical columns `"spei"` and `"zscore"`, and also employ the `normalize` parameter to get relative frequencies. This provides an understanding of how many data points fall into each drought class relative to the total number of observations for a certain month.
 
 ```{python}
-col_spei = df_wide_cat.groupby(level=0)["spei"].value_counts(normalize=True).unstack()
+col_spei = (
+    df_wide_cat.groupby(level=0)["spei"].value_counts(normalize=True).unstack()  # noqa: PD010
+)
 col_zscore = (
-    df_wide_cat.groupby(level=0)["zscore"].value_counts(normalize=True).unstack()
+    df_wide_cat.groupby(level=0)["zscore"].value_counts(normalize=True).unstack()  # noqa: PD010
 )
 ```
 
@@ -201,7 +203,7 @@ mozambique_droughts = [
 
 df_droughts = pd.DataFrame(mozambique_droughts).assign(y=1)
 df_droughts["time"] = pd.to_datetime(df_droughts["time"], format="%Y-%M-%d")
-df_droughts.set_index("time", inplace=True)
+df_droughts = df_droughts.set_index("time")
 labels = df_droughts.hvplot.labels(
     x="time",
     y="y",
@@ -242,7 +244,7 @@ To obtain a more comprehensive and accurate overview of H SAF ASCAT SSM in detec
 We have already prepared a dataset that includes all these drought indicators, along with the previously introduced SPEI and ASCAT data (previously labeled `"zscore"`).
 
 ```{python}
-url = make_url("drought_indices-6_25_monthly.csv")  # noqa
+url = make_url("drought_indices-6_25_monthly.csv")
 df_drought_indices = pd.read_csv(
     url,
     index_col=["time", "location_id"],
@@ -254,14 +256,26 @@ df_drought_indices
 To simplify the calculation of relative drought spatial extent, we will create two functions that loops over the different columns to perform the same analysis as before: 1) set the categorical drought type and 2) calculate relative drought extent.
 
 ```{python}
-def set_drought_cat_type(df):
+def set_drought_cat_type(df: pd.DataFrame) -> pd.DataFrame:
+    """Drought Severity Levels.
+
+    Parameters
+    ----------
+    df: Pandas.DataFrame
+        Data frame with continuos drought indicators.
+
+    Returns
+    -------
+        Pandas.DataFrame: Data frame with discrete drought indicators
+
+    """
     col_names = df.drop(columns=["longitude", "latitude"]).columns
     for name in col_names:
         min_border = df[name].min()
         max_border = df[name].max()
         thresholds = np.array(
             [
-                min_border if min_border < -2 else -2.1,
+                min_border if min_border < -2 else -2.1,  # noqa: PLR2004
                 -2,
                 -1.5,
                 -1,
@@ -273,16 +287,27 @@ def set_drought_cat_type(df):
     return df
 
 
-def calc_drought_areal_extend(df):
+def calc_drought_areal_extend(df: pd.DataFrame) -> pd.DataFrame:
+    """Areal Extent of Drought Severity Levels.
+
+    Parameters
+    ----------
+    df: Pandas.DataFrame
+        Data frame with discrete drought indicators.
+
+    Returns
+    -------
+        Pandas.DataFrame: Data frame with normalize counts of drought levels
+
+    """
     col_names = df.drop(columns=["longitude", "latitude"]).columns
-    new_df = pd.concat(
+    return pd.concat(
         [
-            df.groupby(level=0)[col].value_counts(normalize=True).unstack()
+            df.groupby(level=0)[col].value_counts(normalize=True).unstack()  # noqa: PD010
             for col in col_names
         ],
         keys=pd.Index(col_names, name="indicator"),
     )
-    return new_df
 
 
 df_drought_indices_cat = set_drought_cat_type(df_drought_indices.copy())
