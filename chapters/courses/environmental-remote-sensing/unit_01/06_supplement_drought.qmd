@@ -85,7 +85,6 @@ conda install -c conda-forge hda
 Now, we need to authenticate using the `Configuration` object and provide your account's username and password. As in the previous notebook, we will use a dotenv environment for this purpose. To utilize dotenv, you need to add your username to the `USER_WEKEO` variable and your password to the `PASS_WEKEO` variable in the `.env` file.
 
 ```{python}
-#| error: true
 conf = Configuration(
     user=dotenv_values(".env")["USER_WEKEO"],
     password=dotenv_values(".env")["PASS_WEKEO"],
@@ -110,7 +109,6 @@ Then select the fourth dataset from the top; "Soil Water Index Time Series 2007-
 We will copy this query to our Python environment and use the `hda_client` to search for the files.
 
 ```{python}
-#| error: true
 query = {
     "dataset_id": "EO:CLMS:DAT:CLMS_GLOBAL_SWI_12.5KM_V3_TIME-SERIES_NETCDF",
     "bbox": [
@@ -131,7 +129,7 @@ print(matches)
 If you are content with the results then you can start the downloading process. Here we again create a directory to contain the downloaded files. The downloaded file with be in NetCDF format. NetCDF is a data formats that is tailored to multi-dimensional array-oriented scientific data with many options to label the data.
 
 ```{python}
-#| error: true
+%%capture
 
 local_path = "cgls_swi_12_5"
 
@@ -144,7 +142,6 @@ matches.download(download_dir=local_path)
 The downloaded data is projected on the same Fibonacci grid as the H SAF ASCAT 6.25 km surface soil moisture (see notebook 1). But the NetCDF data format requires another solution to read the data. Hence we will use another package to read the data. We use [`xarray`](https://docs.xarray.dev/en/stable/index.html), which is optimised to work with multi-dimensional arrays. We will introduce this package into more detail later on. We will call the method `to_dataframe()` to turn the `xarray.Dataset` into a `pandas.DataFrame`.
 
 ```{python}
-#| error: true
 def _preprocess(ds: xr.Dataset) -> xr.DataArray:
     """Preprocess Dataset.
 
@@ -164,12 +161,12 @@ def _preprocess(ds: xr.Dataset) -> xr.DataArray:
 df_wekeo = xr.open_mfdataset(
     "cgls_swi_12_5/*.nc",
     engine="h5netcdf",
-    concat_dim="location_id",
     combine="nested",
     parallel=True,
-    chunks={},
+    chunks=-1,
     preprocess=_preprocess,
     join="outer",
+    compat="no_conflicts",
 ).to_dataframe()
 
 df_wekeo.head()
@@ -178,7 +175,6 @@ df_wekeo.head()
 We use again `hvplot` to validate our search results.
 
 ```{python}
-#| error: true
 df_wekeo.hvplot.points(
     x="lon",
     y="lat",
