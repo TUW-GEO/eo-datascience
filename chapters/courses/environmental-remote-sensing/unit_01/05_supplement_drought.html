@@ -302,6 +302,24 @@ background: #006699;
  <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Access to Historic Soil Moisture Data</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../../chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Deforestation detection</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../../chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Forest Classification in Mozambique</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../../chapters/courses/environmental-remote-sensing/unit_02/09_inclass_deforestation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Deforestation Analysis in Mozambique</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -402,7 +420,7 @@ background: #006699;
 </section>
 <section id="imports" class="level2" data-number="14.2">
 <h2 data-number="14.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">14.2</span> Imports</h2>
-<div id="54424eee" class="cell" data-execution_count="1">
+<div id="54424eee" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime, timedelta</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1054,7 +1072,7 @@ if (window.Jupyter !== undefined) {
 <p>Of course, we will look into a “Pythonic” way to download the data. For this we use the <a href="https://github.com/TUW-GEO/ascat"><code>ascat</code></a> package developed by the TU Wien. You can pip install this package from the Python Package Index (<a href="https://pypi.org/">PyPi</a>), like so:</p>
 <pre><code>pip install ascat</code></pre>
 <p>The <code>ascat</code> package has a download interface <code>hsaf_download</code>. The interface needs the following information; a local path for saving the downloaded data, a remote path to locate the H SAF data products on the FTP server, and a start and end datetime for the query. Here we show how to download the H SAF SSM 6.25 km product for the last 30 days from the time of running this notebook.</p>
-<div id="22764af3" class="cell" data-execution_count="2">
+<div id="22764af3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>local_path <span class="op">=</span> <span class="st">"h130"</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>remote_path <span class="op">=</span> <span class="st">"h130/h130_cur_mon_data"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>start_date <span class="op">=</span> datetime.now() <span class="op">-</span> timedelta(days<span class="op">=</span><span class="dv">30</span>)  <span class="co"># noqa: DTZ005</span></span>
@@ -1067,14 +1085,14 @@ if (window.Jupyter !== undefined) {
 <pre><code>USER_HSAF=&lt;your_email_here&gt;
 PASS_HSAF=&lt;your_password_here&gt;</code></pre>
 <p>Now we can load the credentials from the dotenv and pass this information to the H SAF FTP server with <code>hsaf_download</code>.</p>
-<div id="80af7025" class="cell" data-execution_count="3">
+<div id="80af7025" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>credentials <span class="op">=</span> {</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"user"</span>: dotenv_values(<span class="st">".env"</span>)[<span class="st">"USER_HSAF"</span>],</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"password"</span>: dotenv_values(<span class="st">".env"</span>)[<span class="st">"PASS_HSAF"</span>],</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In the following code cell, we create the location to store the downloaded data and start the download.</p>
-<div id="082aa90e" class="cell" data-execution_count="4">
+<div id="082aa90e" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>time</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> Path(local_path).is_dir():</span>
@@ -1176,7 +1194,7 @@ Wall time: 1min 21s</code></pre>
 </table>
 <p>In summary, the choice between swath and cell formats depends on the specific requirements of the Earth observation research. Swath data is advantageous for broad, frequent coverage, while cell data offers detailed, localized information.</p>
 <p>Let’s have a look at the downloaded swath data. For this we can use again the <code>ascat</code> package and the <code>SwathGridFiles</code> class where point to the downloaded data and provide the product id <code>"H130"</code>. We can then read the data, which return the ASCAT 6.25 km data in swath format as a <code>Pandas.DataFrame</code>.</p>
-<div id="0eef8613" class="cell" data-execution_count="5">
+<div id="0eef8613" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>h130_nrt <span class="op">=</span> SwathGridFiles.from_product_id(local_path, product_id<span class="op">=</span><span class="st">"H130"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df_h130 <span class="op">=</span> h130_nrt.read(date_range<span class="op">=</span>(start_date, end_date)).to_dataframe()</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df_h130.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1375,7 +1393,7 @@ Wall time: 1min 21s</code></pre>
 <h2 data-number="14.8" class="anchored" data-anchor-id="selecting-a-region-of-interest"><span class="header-section-number">14.8</span> Selecting a Region of Interest</h2>
 <p>We will plot the obtained soil moisture data without applying any filters. We use <code>hvplot</code>, as we typically do. It is evident that the “swath” format data provides global coverage. However, this format makes it more challenging to directly download data specific to your area of interest, such as Mozambique. To target a specific region before downloading the data, one needs to understand the intersection of the swath geometry with the area of interest at any given time. This is beyond the scope of this course. At present you can download the whole swaths and then extract the region of interest.</p>
 <p><em>Note, that one can stack swath format data to obtain cell format data. This functionality is available in the <code>ascat</code> package, but this is beyond the scope of this notebook.</em></p>
-<div id="2722c132" class="cell" data-execution_count="6">
+<div id="2722c132" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_h130.hvplot.points(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"longitude"</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"latitude"</span>,</span>

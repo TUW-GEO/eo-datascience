@@ -953,6 +953,215 @@
     ]
   },
   {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html",
+    "title": "16  Deforestation detection",
+    "section": "",
+    "text": "16.1 Imports\nimport geopandas as gpd\nimport hvplot.pandas\nimport hvplot.xarray  # noqa\nimport numpy as np\nimport pandas as pd\nimport xarray as xr\n\nfrom envrs.download_path import make_url",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#read-the-data",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#read-the-data",
+    "title": "16  Deforestation detection",
+    "section": "16.2 Read the data",
+    "text": "16.2 Read the data\n\n# Read the cube\ncube_uri = make_url(\"HLS_clip4plots_both_b30_v20.zarr.zip\", is_zip=True)\n\nfull_cube = xr.open_dataset(\n    cube_uri,\n    engine=\"zarr\",\n    consolidated=False,\n).compute()\n\n# Read the points, reproject tro match the datacube, set the index\npoints_uri = make_url(\"timeline_points.geojson\")\npoints = (\n    gpd.read_file(points_uri)\n    .to_crs(full_cube[\"spatial_ref\"].attrs[\"crs_wkt\"])\n    .set_index(\"intact\")\n)\n\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/HLS_clip4plots_both_b30_v20.zarr.zip/raw?ref=main&lfs=true\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/timeline_points.geojson/raw?ref=main&lfs=true",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#specify-the-variables-indicating-cloudshadow-presence",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#specify-the-variables-indicating-cloudshadow-presence",
+    "title": "16  Deforestation detection",
+    "section": "16.3 Specify the variables indicating cloud/shadow presence",
+    "text": "16.3 Specify the variables indicating cloud/shadow presence\n\ncirrus_col = \"cirrus cloud\"\ncloud_col = \"cloud\"\nadjacent_col = \"adjacent to cloud\"\nshadow_col = \"cloud shadow\"\ntainted_cols = [adjacent_col, cloud_col, cirrus_col, shadow_col]",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#select-the-clearest-observations",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#select-the-clearest-observations",
+    "title": "16  Deforestation detection",
+    "section": "16.4 Select the clearest observations",
+    "text": "16.4 Select the clearest observations\n\ntainted_frame = (\n    full_cube[tainted_cols]\n    .to_dataarray(dim=\"mask\")\n    .any(dim=\"mask\")\n    .sum(dim=[\"x\", \"y\"])\n    .to_dataframe(name=\"count_tainted\")\n    .sort_values(by=\"count_tainted\")\n)\n\nmonthly_clearest = tainted_frame.groupby(pd.Grouper(freq=\"ME\")).head(1)\nmonthly_cube = full_cube.sel(time=monthly_clearest.index.values)\n\nfully_clear = tainted_frame[tainted_frame[\"count_tainted\"] == 0]\nclear_cube = full_cube.sel(time=fully_clear.index.values)",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#how-an-image-time-series-looks-like",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#how-an-image-time-series-looks-like",
+    "title": "16  Deforestation detection",
+    "section": "16.5 How an image time series looks like",
+    "text": "16.5 How an image time series looks like\n\n16.5.1 Images need to be converted to 8 bits to set the color stretch\n\ndef to_rgb8(cube, r, g, b, vmax, vmin=0):\n    selected = cube[[r, g, b]].to_dataarray(\"band\")\n    stretched = (selected - vmin) / (vmax - vmin)\n\n    is_positive = (stretched &gt;= 0) & np.isfinite(stretched)\n    positive = stretched.where(is_positive.all(dim=\"band\"), 0)\n    clipped = (\n        np.clip(255 * positive, 0, 255)\n        .astype(np.uint8)\n        .expand_dims({\"composite\": [f\"{r=}, {g=}, {b=}\"]})\n    )\n    clipped[\"band\"] = np.array([\"r\", \"g\", \"b\"], dtype=\"unicode\")\n\n    return clipped\n\n\ndef plot_rgb(*args, dimname=\"composite\"):\n    return xr.concat(args, dim=dimname).hvplot.rgb(\n        x=\"x\",\n        y=\"y\",\n        bands=\"band\",\n        by=dimname,\n        groupby=\"time\",\n        subplots=True,\n        rasterize=True,\n        data_aspect=1,\n        xaxis=False,\n        yaxis=None,\n        widget_location=\"bottom\",\n    )",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#plot-a-time-series-of-the-images",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#plot-a-time-series-of-the-images",
+    "title": "16  Deforestation detection",
+    "section": "16.6 Plot a time series of the images",
+    "text": "16.6 Plot a time series of the images\n\nplot_rgb(\n    to_rgb8(monthly_cube, r=\"Red\", g=\"Green\", b=\"Blue\", vmax=0.15),\n    to_rgb8(monthly_cube, r=\"NIRnarrow\", g=\"SWIR1\", b=\"Red\", vmax=0.40),\n)",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#plot-just-the-fully-clear-images",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#plot-just-the-fully-clear-images",
+    "title": "16  Deforestation detection",
+    "section": "16.7 Plot just the “fully” clear images",
+    "text": "16.7 Plot just the “fully” clear images\n\nplot_rgb(\n    to_rgb8(clear_cube, r=\"Red\", g=\"Green\", b=\"Blue\", vmax=0.15),\n    to_rgb8(clear_cube, r=\"NIRnarrow\", g=\"SWIR1\", b=\"Red\", vmax=0.40),\n)",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#satellite-pixel-time-series-as-tables",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#satellite-pixel-time-series-as-tables",
+    "title": "16  Deforestation detection",
+    "section": "16.8 Satellite pixel time series as tables",
+    "text": "16.8 Satellite pixel time series as tables\n\n16.8.1 Pick two points one that has been deforested, and one that is intact\n\n# https://tutorial.xarray.dev/intermediate/indexing/advanced-indexing.html\n# #orthogonal-indexing-in-xarray\nsel_cube = full_cube.sel(\n    x=xr.DataArray(points.geometry.x, dims=\"intact\"),\n    y=xr.DataArray(points.geometry.y, dims=\"intact\"),\n    method=\"nearest\",\n)\n\n\n\n16.8.2 Flatten (xarray dataset/“cube” to pandas dataframe/table)\n\nsel_frame = (\n    sel_cube.drop_vars(\"spatial_ref\")\n    .to_dataframe()\n    .drop(columns=[\"x\", \"y\"])\n    .reset_index()\n)\n\n\n\n16.8.3 Prepare auxiliary variables for plotting\n\ndef normalized_difference(frame, positive, negative):\n    numerator = frame[positive] - frame[negative]\n    denominator = frame[positive] + frame[negative]\n    return numerator / denominator\n\n\nsel_frame[\"NDVI\"] = normalized_difference(sel_frame, \"NIRnarrow\", \"Red\")\nsel_frame[\"NDMI\"] = normalized_difference(sel_frame, \"NIRnarrow\", \"SWIR1\")\nsel_frame[\"DOY\"] = sel_frame[\"time\"].dt.dayofyear\n\n\n\n16.8.4 Split the table into intact and deforested\n\ndeforested_frame = sel_frame[~sel_frame[\"intact\"]]\nintact_frame = sel_frame[sel_frame[\"intact\"]]",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#clouds-and-shadows-taint-our-time-series",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#clouds-and-shadows-taint-our-time-series",
+    "title": "16  Deforestation detection",
+    "section": "16.9 Clouds and shadows taint our time series",
+    "text": "16.9 Clouds and shadows taint our time series\n\nintact_frame.loc[:, \"flag\"] = \"clear\"\nintact_frame.loc[intact_frame[tainted_cols[1:]].any(axis=1), \"flag\"] = \"cloud/shadow\"\nintact_frame.loc[intact_frame[tainted_cols[0]], \"flag\"] = \"adjacent\"\n\n\nintact_frame.hvplot.scatter(\n    x=\"time\", y=\"Green\", by=\"flag\", color=[\"green\", \"black\", \"orange\"]\n)\n\n/tmp/ipykernel_2974/3467101171.py:1: SettingWithCopyWarning: \nA value is trying to be set on a copy of a slice from a DataFrame.\nTry using .loc[row_indexer,col_indexer] = value instead\n\nSee the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy\n  intact_frame.loc[:, \"flag\"] = \"clear\"",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#filter-out-flagged-observations",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#filter-out-flagged-observations",
+    "title": "16  Deforestation detection",
+    "section": "16.10 Filter out flagged observations",
+    "text": "16.10 Filter out flagged observations\n\nintact_masked = intact_frame[~intact_frame[tainted_cols].any(axis=1)].copy()\ndeforested_masked = deforested_frame[~deforested_frame[tainted_cols].any(axis=1)].copy()",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#removed-the-cloud-the-timeline-becomes-clearer",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#removed-the-cloud-the-timeline-becomes-clearer",
+    "title": "16  Deforestation detection",
+    "section": "16.11 Removed the cloud, the timeline becomes clearer",
+    "text": "16.11 Removed the cloud, the timeline becomes clearer\n\ntetracolor_kwargs = {\n    \"x\": \"time\",\n    \"y\": [\"Blue\", \"Green\", \"Red\", \"NIRnarrow\"],\n    \"color\": [\"blue\", \"green\", \"red\", \"darkgray\"],\n}\n\nintact_masked.hvplot(**tetracolor_kwargs)  # .legend(loc=\"upper left\", ncols=4);",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#spikes-could-be-unmasked-cloudsshadows",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#spikes-could-be-unmasked-cloudsshadows",
+    "title": "16  Deforestation detection",
+    "section": "16.12 Spikes could be unmasked clouds/shadows",
+    "text": "16.12 Spikes could be unmasked clouds/shadows\nA massive value difference respective to its neighbors indicates the presence of possible outliers\n\ndef despike(frame, columns, min_spike, max_spike):\n    summed = frame[columns].sum(axis=1)\n\n    # Perform the selections\n    central = summed.iloc[1:-1]\n    prior = summed.shift(-1).iloc[1:-1]\n    posterior = summed.shift(1).iloc[1:-1]\n\n    # remove observations based on their saliency respective to their neighbors\n    spikyness = central - (prior + posterior) / 2\n    floor, ceiling = spikyness.quantile((min_spike, max_spike))\n    selected = central[spikyness.between(floor, ceiling)]\n\n    return frame.loc[selected.index]\n\n\ncutoff = 0.05\nband_names = [\"Blue\", \"Green\", \"Red\", \"NIRnarrow\", \"SWIR1\", \"SWIR2\"]\n\nintact_despiked = despike(intact_masked, band_names, cutoff, 1 - cutoff)\ndeforested_despiked = despike(deforested_masked, band_names, cutoff, 1 - cutoff)\n\n\n(\n    intact_masked.hvplot(x=\"time\", y=\"NIRnarrow\", color=\"k\")\n    * intact_despiked.hvplot(x=\"time\", y=\"NIRnarrow\", color=\"darkgray\")\n)",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#the-spikes-as-anomalies",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#the-spikes-as-anomalies",
+    "title": "16  Deforestation detection",
+    "section": "16.13 The spikes as anomalies",
+    "text": "16.13 The spikes as anomalies\nThese spikes are anolalies on the context where they appear, but they may or may not be global outliers when compared with the full population.\n\nspike_frame = intact_masked.iloc[1:-1].drop(index=intact_despiked.index)\n\n\n# DOY = day of the year\n(\n    intact_masked.hvplot.scatter(x=\"Red\", y=\"NIRnarrow\", c=\"DOY\", colormap=\"twilight\")\n    * spike_frame.hvplot.scatter(x=\"Red\", y=\"NIRnarrow\", marker=\"x\", s=90, color=\"red\")\n)\n\n\n\n\n\n  \n\n\n\n\nThe isolated points far above and below the general population would be global outliers, whereas the rest were outliers on their specific context.",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#the-signature-of-deforestation",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#the-signature-of-deforestation",
+    "title": "16  Deforestation detection",
+    "section": "16.14 The signature of deforestation",
+    "text": "16.14 The signature of deforestation\n\nintact_despiked.hvplot(**tetracolor_kwargs)\n\n\n\n\n\n  \n\n\n\n\n\ndeforested_despiked.hvplot(**tetracolor_kwargs)",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#with-indices",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.html#with-indices",
+    "title": "16  Deforestation detection",
+    "section": "16.15 With Indices",
+    "text": "16.15 With Indices\n\ncompare_frame = (\n    pd.concat({\"deforested\": deforested_despiked, \"intact\": intact_despiked}, axis=0)\n    .reset_index(names=[\"history\", \"index\"])\n    .drop(columns=\"index\")\n)\n\n\ncompare_frame.hvplot.line(\n    x=\"time\", y=\"NDVI\", by=\"history\", color=[\"black\", \"limegreen\"]\n)",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>Deforestation detection</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html",
+    "title": "17  Forest Classification in Mozambique",
+    "section": "",
+    "text": "17.1 Workflow Setup\nThis notebook presents a workflow for classifying forest cover in Mozambique using remote sensing data. The classification utilizes annual mosaics derived from Sentinel-2 and Landsat sources, with data organized by value quantiles for analysis.\nNational Geographic - https://www.nationalgeographic.com/magazine/article/mozambique-gorongosa-national-park-wildlife-rebound\nWe begin by importing the necessary libraries for geospatial analysis, data handling, visualization, and machine learning. These tools form the foundation for the classification workflow that follows.\nfrom enum import Enum\nfrom pathlib import Path\nfrom typing import Any\n\nimport geopandas as gpd\nimport hvplot.pandas\nimport hvplot.xarray  # noqa\nimport matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd\nimport xarray as xr\nfrom rasterio import Affine\nfrom rasterio.features import rasterize\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.metrics import classification_report\n\nfrom envrs.download_path import make_url\nyear: int = 2018  # change to 2018, 2020 or 2024\nurl_dc = make_url(\n    f\"HLS_T36KXE_{year}_b30_v2.zarr.zip\",\n    is_zip=True,\n)\nurl_slivers = make_url(\n    \"label_features_i02.geojson\",\n)\n\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/HLS_T36KXE_2018_b30_v2.zarr.zip/raw?ref=main&lfs=true\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/label_features_i02.geojson/raw?ref=main&lfs=true\nThe next step is to load the remote sensing image data and the GeoJSON file containing the regions of interest (ROIs) for classification. These ROIs are defined as polygons that represent areas labeled as forest or non-forest. The polygon labels are created using QGIS and provide the ground truth required for supervised classification.\n# Load Data\nfeature_cube = xr.open_dataset(url_dc, engine=\"zarr\", consolidated=False)\nfeature_cube = feature_cube.sel(quantile=slice(0.1, 0.9))  # remove outliers\nslivers: gpd.GeoDataFrame = gpd.read_file(url_slivers)\n# Prepare the crs and affine transformation\nspatial_ref: dict[str, Any] = feature_cube[\"spatial_ref\"].attrs\ncrs: str = spatial_ref[\"crs_wkt\"]\n_geotransfrom: list[float] = [float(x) for x in spatial_ref[\"GeoTransform\"].split()]\naffine = Affine.from_gdal(*_geotransfrom)\n\n# Set the crs on the polygons\nslivers.to_crs(crs, inplace=True)\nDefining land cover types as an enumeration provides a clear mapping between each class and its numeric value. This improves code readability and ensures consistency when assigning and interpreting classification labels throughout the workflow.\nclass LandCoverType(Enum):\n    \"\"\"Binding land cover types to their numeric values.\"\"\"\n\n    TREE_COVER = 10\n    SHRUBLAND = 20\n    GRASSLAND = 30\n    CROPLAND = 40\n    SETTLEMENT = 50\n    BARE_SPARSE = 60\n    SNOW_ICE_ABSENT = 70\n    PERMANENT_WATER = 80\n    INTERMITTENT_WATER = 86\n    WETLAND = 90\nWe will now plot the image data alongside the regions of interest (ROIs) to obtain a comprehensive understanding of the spatial distribution of the labeled areas. This visualization will help us verify the alignment of the labeled polygons with the underlying remote sensing data.\n# Plot RGB Image\nfig, ax = plt.subplots()\nfeature_cube[[\"Red\", \"Green\", \"Blue\"]].sel(quantile=0.5).to_dataarray().plot.imshow(\n    robust=True,\n    ax=ax,\n)\nslivers.plot(ax=ax, column=\"label\", cmap=\"RdYlBu\")\nplt.show()",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Forest Classification in Mozambique</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html#prepare-data-for-classification",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html#prepare-data-for-classification",
+    "title": "17  Forest Classification in Mozambique",
+    "section": "17.2 Prepare Data for Classification",
+    "text": "17.2 Prepare Data for Classification\nPrior to the actual machine learning classification, the data needs to be preprocessed and organized into a suitable format. The preparation involves several key steps: 1. Rasterization of the polygons to create a mask for the areas of interest. 2. Extraction of pixel values from the image data using the mask. 3. Creation of a feature matrix and target vector for classification from the image data.\n\n# https://rasterio.readthedocs.io/en/stable/api/rasterio.features.html#rasterio.features.rasterize\n# Rasterize the polygons\nrst: np.ndarray = rasterize(\n    shapes=slivers.to_crs(crs)[[\"geometry\", \"poly_id\"]]\n    .to_records(index=False)\n    .tolist(),\n    out_shape=feature_cube[\"Red\"].shape[1:],  # only x and y dimensions\n    transform=affine,\n)\n\n# Create a DataArray from the rasterized polygons\nlabel_cube = xr.DataArray(\n    rst,\n    coords={\"y\": feature_cube.y, \"x\": feature_cube.x},\n    name=\"poly_id\",\n)\n\n# Create a DataFrame from the image data\nfeature_frame: pd.DataFrame = (\n    feature_cube.drop_vars(\"spatial_ref\")\n    .to_dataframe()\n    .dropna()\n    .pivot_table(index=[\"y\", \"x\"], columns=\"quantile\", values=None)\n    # .unstack(level=\"quantile\")\n)\n\n\n# Rename the columns to include quantile information\ndef _rename_col(col: tuple[str, float]) -&gt; str:\n    return f\"{col[0]}_P{np.round(100 * col[1], 0).astype(int):03}\"\n\n\nfeature_frame.columns = [_rename_col(col) for col in feature_frame.columns]\n\n\n# Create a DataFrame from the label data (originally the polygons)\nlabel_frame: pd.DataFrame = (\n    label_cube.to_dataframe()\n    .reset_index()\n    .merge(slivers[[\"poly_id\", \"label\"]])\n    .set_index([\"y\", \"x\"])\n)\nSEED: int = 42\ntrain_frame: pd.DataFrame = (\n    label_frame.join(feature_frame)\n    .groupby(\"poly_id\")\n    .sample(frac=0.7, random_state=SEED)\n)\n\n# Prepare the features and target variable for classification\nX_train: pd.DataFrame = train_frame.drop(columns=[\"label\", \"poly_id\"])\ny_train: pd.Series = train_frame[\"label\"]\n\n_drop_idx: pd.Index = train_frame.index\ny_test: pd.Series = label_frame.join(feature_frame).drop(index=_drop_idx)[\"label\"]",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Forest Classification in Mozambique</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html#classify-forest-cover-with-scikit-learn",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.html#classify-forest-cover-with-scikit-learn",
+    "title": "17  Forest Classification in Mozambique",
+    "section": "17.3 Classify Forest Cover with Scikit-learn",
+    "text": "17.3 Classify Forest Cover with Scikit-learn\nWe will proceed with training a Random Forest classifier using the prepared data. This process involves the following key steps: 1. Data Splitting into Training and Testing Sets to evaluate the model’s performance. 2. Model Training on the Training Set. 3. Model Evaluation on the Testing Set. 4. Visualization of Results.\n\n# Classify Forest Cover with Scikit-learn\nclf_rf = RandomForestClassifier(\n    random_state=SEED,\n    class_weight=\"balanced\",\n    n_jobs=-1,\n)\n\nclf_rf.fit(X=X_train, y=(y_train == LandCoverType.TREE_COVER))\n\nRandomForestClassifier(class_weight='balanced', n_jobs=-1, random_state=42)In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.RandomForestClassifier?Documentation for RandomForestClassifieriFitted\n        \n            \n                Parameters\n                \n\n\n\n\nn_estimators \n100\n\n\n\ncriterion \n'gini'\n\n\n\nmax_depth \nNone\n\n\n\nmin_samples_split \n2\n\n\n\nmin_samples_leaf \n1\n\n\n\nmin_weight_fraction_leaf \n0.0\n\n\n\nmax_features \n'sqrt'\n\n\n\nmax_leaf_nodes \nNone\n\n\n\nmin_impurity_decrease \n0.0\n\n\n\nbootstrap \nTrue\n\n\n\noob_score \nFalse\n\n\n\nn_jobs \n-1\n\n\n\nrandom_state \n42\n\n\n\nverbose \n0\n\n\n\nwarm_start \nFalse\n\n\n\nclass_weight \n'balanced'\n\n\n\nccp_alpha \n0.0\n\n\n\nmax_samples \nNone\n\n\n\nmonotonic_cst \nNone\n\n\n\n\n            \n        \n    \n\n\nWith the trained model, we can now make predictions on the image data. The Random Forest classifier will be used to predict the forest cover for each pixel in the image. For that the image data needs to be prepared in a similar way as the training data, as the model expects essentially a vector of features.\n\n# Predict using the trained model\nclass_frame = pd.DataFrame(\n    clf_rf.predict(feature_frame),\n    index=feature_frame.index,\n    columns=[\"RF\"],\n)\n\n# Recreate the DataArray for the predicted forest cover\npredicted_forest = (\n    class_frame.to_xarray().rio.write_crs(crs).rio.write_transform(affine)\n)\n\n\n# Map the predicted forest classification\npredicted_forest.where(predicted_forest == 1).hvplot.image(\n    x=\"x\",\n    y=\"y\",\n    tiles=True,\n    cmap=\"greens\",\n    crs=crs,\n    hover=False,\n)\n\n\n\n\n\n  \n\n\n\n\nNow that we have completed the classification, we can have a look at the quality of the results. We can use various metrics to assess the accuracy of our classification. Here scikit-learn provides us with a convenient function to display a classification report. Finally after the classification is complete, we can save the results for future analysis.\n\n# Display the classification report\nprint(classification_report(y_test, class_frame.loc[y_test.index, \"RF\"]))\n\n              precision    recall  f1-score   support\n\n           0       0.00      0.00      0.00       0.0\n          10       0.00      0.00      0.00    4185.0\n          20       0.00      0.00      0.00     292.0\n          30       0.00      0.00      0.00     444.0\n          40       0.00      0.00      0.00     230.0\n          50       0.00      0.00      0.00       6.0\n          60       0.00      0.00      0.00      32.0\n          80       0.00      0.00      0.00      30.0\n          86       0.00      0.00      0.00      68.0\n          90       0.00      0.00      0.00      61.0\n\n    accuracy                           0.00    5348.0\n   macro avg       0.00      0.00      0.00    5348.0\nweighted avg       0.00      0.00      0.00    5348.0\n\n\n\n/home/runner/work/eo-datascience/eo-datascience/.conda_envs/environmental-remote-sensing/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.\n  _warn_prf(average, modifier, f\"{metric.capitalize()} is\", result.shape[0])\n/home/runner/work/eo-datascience/eo-datascience/.conda_envs/environmental-remote-sensing/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.\n  _warn_prf(average, modifier, f\"{metric.capitalize()} is\", result.shape[0])\n/home/runner/work/eo-datascience/eo-datascience/.conda_envs/environmental-remote-sensing/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.\n  _warn_prf(average, modifier, f\"{metric.capitalize()} is\", result.shape[0])\n/home/runner/work/eo-datascience/eo-datascience/.conda_envs/environmental-remote-sensing/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.\n  _warn_prf(average, modifier, f\"{metric.capitalize()} is\", result.shape[0])\n/home/runner/work/eo-datascience/eo-datascience/.conda_envs/environmental-remote-sensing/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.\n  _warn_prf(average, modifier, f\"{metric.capitalize()} is\", result.shape[0])\n/home/runner/work/eo-datascience/eo-datascience/.conda_envs/environmental-remote-sensing/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.\n  _warn_prf(average, modifier, f\"{metric.capitalize()} is\", result.shape[0])\n\n\n\n# Saving the results for future analysis\nsavepath = Path(f\"forest_classification_{year}.zarr\")\npredicted_forest.astype(np.uint8).to_zarr(\n    savepath,\n    zarr_format=2,\n    consolidated=False,\n    mode=\"w\",\n)\n\n&lt;xarray.backends.zarr.ZarrStore at 0x7f89fe663ba0&gt;",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>17</span>  <span class='chapter-title'>Forest Classification in Mozambique</span>"
+    ]
+  },
+  {
+    "objectID": "chapters/courses/environmental-remote-sensing/unit_02/09_inclass_deforestation.html",
+    "href": "chapters/courses/environmental-remote-sensing/unit_02/09_inclass_deforestation.html",
+    "title": "18  Deforestation Analysis in Mozambique",
+    "section": "",
+    "text": "18.1 A machine Learning Approach\nIn this notebook, we will focus on the classification of deforestation in Mozambique. We will be useing a Machine Learning approach to classify the forest cover (as explained in the previous notebook) and will be covering the deforestation here, where we will specifically have a look at the changes in forest cover over time.\nIt is assumed here that you are already familiar with the previous notebook, since we will be useing the forest cover classification as a basis for the deforestation analysis.\nfrom typing import Any\n\nimport matplotlib.colors as mcolors\nimport matplotlib.pyplot as plt\nimport xarray as xr\n\nfrom envrs.download_path import make_url\ncommon_url_params: dict[str, Any] = {\n    \"is_zip\": True,\n}\n\nurl_before = make_url(\n    \"forest_classification_2018.zarr.zip\",\n    **common_url_params,\n)\nurl_after = make_url(\n    \"forest_classification_2024.zarr.zip\",\n    **common_url_params,\n)\nurl_dc = make_url(\n    \"HLS_T36KXE_2024_b30_v2.zarr.zip\",\n    **common_url_params,\n)\n\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/forest_classification_2018.zarr.zip/raw?ref=main&lfs=true\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/forest_classification_2024.zarr.zip/raw?ref=main&lfs=true\nhttps://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/HLS_T36KXE_2024_b30_v2.zarr.zip/raw?ref=main&lfs=true\ncommon_params: dict[str, Any] = {\n    \"engine\": \"zarr\",\n    \"consolidated\": False,\n}\nforest_before = xr.open_dataarray(url_before, **common_params)\nforest_after = xr.open_dataarray(url_after, **common_params)\nimg = xr.open_dataset(url_dc, **common_params)\nbit_zero = 1 &lt;&lt; 0  # 0b01\nbit_one = 1 &lt;&lt; 1  # 0b10\nforest_label_value = 1\n# fmt: off\ndeforestation = (\n    (forest_before == forest_label_value) * bit_zero\n    + (forest_after == forest_label_value) * bit_one\n)\n# fmt: on\n\ndeforestation_value = int(\"0b01\", 2)  # before=1 and after=0 -&gt; was forest but not now\ndeforestation = deforestation.where(deforestation == deforestation_value)\ncmap_red = mcolors.ListedColormap([\"#FF2600\"])\ncmap_green = mcolors.ListedColormap([\"#00FF20\"])\nfig, ax = plt.subplots()\nimg[[\"Red\", \"Green\", \"Blue\"]].sel(quantile=0.5).to_dataarray().plot.imshow(\n    robust=True,\n    ax=ax,\n)\ndeforestation.squeeze().plot.imshow(ax=ax, alpha=1, cmap=cmap_red, add_colorbar=False)\nforest_after.where(forest_after == forest_label_value).squeeze().plot.imshow(\n    ax=ax,\n    alpha=0.3,\n    cmap=cmap_green,\n    add_colorbar=False,\n)\nplt.show()",
+    "crumbs": [
+      "Environmental Remote Sensing",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Deforestation Analysis in Mozambique</span>"
+    ]
+  },
+  {
     "objectID": "chapters/templates/prereqs-templates.html",
     "href": "chapters/templates/prereqs-templates.html",
     "title": "Templates",
