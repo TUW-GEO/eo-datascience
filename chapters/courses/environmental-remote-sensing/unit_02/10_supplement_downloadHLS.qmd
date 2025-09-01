@@ -1,0 +1,186 @@
+---
+title: Login
+jupyter: environmental-remote-sensing
+---
+
+```{python}
+from pathlib import Path
+
+import earthaccess as ea
+import geopandas as gpd
+import numpy as np
+import rasterio as rio
+
+from envrs import hls_tools as hls
+from envrs import rio_tools as rt
+from envrs.download_path import make_url
+```
+
+
+
+```{python}
+# are we authenticated?
+auth = ea.login()
+
+if not auth.authenticated:
+    # ask for credentials and persist them in a .netrc file
+    auth.login(strategy="interactive", persist=True)
+```
+
+## Identify the target datasets
+
+```{python}
+dataset_tree = ea.search_datasets(keyword="S30")
+```
+
+```{python}
+[d["umm"]["ShortName"] for d in dataset_tree]
+```
+
+## Query NASA datasets to identify overlapping datasets
+
+```{python}
+aoi_uri = make_url("HLSextent.geojson")
+
+aoi = gpd.read_file(aoi_uri)
+geometry = aoi.loc[0, "geometry"]
+
+bbox = geometry.bounds
+```
+
+```{python}
+granule_pile = ea.search_data(
+    short_name=["HLSL30", "HLSS30"],
+    cloud_hosted=True,
+    temporal=("2018-01-01T00:00:00", "2024-12-31T23:59:59"),
+    bounding_box=bbox,
+)
+```
+
+## Examine the contents of a granule
+
+```{python}
+first_granule = granule_pile[0]
+```
+
+```{python}
+first_granule
+```
+
+we can access to all the information about the granule with:
+
+```{python}
+dict(first_granule.items())
+```
+
+## Retain only one of the tiles, when the cloud cover is <90%
+
+```{python}
+min_valid = 10.0
+max_cloud = 100 - min_valid
+target_tile = "T36KXE"
+```
+
+```{python}
+layer_pile, name_pile = [], []
+for granule in granule_pile:
+    # Extract the relevant attributes
+    granule_attrs = hls.extract_extra_attrs(granule)
+
+    # Skip if the target tile does not match
+    if granule_attrs["MGRS_TILE_ID"] not in target_tile:
+        continue
+
+    # Skip if the cloud cover is too high
+    if float(granule_attrs["CLOUD_COVERAGE"]) > max_cloud:
+        continue
+
+    # ad the URI's of the selected rasters to the pile
+    layer_pile.extend(granule.data_links())
+    name_pile.append(granule)
+```
+
+## Format the dataframe of the downloads
+
+```{python}
+sel_frame = hls.harmonize_hls_frame(hls.tabulate_hls_uris(layer_pile))
+```
+
+## Drop the coastal aerosol and the angle bands: they will not be used
+
+```{python}
+sel_frame = sel_frame.drop(columns=["CoastalAerosol", "SZA", "SAA", "VZA", "VAA"])
+```
+
+## Perform download with conditions
+
+### Set the environment for the download:
+
+```{python}
+# https://github.com/nasa/HLS-Data-Resources/blob/main/python/tutorials/HLS_Tutorial.ipynb
+env_pairs = {
+    "GDAL_HTTP_COOKIEFILE": "~/cookies.txt",
+    "GDAL_HTTP_COOKIEJAR": "~/cookies.txt",
+    "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
+    "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": "TIF",
+    "GDAL_HTTP_UNSAFESSL": "YES",
+    "GDAL_HTTP_MAX_RETRY": "10",
+    "GDAL_HTTP_RETRY_DELAY": "0.5",
+}
+```
+
+```{python}
+OUT_DIR = Path(r"~/Downloads/hls/automated").expanduser()
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+```
+
+```{python}
+selected_columns = ["Blue", "Green", "Red", "NIRnarrow", "SWIR1", "SWIR2"]
+```
+
+```{python}
+with rio.Env(**env_pairs) as download_env:
+    for row_idx, (product_prefix, product_uris) in enumerate(sel_frame.iterrows()):
+        # Print progress
+        if row_idx % 100 == 0:
+            print(f"{row_idx:>04}", "/", sel_frame.shape[0], product_prefix)
+
+        # check if the fmask file exists, skip if that's the case
+        fmask_path = OUT_DIR / f"{product_prefix}_fmask.tif"
+        if fmask_path.is_file():
+            continue
+
+        # If does not exist, download and save
+        fmask_pairs, fmask_profiles, fmask_tags = rt.clipped_read(
+            product_uris[["Fmask"]], aoi
+        )
+        rt.write_raster(fmask_pairs, fmask_profiles, fmask_tags, fmask_path)
+
+        # Decompose the bit flags
+        fmask_number = next(iter(fmask_pairs.values()))
+        fmask_flags = np.flip(
+            np.unpackbits(np.expand_dims(fmask_number, axis=0), axis=0), axis=0
+        )
+
+        # Estimate the percentage of clear pixels
+        # (not cirrus, cloud core/adjacent or shadow casted by them)
+        is_clear = np.all(fmask_flags[0:4] == 0, axis=0)
+        perc_valid = 100 * np.sum(is_clear) / fmask_number.size
+
+        # Skip band download if the percentage of valid pixels is under threshold
+        if perc_valid < min_valid:
+            continue
+
+        # check if the band file exists, skip if that's the case
+        band_path = OUT_DIR / f"{product_prefix}_bands.tif"
+        if band_path.is_file():
+            continue
+
+        # read the bands
+        band_pairs, band_profiles, band_tags = rt.clipped_read(
+            product_uris[selected_columns], aoi
+        )
+
+        # Write to the hard drive
+        rt.write_raster(band_pairs, band_profiles, band_tags, band_path)
+```

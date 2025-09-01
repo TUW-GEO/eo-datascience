@@ -1,0 +1,283 @@
+---
+title: Deforestation detection
+jupyter: environmental-remote-sensing
+---
+
+
+
+## Imports
+
+```{python}
+import geopandas as gpd
+import hvplot.pandas
+import hvplot.xarray  # noqa
+import numpy as np
+import pandas as pd
+import xarray as xr
+
+from envrs.download_path import make_url
+```
+
+## Read the data
+
+```{python}
+# Read the cube
+cube_uri = make_url("HLS_clip4plots_both_b30_v20.zarr.zip", is_zip=True)
+
+full_cube = xr.open_dataset(
+    cube_uri,
+    engine="zarr",
+    consolidated=False,
+).compute()
+
+# Read the points, reproject tro match the datacube, set the index
+points_uri = make_url("timeline_points.geojson")
+points = (
+    gpd.read_file(points_uri)
+    .to_crs(full_cube["spatial_ref"].attrs["crs_wkt"])
+    .set_index("intact")
+)
+```
+
+## Specify the variables indicating cloud/shadow presence
+
+```{python}
+cirrus_col = "cirrus cloud"
+cloud_col = "cloud"
+adjacent_col = "adjacent to cloud"
+shadow_col = "cloud shadow"
+tainted_cols = [adjacent_col, cloud_col, cirrus_col, shadow_col]
+```
+
+## Select the clearest observations
+
+```{python}
+tainted_frame = (
+    full_cube[tainted_cols]
+    .to_dataarray(dim="mask")
+    .any(dim="mask")
+    .sum(dim=["x", "y"])
+    .to_dataframe(name="count_tainted")
+    .sort_values(by="count_tainted")
+)
+
+monthly_clearest = tainted_frame.groupby(pd.Grouper(freq="ME")).head(1)
+monthly_cube = full_cube.sel(time=monthly_clearest.index.values)
+
+fully_clear = tainted_frame[tainted_frame["count_tainted"] == 0]
+clear_cube = full_cube.sel(time=fully_clear.index.values)
+```
+
+## How an image time series looks like
+
+### Images need to be converted to 8 bits to set the color stretch
+
+```{python}
+def to_rgb8(cube, r, g, b, vmax, vmin=0):
+    selected = cube[[r, g, b]].to_dataarray("band")
+    stretched = (selected - vmin) / (vmax - vmin)
+
+    is_positive = (stretched >= 0) & np.isfinite(stretched)
+    positive = stretched.where(is_positive.all(dim="band"), 0)
+    clipped = (
+        np.clip(255 * positive, 0, 255)
+        .astype(np.uint8)
+        .expand_dims({"composite": [f"{r=}, {g=}, {b=}"]})
+    )
+    clipped["band"] = np.array(["r", "g", "b"], dtype="unicode")
+
+    return clipped
+
+
+def plot_rgb(*args, dimname="composite"):
+    return xr.concat(args, dim=dimname).hvplot.rgb(
+        x="x",
+        y="y",
+        bands="band",
+        by=dimname,
+        groupby="time",
+        subplots=True,
+        rasterize=True,
+        data_aspect=1,
+        xaxis=False,
+        yaxis=None,
+        widget_location="bottom",
+    )
+```
+
+## Plot a time series of the images
+
+```{python}
+plot_rgb(
+    to_rgb8(monthly_cube, r="Red", g="Green", b="Blue", vmax=0.15),
+    to_rgb8(monthly_cube, r="NIRnarrow", g="SWIR1", b="Red", vmax=0.40),
+)
+```
+
+## Plot just the "fully" clear images
+
+```{python}
+plot_rgb(
+    to_rgb8(clear_cube, r="Red", g="Green", b="Blue", vmax=0.15),
+    to_rgb8(clear_cube, r="NIRnarrow", g="SWIR1", b="Red", vmax=0.40),
+)
+```
+
+## Satellite pixel time series as tables
+
+### Pick two points one that has been deforested, and one that is intact
+
+```{python}
+# https://tutorial.xarray.dev/intermediate/indexing/advanced-indexing.html
+# #orthogonal-indexing-in-xarray
+sel_cube = full_cube.sel(
+    x=xr.DataArray(points.geometry.x, dims="intact"),
+    y=xr.DataArray(points.geometry.y, dims="intact"),
+    method="nearest",
+)
+```
+
+### Flatten (xarray dataset/"cube" to pandas dataframe/table)
+
+```{python}
+sel_frame = (
+    sel_cube.drop_vars("spatial_ref")
+    .to_dataframe()
+    .drop(columns=["x", "y"])
+    .reset_index()
+)
+```
+
+### Prepare auxiliary variables for plotting
+
+```{python}
+def normalized_difference(frame, positive, negative):
+    numerator = frame[positive] - frame[negative]
+    denominator = frame[positive] + frame[negative]
+    return numerator / denominator
+
+
+sel_frame["NDVI"] = normalized_difference(sel_frame, "NIRnarrow", "Red")
+sel_frame["NDMI"] = normalized_difference(sel_frame, "NIRnarrow", "SWIR1")
+sel_frame["DOY"] = sel_frame["time"].dt.dayofyear
+```
+
+### Split the table into intact and deforested
+
+```{python}
+deforested_frame = sel_frame[~sel_frame["intact"]]
+intact_frame = sel_frame[sel_frame["intact"]]
+```
+
+## Clouds and shadows taint our time series
+
+```{python}
+intact_frame.loc[:, "flag"] = "clear"
+intact_frame.loc[intact_frame[tainted_cols[1:]].any(axis=1), "flag"] = "cloud/shadow"
+intact_frame.loc[intact_frame[tainted_cols[0]], "flag"] = "adjacent"
+
+
+intact_frame.hvplot.scatter(
+    x="time", y="Green", by="flag", color=["green", "black", "orange"]
+)
+```
+
+## Filter out flagged observations
+
+```{python}
+intact_masked = intact_frame[~intact_frame[tainted_cols].any(axis=1)].copy()
+deforested_masked = deforested_frame[~deforested_frame[tainted_cols].any(axis=1)].copy()
+```
+
+## Removed the cloud, the timeline becomes clearer
+
+```{python}
+tetracolor_kwargs = {
+    "x": "time",
+    "y": ["Blue", "Green", "Red", "NIRnarrow"],
+    "color": ["blue", "green", "red", "darkgray"],
+}
+
+intact_masked.hvplot(**tetracolor_kwargs)  # .legend(loc="upper left", ncols=4);
+```
+
+## Spikes could be unmasked clouds/shadows
+
+A massive value difference respective to its neighbors indicates the presence of possible outliers
+
+```{python}
+def despike(frame, columns, min_spike, max_spike):
+    summed = frame[columns].sum(axis=1)
+
+    # Perform the selections
+    central = summed.iloc[1:-1]
+    prior = summed.shift(-1).iloc[1:-1]
+    posterior = summed.shift(1).iloc[1:-1]
+
+    # remove observations based on their saliency respective to their neighbors
+    spikyness = central - (prior + posterior) / 2
+    floor, ceiling = spikyness.quantile((min_spike, max_spike))
+    selected = central[spikyness.between(floor, ceiling)]
+
+    return frame.loc[selected.index]
+
+
+cutoff = 0.05
+band_names = ["Blue", "Green", "Red", "NIRnarrow", "SWIR1", "SWIR2"]
+
+intact_despiked = despike(intact_masked, band_names, cutoff, 1 - cutoff)
+deforested_despiked = despike(deforested_masked, band_names, cutoff, 1 - cutoff)
+```
+
+```{python}
+(
+    intact_masked.hvplot(x="time", y="NIRnarrow", color="k")
+    * intact_despiked.hvplot(x="time", y="NIRnarrow", color="darkgray")
+)
+```
+
+## The spikes as anomalies
+
+These spikes are anolalies on the context where they appear, but they may or
+may not be global outliers when compared with the full population.
+
+```{python}
+spike_frame = intact_masked.iloc[1:-1].drop(index=intact_despiked.index)
+```
+
+```{python}
+# DOY = day of the year
+(
+    intact_masked.hvplot.scatter(x="Red", y="NIRnarrow", c="DOY", colormap="twilight")
+    * spike_frame.hvplot.scatter(x="Red", y="NIRnarrow", marker="x", s=90, color="red")
+)
+```
+
+The isolated points far above and below the general population would be
+global outliers, whereas the rest were outliers on their specific context.
+
+## The signature of deforestation
+
+```{python}
+intact_despiked.hvplot(**tetracolor_kwargs)
+```
+
+```{python}
+deforested_despiked.hvplot(**tetracolor_kwargs)
+```
+
+## With Indices
+
+```{python}
+compare_frame = (
+    pd.concat({"deforested": deforested_despiked, "intact": intact_despiked}, axis=0)
+    .reset_index(names=["history", "index"])
+    .drop(columns="index")
+)
+```
+
+```{python}
+compare_frame.hvplot.line(
+    x="time", y="NDVI", by="history", color=["black", "limegreen"]
+)
+```

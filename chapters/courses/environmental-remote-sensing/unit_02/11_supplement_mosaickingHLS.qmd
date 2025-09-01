@@ -1,0 +1,134 @@
+---
+title: List the files
+jupyter: environmental-remote-sensing
+---
+
+```{python}
+from pathlib import Path
+
+import numpy as np
+import rioxarray as rxr
+import xarray as xr
+```
+
+```{python}
+from envrs.hls_tools import preprocess_bands, preprocess_fmask
+```
+
+```{python}
+PARENT_DIR = Path(r"~/Downloads/hls").expanduser()
+
+IN_DIR = PARENT_DIR / "automated"
+
+IN_DIR.mkdir(exist_ok=True, parents=True)
+```
+
+
+
+```{python}
+product, tile, res, version = "HLS", "T36KXE", "30", "v2.0"
+
+band_paths = sorted(IN_DIR.glob(f"{product}_{tile}_*{res}_{version}_bands.tif"))
+```
+
+```{python}
+fmask_paths = [p.parent / p.name.replace("_bands", "_fmask") for p in band_paths]
+```
+
+## Preprocess the Fmask
+
+```{python}
+fmask = xr.open_mfdataset(
+    fmask_paths,
+    chunks="auto",
+    concat_dim="time",
+    combine="nested",
+    preprocess=preprocess_fmask,
+    mask_and_scale=False,
+    engine="rasterio",
+    parallel=True,
+)
+```
+
+## Preprocess the bands
+
+```{python}
+bands = xr.open_mfdataset(
+    band_paths,
+    chunks="auto",
+    concat_dim="time",
+    combine="nested",
+    preprocess=preprocess_bands,
+    engine="rasterio",
+    parallel=True,
+    band_as_variable=True,
+)
+```
+
+## Make a raster definition
+
+```{python}
+example_bands = rxr.open_rasterio(band_paths[0])  # .encoding
+
+example_attrs = example_bands.attrs
+example_encoding = example_bands.encoding
+
+crs = example_bands.rio.crs
+transform = example_bands.rio.transform()
+```
+
+## Mask and make the yearly mosaics
+
+```{python}
+first_year = bands["time"].min().dt.year.item()
+last_year = bands["time"].max().dt.year.item()
+```
+
+```{python}
+out_attrs = {}
+out_encoding = {
+    "dtype": example_encoding["rasterio_dtype"],
+    "add_offset": example_attrs["add_offset"],
+    "scale_factor": example_attrs["scale_factor"],
+    "_FillValue": example_attrs["_FillValue"],
+    "zlib": True,
+}
+
+# What to exclude
+cloud_flags = ["cloud shadow", "adjacent to cloud", "cloud", "cirrus cloud"]
+
+# For every year
+for target_year in range(first_year, last_year + 1):
+    out_path = PARENT_DIR / f"{product}_{tile}_{target_year}_b{res}_{version}.nc"
+    if out_path.exists():
+        continue
+
+    # define what to mask
+    is_cloudy = (
+        fmask["masks"]
+        .sel(time=(fmask.time.dt.year == target_year), flag=cloud_flags)
+        .any(dim="flag")
+    )
+
+    # Mask the bands, calculate the quantiles
+    quantiles = (
+        bands.sel(time=(bands.time.dt.year == target_year))
+        .sortby("time")
+        .where(np.logical_not(is_cloudy))
+        .quantile(np.arange(0, 1.01, 0.1), dim="time", skipna=True)
+        .sortby("y", ascending=False)
+    )
+
+    # Apply the scaling
+    referenced = quantiles.rio.write_crs(crs).rio.write_transform(transform)
+
+    # set the attributes and the encoding
+    for band_name in quantiles:
+        referenced[band_name].attrs.update(long_name=band_name, **out_attrs)
+        referenced[band_name].encoding.update(**out_encoding)
+
+    # Write
+    referenced.to_netcdf(out_path)
+
+    print(target_year)
+```
