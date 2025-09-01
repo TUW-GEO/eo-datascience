@@ -41,8 +41,6 @@ book:
         - chapters/courses/environmental-remote-sensing/unit_02/07_inclass_multispectral_images.qmd
         - chapters/courses/environmental-remote-sensing/unit_02/08_inclass_forest_classification.qmd
         - chapters/courses/environmental-remote-sensing/unit_02/09_inclass_deforestation.qmd
-        - chapters/courses/environmental-remote-sensing/unit_02/10_supplement_downloadHLS.qmd
-        - chapters/courses/environmental-remote-sensing/unit_02/11_supplement_mosaickingHLS.qmd
   appendices:
     - part: chapters/templates/prereqs-templates.qmd
       chapters:
