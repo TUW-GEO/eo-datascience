@@ -400,7 +400,7 @@ background: #006699;
 <h2 data-number="18.1" class="anchored" data-anchor-id="a-machine-learning-approach"><span class="header-section-number">18.1</span> A machine Learning Approach</h2>
 <p>In this notebook, we will focus on the classification of deforestation in Mozambique. We will be useing a <code>Machine Learning</code> approach to classify the forest cover (as explained in the previous notebook) and will be covering the deforestation here, where we will specifically have a look at the changes in forest cover over time.</p>
 <p>It is assumed here that you are already familiar with the previous notebook, since we will be useing the forest cover classification as a basis for the deforestation analysis.</p>
-<div id="1408a271" class="cell" data-execution_count="1">
+<div id="44f81566" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.colors <span class="im">as</span> mcolors</span>
@@ -409,7 +409,7 @@ background: #006699;
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> envrs.download_path <span class="im">import</span> make_url</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="55ce0c16" class="cell" data-execution_count="2">
+<div id="a75077ce" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>common_url_params: <span class="bu">dict</span>[<span class="bu">str</span>, Any] <span class="op">=</span> {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"is_zip"</span>: <span class="va">True</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>}</span>
@@ -432,7 +432,7 @@ https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/forest_classi
 https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/HLS_T36KXE_2024_b30_v2.zarr.zip/raw?ref=main&amp;lfs=true</code></pre>
 </div>
 </div>
-<div id="2a8e0810" class="cell" data-execution_count="3">
+<div id="c37497ac" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>common_params: <span class="bu">dict</span>[<span class="bu">str</span>, Any] <span class="op">=</span> {</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"engine"</span>: <span class="st">"zarr"</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"consolidated"</span>: <span class="va">False</span>,</span>
@@ -441,7 +441,7 @@ https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/HLS_T36KXE_20
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>forest_after <span class="op">=</span> xr.open_dataarray(url_after, <span class="op">**</span>common_params)</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>img <span class="op">=</span> xr.open_dataset(url_dc, <span class="op">**</span>common_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="d5012a6c" class="cell" data-execution_count="4">
+<div id="0d5a8ad4" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bit_zero <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="dv">0</span>  <span class="co"># 0b01</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>bit_one <span class="op">=</span> <span class="dv">1</span> <span class="op">&lt;&lt;</span> <span class="dv">1</span>  <span class="co"># 0b10</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>forest_label_value <span class="op">=</span> <span class="dv">1</span></span>
@@ -455,7 +455,7 @@ https://git.geo.tuwien.ac.at/api/v4/projects/1266/repository/files/HLS_T36KXE_20
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>deforestation_value <span class="op">=</span> <span class="bu">int</span>(<span class="st">"0b01"</span>, <span class="dv">2</span>)  <span class="co"># before=1 and after=0 -&gt; was forest but not now</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>deforestation <span class="op">=</span> deforestation.where(deforestation <span class="op">==</span> deforestation_value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="7434e7d5" class="cell" data-execution_count="5">
+<div id="c81bbcbb" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cmap_red <span class="op">=</span> mcolors.ListedColormap([<span class="st">"#FF2600"</span>])</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cmap_green <span class="op">=</span> mcolors.ListedColormap([<span class="st">"#00FF20"</span>])</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>

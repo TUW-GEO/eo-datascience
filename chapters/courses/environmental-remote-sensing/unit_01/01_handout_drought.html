@@ -424,6 +424,7 @@ window.Quarto = {
   <li><a href="#normalization-and-anomaly-detection" id="toc-normalization-and-anomaly-detection" class="nav-link" data-scroll-target="#normalization-and-anomaly-detection"><span class="header-section-number">10.5</span> Normalization and Anomaly Detection</a></li>
   <li><a href="#drought-anomaly-detection" id="toc-drought-anomaly-detection" class="nav-link" data-scroll-target="#drought-anomaly-detection"><span class="header-section-number">10.6</span> Drought Anomaly Detection</a></li>
   <li><a href="#monitoring-drought-in-time-and-space" id="toc-monitoring-drought-in-time-and-space" class="nav-link" data-scroll-target="#monitoring-drought-in-time-and-space"><span class="header-section-number">10.7</span> Monitoring Drought in Time and Space</a></li>
+  <li><a href="#appendix-fibonacci-grid" id="toc-appendix-fibonacci-grid" class="nav-link" data-scroll-target="#appendix-fibonacci-grid"><span class="header-section-number">10.8</span> Appendix: Fibonacci Grid</a></li>
   </ul>
 </nav>
     </div>
@@ -1769,15 +1770,10 @@ s^{\bar{\text{SM}}_i} &amp;\quad \text{: long-term standard deviation soil moist
 </div>
 <p>This temporospatial analysis (in time and space) confirms that 2015/2016 was particularly pronounced in the south of the country surrounding the region of Chokwé. But this intense drought was also prevalent in the northern districts neighbouring Malawi. This is something that would not be seen in a spot-wise analysis.</p>
 <p>In the next notebooks, we will compare this microwave-based technique to other indicators of drought such as SPEI and vegetation-based indicators of drought (NDVI).</p>
-
-
 </section>
-<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
-<hr>
-<ol>
-<li id="fn1"><p><a href="https://www.eumetsat.int/">European Organisation for the Exploitation of Meteorological Satellites</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>The Climate and Forecast (CF) Conventions are standards for NetCDF files that define metadata, including variable names, units, and other attributes, to ensure interoperability and consistency in climate and forecast data handling.</p>
-<p>The H SAF ASCAT SSM data is presented on an irregular grid known as the Fibonacci grid (González, 2010). This grid offers advantages for e.g., statistical calculations on the data by reducing errors caused by distortions and non-uniform weighting of point contributions. For instance, when comparing areas over a wide latitudinal range, a regular longitude-latitude grid can lead to unequal weighting, as data points become more densely packed farther from the equator (see table). However, working with irregular grids can be more challenging. We will provide you with some useful techniques to simplify your work.</p>
+<section id="appendix-fibonacci-grid" class="level2" data-number="10.8">
+<h2 data-number="10.8" class="anchored" data-anchor-id="appendix-fibonacci-grid"><span class="header-section-number">10.8</span> Appendix: Fibonacci Grid</h2>
+<p>The H SAF ASCAT SSM data is presented on an irregular grid known as the Fibonacci grid (González, 2010)<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. This grid offers advantages for e.g., statistical calculations on the data by reducing errors caused by distortions and non-uniform weighting of point contributions. For instance, when comparing areas over a wide latitudinal range, a regular longitude-latitude grid can lead to unequal weighting, as data points become more densely packed farther from the equator (see table). However, working with irregular grids can be more challenging. We will provide you with some useful techniques to simplify your work.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 16%">
@@ -1819,7 +1815,15 @@ s^{\bar{\text{SM}}_i} &amp;\quad \text{: long-term standard deviation soil moist
 </tr>
 </tbody>
 </table>
-<p>Á. González, 2010, Measurement of Areas on a Sphere Using Fibonacci and Latitude-Longitude Lattices, Math Geosci, vol.&nbsp;42, no. 1, pp.&nbsp;49-64, doi: <a href="https://doi.org/10.1007/s11004-009-9257-x">10.1007/s11004-009-9257-x</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p><a href="https://www.eumetsat.int/">European Organisation for the Exploitation of Meteorological Satellites</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>The Climate and Forecast (CF) Conventions are standards for NetCDF files that define metadata, including variable names, units, and other attributes, to ensure interoperability and consistency in climate and forecast data handling.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Á. González, 2010, Measurement of Areas on a Sphere Using Fibonacci and Latitude-Longitude Lattices, Math Geosci, vol.&nbsp;42, no. 1, pp.&nbsp;49-64, doi: <a href="https://doi.org/10.1007/s11004-009-9257-x">10.1007/s11004-009-9257-x</a>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 
