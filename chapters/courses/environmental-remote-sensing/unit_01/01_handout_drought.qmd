@@ -60,18 +60,6 @@ SSM values are reported as the degree of saturation, indicating how much of the 
 [^2]: The Climate and Forecast (CF) Conventions are standards for
     NetCDF files that define metadata, including variable names, units, and other attributes, to ensure interoperability and consistency in climate and forecast data handling.
 
-    The H SAF ASCAT SSM data is presented on an irregular grid known as the Fibonacci grid (González, 2010). This grid offers advantages for e.g., statistical calculations on the data by reducing errors caused by distortions and non-uniform weighting of point contributions. For instance, when comparing areas over a wide latitudinal range, a regular longitude-latitude grid can lead to unequal weighting, as data points become more densely packed farther from the equator (see table). However, working with irregular grids can be more challenging. We will provide you with some useful techniques to simplify your work.
-
-    | Feature             | Regular Grids                                      | Irregular Grids                                      |
-    |---------------------|----------------------------------------------------|------------------------------------------------------|
-    | **Structure**       | Uniform spacing and cell size                      | Variable spacing and cell size                       |
-    | **Data Distribution**| Evenly distributed data points                   | Densely placed data points in areas of interest      |
-    | **Computational Efficiency** | Highly efficient for processing and visualization | More complex and time-consuming computations         |
-    | **Benefits**        | - Simplicity<br>- Computational efficiency<br>- Ease of implementation | - Detailed representation<br>- Flexibility<br>- Accurate spatial heterogeneity |
-    | **Downsides**       | - May lack detail in complex areas<br>- Uneven sampling weights in statistics | - Increased computational complexity<br>- More challenging to implement |
-
-    Á. González, 2010, Measurement of Areas on a Sphere Using Fibonacci and Latitude-Longitude Lattices, Math Geosci, vol. 42, no. 1, pp. 49-64, doi: [10.1007/s11004-009-9257-x](https://doi.org/10.1007/s11004-009-9257-x).
-
 ```{python}
 locations = {
     "Muanza": {"latitude": -18.9064758, "longitude": 34.7738921},
@@ -259,3 +247,17 @@ df[df.zscore <= 0].hvplot.points(
 This temporospatial analysis (in time and space) confirms that 2015/2016 was particularly pronounced in the south of the country surrounding the region of Chokwé. But this intense drought was also prevalent in the northern districts neighbouring Malawi. This is something that would not be seen in a spot-wise analysis.
 
 In the next notebooks, we will compare this microwave-based technique to other indicators of drought such as SPEI and vegetation-based indicators of drought (NDVI).
+
+## Appendix: Fibonacci Grid
+
+The H SAF ASCAT SSM data is presented on an irregular grid known as the Fibonacci grid (González, 2010)[^3]. This grid offers advantages for e.g., statistical calculations on the data by reducing errors caused by distortions and non-uniform weighting of point contributions. For instance, when comparing areas over a wide latitudinal range, a regular longitude-latitude grid can lead to unequal weighting, as data points become more densely packed farther from the equator (see table). However, working with irregular grids can be more challenging. We will provide you with some useful techniques to simplify your work.
+
+| Feature             | Regular Grids                                      | Irregular Grids                                      |
+|---------------------|----------------------------------------------------|------------------------------------------------------|
+| **Structure**       | Uniform spacing and cell size                      | Variable spacing and cell size                       |
+| **Data Distribution**| Evenly distributed data points                   | Densely placed data points in areas of interest      |
+| **Computational Efficiency** | Highly efficient for processing and visualization | More complex and time-consuming computations         |
+| **Benefits**        | - Simplicity<br>- Computational efficiency<br>- Ease of implementation | - Detailed representation<br>- Flexibility<br>- Accurate spatial heterogeneity |
+| **Downsides**       | - May lack detail in complex areas<br>- Uneven sampling weights in statistics | - Increased computational complexity<br>- More challenging to implement |
+
+[^3]: Á. González, 2010, Measurement of Areas on a Sphere Using Fibonacci and Latitude-Longitude Lattices, Math Geosci, vol. 42, no. 1, pp. 49-64, doi: [10.1007/s11004-009-9257-x](https://doi.org/10.1007/s11004-009-9257-x).
