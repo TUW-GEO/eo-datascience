@@ -12,13 +12,16 @@ dependencies:
   - fiona
   - flake8-nb
   - folium
-  - geopandas
   - geoviews
   - hda
   - hvplot
   - isort
   - importlib-metadata=4.13.0
-  - jupyter
+  - jupyter==1.1.1
+  - jupyterlab==4.2.5
+  - jupyterlab_server==2.27.3
+  - jupyterlab_widgets==3.0.13
+  - jupyter-server-proxy
   - jupyter_bokeh
   - lxml
   - mamba
@@ -42,4 +45,5 @@ dependencies:
       - pynetcf
       - pre-commit
       - pyswi
-      - .
+      - pyviz_comms==3.0.4
+      - ./environmental-remote-sensing
