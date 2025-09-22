@@ -65,9 +65,7 @@ def convert_bibliography(nb_path="./notebooks/references.ipynb", out=None, save=
     nb_path = Path(nb_path)
     if nb_path.exists():
         nb = nbformat.read(nb_path, as_version=4)
-        nb.cells[
-            0
-        ].source = """# References
+        nb.cells[0].source = """# References
 ```{bibliography}
 :style: plain
 ```

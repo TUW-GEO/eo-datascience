@@ -1,0 +1,441 @@
+---
+title: Exercise 1
+jupyter: environmental-remote-sensing
+---
+
+**Making Publication Ready Drought Maps**
+
+
+## Overview
+
+Creating publication-ready maps of drought events using H SAF ASCAT Surface Soil Moisture (SSM) data involves several steps, including data acquisition, pre-processing, analysis, and visualization. Below is a step-by-step guide to help you through this process using Python, specifically with the  [`matplotlib`](https://matplotlib.org/) and  [`cartopy`](https://scitools.org.uk/cartopy/docs/latest/) libraries for visualization.
+
+- **Step 1: Data Acquisition**: First, you need to acquire the H SAF ASCAT SSM data. This data is typically available from satellite data providers or specialized repositories. For this example, the data is again prepared, but we will look into data access in another notebook.
+
+- **Step 2: Data Pre-processing**: Pre-process the data to calculate monthly aggregated Z-scores. This has already been done for the dataset used here. For the best results it would then be necessary to resample the data from the Fibonacci grid to a longitude/latitude grid ([WGS84](https://en.wikipedia.org/wiki/World_Geodetic_System)). We will be using [`pyresample`](https://pyresample.readthedocs.io/en/latest/index.html).
+
+
+- **Step 3: Analysis**: Identify drought events based on the Z-scores. A common threshold for drought identification is a Z-score of -1 or lower. We won't delve into this much at this point, but we will return to it in notebook 3.
+
+- **Step 4: Visualization**: Use  `matplotlib` and  `cartopy` to create publication-ready maps.
+
+## Imports
+
+
+```{python}
+import os
+
+os.environ["PROJ_DATA"] = "/opt/conda/share/proj/proj.db"
+
+import cartopy.crs as ccrs
+import geopandas as gpd
+import hvplot.pandas  # noqa
+import matplotlib.dates as mdates  # noqa
+import matplotlib.pyplot as plt
+import pandas as pd
+import rioxarray  # noqa
+import xarray as xr
+from cartopy.mpl.ticker import (
+    LatitudeFormatter,
+    LatitudeLocator,
+    LongitudeFormatter,
+    LongitudeLocator,
+)
+from fibgrid.realization import FibGrid
+from pyresample import create_area_def, geometry
+from pyresample.kd_tree import resample_gauss
+from shapely.geometry import mapping
+
+from envrs.download_path import make_url
+```
+
+## Loading Soil Moisture and Anomaly Data
+
+As before, we load the data as a `pandas.DataFrame`.
+
+```{python}
+url = make_url("ascat-6_25_ssm_monthly.csv")
+df_month = pd.read_csv(
+    url,
+    index_col=["time", "location_id"],
+    parse_dates=["time"],
+)
+
+df_month.head()
+```
+
+## Creating Timeseries Plots
+
+First, we will look how to create timeseries plot with `matplotlib`. For this we will first select a coordinate from the dataset. To do this we need to obtain the nearest `location_id` with the `FibGrid` package. In this example we will again extract the location for Muanza.
+
+```{python}
+grid = FibGrid(6.25)
+location_id = grid.find_nearest_gpi(lat=-18.9064758, lon=34.7738921)[0]  # Muanza
+location_id
+```
+
+we can then use the returned location to subset the dataset for the timeseries of that location.
+
+```{python}
+df_muanza = df_month[df_month.index.get_level_values("location_id") == location_id]
+```
+
+Plotting the timeseries as a `matplotlib` plot is now straightforward with the `Pandas` method `plot`.
+
+```{python}
+ax = df_muanza.reset_index("location_id")["surface_soil_moisture"].plot()
+ax.set_ylabel("surface soil moisture (%)")
+ax.set_xlabel("")
+```
+
+Now it is your turn. Select a longitude and latitude in Mozambique and try to plot the timeseries.
+
+*Note, not all locations have valid surface soil moisture retrievals from H SAF ASCAT and thus won't return data.*
+
+```{python}
+# Your timeseries goes here
+```
+
+## Creating Drought Maps
+### Selection of a Time Window
+
+First, we will select a time window and quickly plot the results with `hvplot` as we did in notebook 1.
+
+```{python}
+quicklook_args = {
+    "x": "longitude",
+    "y": "latitude",
+    "c": "zscore",
+    "x_sampling": 0.08,
+    "y_sampling": 0.08,
+    "rasterize": True,
+    "crs": ccrs.PlateCarree(),
+    "tiles": True,
+    "cmap": "reds_r",
+    "clim": (-4, 0),
+    "frame_width": 500,
+    "clabel": "Drought anomaly",
+}
+selected_date = "2016-01-01"
+df_month_20260101 = df_month.loc[selected_date]
+df_month_20260101.hvplot.points(**quicklook_args)
+```
+
+## Resampling the Fibonacci grid
+
+For the publication ready plot, we are going to resample the data from our Fibonacci grid to a regular longitude/latitude grid. we do this so that we obtain more fine grained control on the resampling technique. We do this with the [`pyresample`](https://pyresample.readthedocs.io/en/latest/index.html) and by using a Gaussian filter for the resampling. Gaussian resampling uses a kernel to estimate a local mean values, where the weights of the observation decreases towards the edges of the kernel. The shape of the Gaussian curve can be modified with the `sigma` parameter.
+
+Here you ca see a Gaussian kernel of 3*3 and a sigma of 1.
+
+![Source: [geeksforgeeks](https://media.geeksforgeeks.org/wp-content/uploads/20201216123116/3x3GaussianKernel.png)](https://media.geeksforgeeks.org/wp-content/uploads/20201216123116/3x3GaussianKernel.png)
+
+Now let's apply this to our data.
+
+*You don't have to understand all code here, but, at least, get an impression of the processes involved in getting good quality figures*
+
+```{python}
+def clip_array_to_shape_file(da: xr.DataArray, clip_shape: geometry) -> xr.DataArray:
+    """Clip Border.
+
+    Parameters
+    ----------
+    da: Xarray.DataArray
+        Raster of surface soil moisture data
+    clip_shape: shapely.Geometry
+        Border of country, province, or district
+
+    Returns
+    -------
+    Xarray.DataArray
+        Clipped raster of surface soil moisture data
+
+    """
+    return da.rio.clip(
+        clip_shape.geometry.apply(mapping), clip_shape.crs, drop=False, invert=False
+    )
+
+
+def resample_fibgrid_to_lonlat(df: pd.DataFrame) -> tuple[xr.DataArray, ccrs.CRS]:
+    """Fibonacci to Longitude/Latitude Grid.
+
+    Parameters
+    ----------
+    df: Pandas.DataFrame
+        Longitude/Latitude Point Data
+
+    Returns
+    -------
+    tuple[Xarray.DataArray, cartopy.crs.CRS]
+        Raster of surface soil moisture data and Cartopy CRS for plotting
+
+    """
+    area_def = create_area_def(
+        "mozambique_area",
+        {"proj": "longlat", "datum": "WGS84"},
+        area_extent=[
+            30.315,
+            -27.49,
+            41.07,
+            -10.20,
+        ],
+        resolution=0.05,
+        units="degrees",
+        description="Global 0.01x0.01 degree lat-lon grid",
+    )
+
+    data = df.zscore.to_numpy()
+    lons = df.longitude.to_numpy()
+    lats = df.latitude.to_numpy()
+
+    swath_def = geometry.SwathDefinition(lons=lons, lats=lats)
+
+    result = resample_gauss(
+        swath_def,
+        data,
+        area_def,
+        radius_of_influence=7500,
+        sigmas=3750,
+        fill_value=None,
+    )
+    lons, lats = area_def.get_proj_vectors()
+    da = xr.DataArray(
+        result,
+        dims=("latitude", "longitude"),
+        coords={"latitude": lats, "longitude": lons},
+    ).rio.write_crs(area_def.crs)
+
+    country_border = gpd.read_file(make_url("country_border_10m.gpkg"))
+
+    da_clipped = clip_array_to_shape_file(da, country_border)
+    return da_clipped, area_def.to_cartopy_crs()
+
+
+da, crs = resample_fibgrid_to_lonlat(df_month_20260101)
+da
+```
+
+The returned object is a [`xarray`](https://docs.xarray.dev/en/stable/index.html) DataArray. Xarray is a solution to work with multi-dimensional arrays. We will introduce this package into more detail later on, but for now we use it mainly for plotting.
+
+### Initial Plot
+
+Now we are ready for plotting with `matplotlib` and `cartopy`. First we tell `matplotlib` which reference system to use for the map projection.
+
+```{python}
+projection = ccrs.PlateCarree()
+projection
+```
+
+Then we tell `matplotlib` what projection the data has.
+
+```{python}
+crs
+```
+
+Now we can start plotting our resampled data.
+
+```{python}
+ax = plt.axes(projection=projection)
+da.plot(ax=ax, transform=crs)
+```
+
+### Basemap with Cartopy
+
+Now we further populate our plot with feature that we usually present on maps. We will now first formulate a canvas with an empty map. To start of we will define the maps size and printed resolution as well as the desired projection.
+
+```{python}
+fig = plt.figure(figsize=(8, 8), dpi=150)
+ax = plt.axes(projection=projection)
+```
+
+Then we will add some graticule grid lines and coordinates as well as the country borders.
+
+```{python}
+fig = plt.figure(figsize=(8, 8), dpi=150)
+ax = plt.axes(projection=projection, frameon=True)
+
+# Map features
+gl = ax.gridlines(
+    draw_labels=True,
+    linewidth=0.6,
+    color="gray",
+    alpha=0.5,
+    linestyle="-.",
+)
+gl.xlabel_style = {"size": 7, "color": "gray"}
+gl.ylabel_style = {"size": 7, "color": "gray"}
+gl.top_labels, gl.right_labels = False, False
+gl.ylocator = LatitudeLocator()
+gl.xlocator = LongitudeLocator()
+gl.xformatter = LongitudeFormatter()
+gl.yformatter = LatitudeFormatter()
+
+# Border
+country_border = gpd.read_file(make_url("country_border_10m.gpkg"))
+ax.add_geometries(
+    country_border.geometry,
+    crs=projection,
+    facecolor="none",
+    edgecolor="black",
+    linewidth=2,
+)
+
+# For viewing we set the extent
+ax.set_extent(crs.bounds, crs=crs)
+```
+
+Now we are ready to plot our data on to the base map.
+
+```{python}
+fig = plt.figure(figsize=(8, 8), dpi=150)
+ax = plt.axes(projection=projection)
+
+# Map features
+gl = ax.gridlines(
+    draw_labels=True,
+    linewidth=0.6,
+    color="gray",
+    alpha=0.5,
+    linestyle="-.",
+)
+gl.xlabel_style = {"size": 7, "color": "gray"}
+gl.ylabel_style = {"size": 7, "color": "gray"}
+gl.top_labels, gl.right_labels = False, False
+gl.ylocator = LatitudeLocator()
+gl.xlocator = LongitudeLocator()
+gl.xformatter = LongitudeFormatter()
+gl.yformatter = LatitudeFormatter()
+
+ax.add_geometries(
+    country_border.geometry,
+    crs=projection,
+    facecolor="none",
+    edgecolor="black",
+    linewidth=2,
+)
+
+# Data
+levels = [-3, -2.5, -2, -1.5, -1, 0]
+im = da.plot(
+    ax=ax,
+    transform=crs,
+    cmap="Reds_r",
+    add_colorbar=False,
+    levels=levels,
+    alpha=0.8,
+)
+```
+
+In a final stage, we can add a color bar, so that users can interpret the data. In addition, we add a title to the plot that tell us about the main content of the data.
+
+```{python}
+fig = plt.figure(figsize=(8, 8), dpi=150)
+ax = plt.axes(projection=projection)
+
+gl = ax.gridlines(
+    draw_labels=True,
+    linewidth=0.6,
+    color="gray",
+    alpha=0.5,
+    linestyle="-.",
+)
+
+gl.xlabel_style = {"size": 7, "color": "gray"}
+gl.ylabel_style = {"size": 7, "color": "gray"}
+
+gl.top_labels, gl.right_labels = False, False
+
+gl.ylocator = LatitudeLocator()
+gl.xlocator = LongitudeLocator()
+gl.xformatter = LongitudeFormatter()
+gl.yformatter = LatitudeFormatter()
+
+ax.add_geometries(
+    country_border.geometry,
+    crs=projection,
+    facecolor="none",
+    edgecolor="black",
+    linewidth=2,
+)
+
+# Data
+levels = [-3, -2.5, -2, -1.5, -1, 0]
+im = da.plot(
+    ax=ax,
+    transform=crs,
+    cmap="Reds_r",
+    add_colorbar=False,
+    levels=levels,
+    alpha=0.8,
+)
+
+# Color bar
+cbar_kwargs = {
+    "orientation": "horizontal",
+    "shrink": 0.6,
+    "pad": 0.05,
+    "aspect": 40,
+    "label": "Drought Severity",
+    "spacing": "proportional",
+}
+cbar = plt.colorbar(im, **cbar_kwargs)
+cbar.set_ticks(levels)
+cbar.set_ticklabels(["", "Extreme", "Severe", "Moderate", "Mild", "Normal"])
+cbar.ax.tick_params(labelsize=9, rotation=45)  # Set custom labels
+
+# Title
+fancy_datetime = pd.to_datetime(selected_date).strftime("%d %B %Y")
+title = plt.title(f"Soil moisture anomaly over Maputo ({fancy_datetime})")
+```
+
+### Drought in Maputo
+
+Now it is your turn! You will create two side-by-side subplots comparing January 1st of 2015 with 2016 for the Province of Maputo. Use the following polygons for sub-setting the province. We already defined `clip_array_to_shape_file`, which helps with clipping the raster data according to the polygons.
+
+```{python}
+province_border = gpd.read_file(make_url("province_border_10m.gpkg"))
+border_maputo = province_border[province_border.shapeName == "Maputo"]
+da_maputo_2016 = clip_array_to_shape_file(da, border_maputo)
+da_maputo_2016
+```
+
+Use `subplots` to obtain a gridded layout.
+
+```{python}
+fig, axes = plt.subplots(
+    1, 2, figsize=(8, 8), dpi=150, subplot_kw={"projection": projection}
+)
+```
+
+Now resample the data for the additional time window.
+
+```{python}
+da_2015, crs = resample_fibgrid_to_lonlat(df_month.loc["2015-01-01"])
+da_maputo_2015 = clip_array_to_shape_file(da_2015, border_maputo)
+```
+
+Add the data to the subplots and make the plots pretty again
+
+```{python}
+fig, axes = plt.subplots(
+    1, 2, figsize=(8, 8), dpi=150, subplot_kw={"projection": projection}
+)
+da_maputo_2015.plot(
+    ax=axes[0],
+    transform=crs,
+    cmap="Reds_r",
+    add_colorbar=False,
+    levels=levels,
+    alpha=0.8,
+)
+da_maputo_2016.plot(
+    ax=axes[1],
+    transform=crs,
+    cmap="Reds_r",
+    add_colorbar=False,
+    levels=levels,
+    alpha=0.8,
+)
+bounds_maputo = tuple(border_maputo.geometry.bounds.to_numpy()[0, [0, 2, 1, 3]])
+axes[0].set_extent(bounds_maputo, crs=crs)
+axes[1].set_extent(bounds_maputo, crs=crs)
+```

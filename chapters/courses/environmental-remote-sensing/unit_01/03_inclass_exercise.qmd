@@ -1,0 +1,174 @@
+---
+title: Exercise 3
+jupyter: environmental-remote-sensing
+---
+
+**Drought Indicators based on Soil Moisture Data**
+
+## Overview
+
+In this exercise you will calculate some alternatives to the Z score anomaly detection; namely, the Soil Moisture Anomaly Percentage Index (SMAPI) and the modified Z sore. A comprehensive overview of drought indicators can be found in Vreugdenhil et al., 2022[^1]
+
+
+
+$$
+\begin{aligned}
+\text{ Z score: }  &\quad  z_{k,i} = \frac{\text{SM}_{k,i} - \bar{\text{SM}}_i}{s^{\bar{\text{SM}}_i}}  \\
+\text{ SMAPI: }  &\quad  I_{k, i} =  \frac{\text{SM}_{k, i} - \bar{\text{SM}}_i}{ \bar{\text{SM}}_i} \times 100 \\
+\text{ Modified Z score: }  &\quad  z_{k,i}^* = 0.6745 \frac{\text{SM}_{k,i} - \tilde{\text{SM}}_i}{\text{MAD}_i} &\quad \text{MAD} = \text{median} \left( \left| x_i - \tilde{x} \right| \right)
+\end{aligned}
+$$
+
+where:
+
+$$
+\begin{align}
+\text{SM}_{k,i} &\quad \text{: soil moisture for specific period (e.g., month) (} \; i \; \text{) and year (} \; k \; \text{)}\\
+\bar{\text{SM}}_i &\quad \text{: long-term mean soil moisture for specific period (e.g., month) (} \; i \; \text{)} \\
+\tilde{\text{SM}}_i &\quad \text{: long-term median soil moisture for specific period (e.g., month) (} \; i \; \text{)} \\
+s^{\bar{\text{SM}}_i} &\quad \text{: long-term standard deviation soil moisture for specific period (e.g., month) (} \; i \; \text{)} \\
+\text{MAD}_i &\quad \text{: long-term median absolute deviation soil moisture for specific period (e.g., month) (} \; i \; \text{)}
+\end{align}
+$$
+
+[^1]: Vreugdenhil, Mariette, Isabella Greimeister-Pfeil, Wolfgang Preimesberger, et al. 2022. “Microwave Remote Sensing for Agricultural Drought Monitoring: Recent Developments and Challenges.” Frontiers in Water 4 (November). [doi: frwa.2022.1045451](https://doi.org/10.3389/frwa.2022.1045451).
+
+## Imports
+
+
+```{python}
+import hvplot.pandas  # noqa
+import pandas as pd
+from envrs.download_path import make_url
+```
+
+## Loading Soil Moisture Data
+
+We will Surface Soil Moisture (SSM) time series for Buzi, Chokwé, Mabalane, Mabote and Muanza ASCAT. As before, we load the data as a `pandas.DataFrame`.
+
+```{python}
+url = make_url("ascat-6_25_ssm_timeseries.csv")
+ts = pd.read_csv(
+    url,
+    index_col="time",
+    parse_dates=True,
+)
+```
+
+## Calculation of Drought Indicators
+
+Calculation of Drought Indicators will involve two steps:
+
+1. Translate the equation into `pandas` math operations
+2. Aggregate the time series
+2. Apply the function to a time series grouped for each location (`"name"`) and the month (`ts_monthly.index.month`).
+
+```{python}
+def zscore(x: pd.Series) -> pd.Series:
+    """Z Score.
+
+    Parameters
+    ----------
+    x : pd.Series
+        Monthly aggregated surface soil moisture values
+
+
+    Returns
+    -------
+    Z scores : pd.Series
+
+    """
+    return (x - x.mean()) / x.std()
+```
+
+```{python}
+ts_monthly = (
+    ts.groupby([pd.Grouper(freq="ME"), "name"])
+    .surface_soil_moisture.mean()
+    .reset_index(level="name")
+)
+```
+
+```{python}
+ts_monthly["zscore"] = ts_monthly.groupby(
+    [ts_monthly.index.month, "name"]
+).surface_soil_moisture.transform(zscore)
+ts_monthly.hvplot.line(
+    x="time",
+    y="zscore",
+    by="name",
+    frame_width=800,
+    padding=(0.01, 0.1),
+)
+```
+
+Now it is your turn to do the same for "SMAPI" and the "Modified Z score" by filling in the blanks `...`.
+
+## Soil Moisture Anomaly Percentage Index (SMAPI)
+
+```{python}
+def smapi(x: pd.Series) -> pd.Series:  # noqa: D103
+    return  # noqa: ADD YOUR CODE HERE
+```
+
+```{python}
+# noqa: ADD YOUR CODE HERE
+```
+
+```{python}
+ts_monthly["smapi"] = ts_monthly.groupby(
+    [ts_monthly.index.month, "name"]
+).surface_soil_moisture.transform(smapi)
+ts_monthly.hvplot.line(
+    x="time",
+    y="smapi",
+    by="name",
+    frame_width=800,
+    padding=(0.01, 0.1),
+)
+```
+
+## Modified Z sore.
+
+```{python}
+def modified_zscore(x: pd.Series) -> pd.Series:  # noqa: D103
+    return  # noqa: ADD YOUR CODE HERE
+```
+
+```{python}
+# noqa: ADD YOUR CODE HERE
+```
+
+```{python}
+ts_monthly["modified_zscore"] = ts_monthly.groupby(
+    [ts_monthly.index.month, "name"]
+).ssm_monthly_median.transform(modified_zscore)
+ts_monthly.hvplot.line(
+    x="time",
+    y="modified_zscore",
+    by="name",
+    frame_width=800,
+    padding=(0.01, 0.1),
+)
+```
+
+## Compare the results
+
+```{python}
+(
+    ts_monthly.hvplot.line(
+        x="time",
+        y=["zscore", "modified_zscore"],
+        groupby="name",
+        frame_width=800,
+        padding=(0.01, 0.1),
+    )
+    + ts_monthly.hvplot.line(
+        x="time",
+        y=["smapi"],
+        groupby="name",
+        frame_width=800,
+        padding=(0.01, 0.1),
+    )
+).cols(1)
+```

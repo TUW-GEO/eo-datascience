@@ -1,0 +1,158 @@
+---
+title: Exercise 2
+jupyter: environmental-remote-sensing
+---
+
+**Evaluate the Scale of Measurement on Soil Moisture**
+
+## Overview
+
+In this exercise you will do your own evaluation of H SAF ASCAT surface soil moisture (SSM) 6.25 km. However, for your own analysis you will use modelled soil moisture estimates from [ECMWF](https://www.ecmwf.int/) instead of the in situ stations. The particular dataset used here is [ERA5-Land daily](https://cds.climate.copernicus.eu/datasets/derived-era5-land-daily-statistics?tab=overview). We have extracted for you the volume of water in soil layer 1 (0 - 7cm, the surface is at 0cm). The soil's water content is derived by using a combination of modeling and data assimilation techniques. Here's a simplified explanation of how it works:
+
+- **Modelling**: ERA5-Land uses a sophisticated land surface model to simulate various processes that affect soil moisture. This model takes into account factors like rainfall, evaporation, runoff, and infiltration to estimate how much water is present in different layers of the soil.
+
+- **Data Assimilation**: To improve the accuracy of these estimates, ERA5-Land incorporates observational atmospheric variables, such as air temperature and air humidity.
+
+- **Soil Layers**: The model divides the soil into multiple layers, each with its own characteristics and moisture content. By considering the water movement between these layers, ERA5-Land can provide detailed information about soil moisture at different depths.
+
+In essence, ERA5-Land combines advanced modeling techniques with real-world observations to derive accurate and detailed estimates of water content in soil layers. This information is crucial for applications like weather forecasting, agriculture, and water resource management. The resolution of this dataset is 9 km and comes in volumetric units [m$^3$ / m$^3$], so much coarser than the point-wise in situ stations.
+
+## Imports
+
+
+```{python}
+import hvplot.pandas  # noqa
+import pandas as pd
+from envrs.download_path import make_url
+```
+
+## Loading Soil Moisture Data
+
+As before, we load the data as a `pandas.DataFrame`. First ERA5 Land soil moisture and then the H SAF ASCAT SSM.
+
+```{python}
+url = make_url("era5_ssm_timeseries.csv")
+df_era5 = pd.read_csv(
+    url,
+    index_col="time",
+    parse_dates=True,
+)
+
+url = make_url("ascat-6_25_ssm_timeseries.csv")
+df_ascat = pd.read_csv(
+    url,
+    index_col="time",
+    parse_dates=True,
+)
+```
+
+Now you will perform the same type of analyses as in notebook 2. Perform the analysis by adhering to the following steps and filling in the blanks `...`.
+
+1. **Unit Conversions**
+
+- Calculate porosity with `calc_porosity` from bulk and particle densities `density_df` using pandas `transform`.
+
+```{python}
+density_df = pd.DataFrame(
+    {
+        "name": ["Buzi", "Chokwé", "Mabalane", "Mabote", "Muanza"],
+        "bulk_density": [1.25, 1.4, 1.4, 1.35, 1.25],
+    }
+).set_index("name")
+
+def calc_porosity(x):
+    return 1 - x / 2.65
+
+
+porosity_df = ...# noqa ADD YOUR CODE
+porosity_df
+```
+
+- Add the porosity (`porosity_df`) to the ASCAT `DataFrame` as a new column with pandas `merge`.
+
+```{python}
+df_ascat_porosity = ...# noqa ADD YOUR CODE
+df_ascat_porosity.head()
+```
+
+- Convert SSM in degrees of saturation to volumetric units with `deg2vol` and pandas `apply` on `df_ascat_porosity`.
+
+```{python}
+def deg2vol(df: pd.DataFrame) -> pd.Series:
+    """Degree of Saturation to Volumetric Units.
+
+    Parameters
+    ----------
+    df: Pandas.DataFrame
+        Degree of Saturation
+
+    Returns
+    -------
+        Pandas.Series: Volumetric Units
+
+    """
+    return df["porosity"] * df["surface_soil_moisture"] / 100
+
+
+df_ascat_vol = df_ascat.copy()
+df_ascat_vol["unit"] = "m³/m³"
+df_ascat_vol["surface_soil_moisture"] = ...  # noqa ADD YOUR CODE
+df_ascat_vol.head()
+```
+
+## Correlations
+
+- Concatenate the `df_ascat_vol` and `df_era5` datasets.
+
+```{python}
+df_combined = ...  # noqa ADD YOUR CODE
+df_combined.head()
+```
+
+```{python}
+df_combined.hvplot.scatter(
+    x="time",
+    y="surface_soil_moisture",
+    by="type",
+    groupby="name",
+    frame_width=800,
+    padding=(0.01, 0.1),
+    alpha=0.5,
+)
+```
+
+- Resample the `df_ascat_vol` and `df_era5` to daily values datasets and merge the datasets.
+
+```{python}
+df_insitu_daily = (
+    df_era5.groupby("name")["surface_soil_moisture"]
+    ...  # noqa ADD YOUR CODE
+    .median()
+    .to_frame("era5")
+)
+
+df_ascat_vol_daily = (
+   ...  # noqa ADD YOUR CODE
+)
+
+df_resampled = df_ascat_vol_daily.join(df_insitu_daily).dropna()
+df_resampled.head()
+```
+
+- Calculate Pearson's R$^2$ with pandas `groupby` on the locations and `corr`.
+
+```{python}
+...  # ADD YOUR CODE
+```
+
+1. **Calculate the root mean squared error**
+
+ - Calculate RMSE with pandas `groupby` on the locations and an user defined function `RMSE`.
+
+```{python}
+def rmse(df):
+    return ...  # ADD YOUR CODE
+
+
+df_resampled.groupby("name").apply(rmse)
+```

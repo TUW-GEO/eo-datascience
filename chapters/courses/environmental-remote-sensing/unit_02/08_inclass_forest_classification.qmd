@@ -54,6 +54,11 @@ feature_cube = feature_cube.sel(quantile=slice(0.1, 0.9))  # remove outliers
 slivers: gpd.GeoDataFrame = gpd.read_file(url_slivers)
 ```
 
+The dataset used is the `Harmonized Landsat and Sentinel-2 (HLS)` product. From this data, yearly mosaics were created, where each variable represents a specific quantile of original pixel values across the time dimension. Before the quantiles have been calculated, the clouds have been masked.
+This data is used to train the machine learning model for forest classification.
+
+The other data that is used in this notebook is the `geojson` file, which is containing the training and testing areas in the region of interest. This data is used to define the spatial extent of areas with known land cover types, which is crucial for training and evaluating the model.
+
 ```{python}
 # Prepare the crs and affine transformation
 spatial_ref: dict[str, Any] = feature_cube["spatial_ref"].attrs
@@ -136,7 +141,7 @@ def _rename_col(col: tuple[str, float]) -> str:
     return f"{col[0]}_P{np.round(100 * col[1], 0).astype(int):03}"
 
 
-feature_frame.columns = [_rename_col(col) for col in feature_frame.columns]
+feature_frame.columns = [_rename_col(col) for col in feature_frame.columns]  # type: ignore
 ```
 
 ```{python}
@@ -179,7 +184,7 @@ clf_rf = RandomForestClassifier(
     n_jobs=-1,
 )
 
-clf_rf.fit(X=X_train, y=(y_train == LandCoverType.TREE_COVER))
+clf_rf.fit(X=X_train, y=y_train)
 ```
 
 With the trained model, we can now make predictions on the image data.
@@ -188,8 +193,9 @@ For that the image data needs to be prepared in a similar way as the training da
 
 ```{python}
 # Predict using the trained model
+y_pred = clf_rf.predict(feature_frame)
 class_frame = pd.DataFrame(
-    clf_rf.predict(feature_frame),
+    y_pred,
     index=feature_frame.index,
     columns=["RF"],
 )
@@ -202,7 +208,7 @@ predicted_forest = (
 
 ```{python}
 # Map the predicted forest classification
-predicted_forest.where(predicted_forest == 1).hvplot.image(
+predicted_forest.where(predicted_forest == LandCoverType.TREE_COVER.value).hvplot.image(
     x="x",
     y="y",
     tiles=True,
@@ -218,8 +224,11 @@ Finally after the classification is complete, we can save the results for future
 
 ```{python}
 # Display the classification report
-print(classification_report(y_test, class_frame.loc[y_test.index, "RF"]))
+print(classification_report(y_true=y_test, y_pred=class_frame.loc[y_test.index, "RF"]))
 ```
+
+Lastly the predicted forest coverage map can be saved to disk for further analysis and visualization.
+The results for this specific usecase has already been computed and saved in the same place where the source data is located. In the next notebook we will explore the results and visualize the loss of forest cover over time.
 
 ```{python}
 # Saving the results for future analysis

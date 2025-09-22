@@ -6,9 +6,9 @@ jupyter: environmental-remote-sensing
 ## A machine Learning Approach
 
 In this notebook, we will focus on the classification of deforestation in Mozambique.
-We will be useing a `Machine Learning` approach to classify the forest cover (as explained in the previous notebook) and will be covering the deforestation here, where we will specifically have a look at the changes in forest cover over time.
+We will be using a `Machine Learning` approach to classify the forest cover (as explained in the previous notebook) and will be covering the deforestation here, where we will specifically have a look at the changes in forest cover over time.
 
-It is assumed here that you are already familiar with the previous notebook, since we will be useing the forest cover classification as a basis for the deforestation analysis.
+It is assumed here that you are already familiar with the previous notebook, since we will be using the forest cover classification as a basis for the deforestation analysis.
 
 
 ```{python}
@@ -20,6 +20,9 @@ import xarray as xr
 
 from envrs.download_path import make_url
 ```
+
+We start of by loading the datasets, which contain the forest cover classification data.
+The results from the previous notebook can be used, but we have already preprocessed the data and saved it for convenience.
 
 ```{python}
 common_url_params: dict[str, Any] = {
@@ -50,10 +53,21 @@ forest_after = xr.open_dataarray(url_after, **common_params)
 img = xr.open_dataset(url_dc, **common_params)
 ```
 
+Now that we have read the data into memory, we can start exploring the deforestation patterns.
+We will take the forest coverage binary masks from the years `2018` and `2024` and assign the values:
+
+- `1` (binary: '001') will be assigned to forest areas in the year 2018.
+- `2` (binary: '010') will be assigned to the forest areas in the year 2024.
+
+This approach allows us to add the two binary masks together and easily interpret the resulting values.
+The values in the combined mask indicate the change in forest cover over time.
+
+If the first digit of the binary representation of any given value is a 1, then the area was forested in 2018. If the second digit is a 1, then the area was forested in 2024. Therefore the value 1 (binary: '01') indicates that the area was forested in 2018, but not in 2024. This is an indication of deforestation.
+
 ```{python}
 bit_zero = 1 << 0  # 0b01
 bit_one = 1 << 1  # 0b10
-forest_label_value = 1
+forest_label_value = 1  # as results have been saved as binary mask
 # fmt: off
 deforestation = (
     (forest_before == forest_label_value) * bit_zero
@@ -64,6 +78,9 @@ deforestation = (
 deforestation_value = int("0b01", 2)  # before=1 and after=0 -> was forest but not now
 deforestation = deforestation.where(deforestation == deforestation_value)
 ```
+
+Finally we can visualize the deforestation areas using a suitable plotting library.
+To put our results into a bit of a context the original dataset, that has been used for the analysis, will be overlaid with the deforestation areas.
 
 ```{python}
 cmap_red = mcolors.ListedColormap(["#FF2600"])
