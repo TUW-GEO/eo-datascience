@@ -33,7 +33,7 @@ jobs:
           persist-credentials: true
 
       - name: Run Quarto Workflow
-        uses: tuw-geo/publish-quarto
+        uses: tuw-geo/publish-quarto@v2025.06.22
 
       - name: Commit Files Pythia Book
         run: |
