@@ -1,4 +1,3 @@
-import argparse
 import re
 from pathlib import Path
 
@@ -163,18 +162,9 @@ def substitute_path(nb_path, dir, out):
     return nb_path
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Convert Quarto to Jupyter Book")
-    parser.add_argument("dir", type=str, help="Input Directory")
-    parser.add_argument("out", type=str, help="Destination directory")
-    args = parser.parse_args()
-
-    clean_up_frontmatter(args.dir, args.out)
-    set_kernel_all_notebooks(args.out)
-    convert_callout_notes(args.out)
-    convert_refs(args.out)
-    convert_bibliography(out=args.out)
-
-
-if __name__ == "__main__":
-    main()
+def clean_nb(dir, out):
+    clean_up_frontmatter(dir, out)
+    set_kernel_all_notebooks(out)
+    convert_callout_notes(out)
+    convert_refs(out)
+    convert_bibliography(out=out)

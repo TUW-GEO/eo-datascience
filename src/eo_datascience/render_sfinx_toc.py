@@ -1,4 +1,3 @@
-import argparse
 from pathlib import Path
 
 import yaml
@@ -97,15 +96,6 @@ def rename_file_path(file_path):
         file_path = str(
             substitute_path(file_path, "chapters", "notebooks").with_suffix("")
         )
+    else:
+        KeyError("File does not exist")
     return file_path
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Convert Quarto to Jupyter Book")
-    parser.add_argument("out", type=str, help="Destination directory")
-    args = parser.parse_args()
-    render_toc(p=Path("_quarto.yml").absolute().as_posix(), out=args.out)
-
-
-if __name__ == "__main__":
-    main()

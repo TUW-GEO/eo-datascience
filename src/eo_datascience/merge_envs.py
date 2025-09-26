@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
+from pathlib import Path, PurePath
 
 import yaml  # type: ignore
 from packaging.version import parse
@@ -32,25 +32,32 @@ def aggregate_env_dependencies(files: list[Path]) -> tuple[list[str], list[str]]
     for file in files:
         environment: dict = get_environment_from_yml(file)
         env_dependencies: list[str | dict] = environment.get("dependencies", [])
-        regular_deps, sub_deps = extract_sub_dependencies(env_dependencies)
+        regular_deps, sub_deps = extract_sub_dependencies(env_dependencies, file)
         unrefined_dependencies.extend(regular_deps)
         pip_dependencies.extend(sub_deps)
     return unrefined_dependencies, pip_dependencies
 
 
-def extract_sub_dependencies(deps: list[str | dict]) -> tuple[list, list]:
+def extract_sub_dependencies(deps: list[str | dict], file: Path) -> tuple[list, list]:
     """Remove pip dependecies from a list of dependencies."""
     subdependencies: list = []
     regular_deps: list = []
     for dep in deps:
         if isinstance(dep, dict) and "pip" in dep:
-            subdependencies.extend(dep["pip"])
+            subdependencies.extend(relative_path_custom_package(dep["pip"], file))
         elif isinstance(dep, dict):
             # If it's a dict but not pip, we ignore it
             continue
         else:
             regular_deps.append(dep)
     return regular_deps, subdependencies
+
+
+def relative_path_custom_package(pip_deps, file: Path):
+    for i, pip_dep in enumerate(pip_deps):
+        if pip_dep == ".":
+            pip_deps[i] = str(PurePath(file).parent.relative_to(Path.cwd()))
+    return pip_deps
 
 
 def separate_dependencies(dep: list[str]) -> tuple[set, dict]:
@@ -78,7 +85,7 @@ def resolve_dependency_versions(unique_deps: set, non_unique_deps: dict) -> set:
     for name in unique_deps:
         if name in non_unique_deps:
             latest_version = max(non_unique_deps[name], key=parse)
-            final_dependencies.add(f"{name}={latest_version}")
+            final_dependencies.add(f"{name}=={latest_version}")
         else:
             final_dependencies.add(name)
     return final_dependencies
@@ -93,7 +100,7 @@ def resolve_versions(dep: list[str]) -> set:
 
 def create_master_environment(
     final_dependencies: set,
-    name: str = "eo-datascience-cookbook-dev",
+    name: str = "eo-datascience-cookbook",
     pip_deps: set[str] | None = None,
 ) -> dict:
     """Put a list of dependencies into the conda yaml environment format."""
@@ -107,9 +114,9 @@ def create_master_environment(
     }
 
 
-def dump_environment(output_file: Path, master_env: dict) -> None:
+def dump_environment(out: Path, master_env: dict) -> None:
     """Safe the environment dictionary as a yaml file."""
-    with output_file.open("w") as f:
+    with (out / "environment.yml").open("w") as f:
         yaml.dump(
             master_env,
             f,
@@ -133,22 +140,7 @@ def fix_yml_indentation(output_file: Path) -> None:
                 f.write(line)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Merge environment files")
-    parser.add_argument(
-        "--out",
-        type=str,
-        default="environment.yml",
-        help="Output file name",
-    )
-    parser.add_argument(
-        "--name",
-        type=str,
-        help="Name of the environment",
-        default="eo-datascience-cookbook-dev",
-    )
-    args = parser.parse_args()
-
+def merge_envs(name: str, out: Path):
     root = Path("notebooks").resolve()
     files: list[Path] = collect_yaml_files(root)
 
@@ -162,14 +154,31 @@ def main() -> None:
 
     # Create master YAML file
     master_env: dict = create_master_environment(
-        final_dependencies, name=args.name, pip_deps=final_pip_dependencies
+        final_dependencies, name=name, pip_deps=final_pip_dependencies
     )
-    dump_environment(Path(args.out), master_env)
+    dump_environment(out, master_env)
 
     # Dirty fix: Read the file and add two spaces before
-    fix_yml_indentation(Path(args.out))
+    fix_yml_indentation(out / "environment.yml")
     print("Environments have been merged.")
-    print(f"{args.out} file created successfully.")
+    print(f"{out} file created successfully.")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Merge environment files")
+    parser.add_argument(
+        "--out",
+        type=str,
+        help="Output file name",
+    )
+    parser.add_argument(
+        "--name",
+        type=str,
+        help="Name of the environment",
+        default="eo-datascience-cookbook",
+    )
+    args = parser.parse_args()
+    merge_envs(args.name, Path(args.out))
 
 
 if __name__ == "__main__":

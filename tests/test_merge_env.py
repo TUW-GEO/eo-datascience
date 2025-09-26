@@ -22,7 +22,7 @@ def test_create_master_environment_returns_correct():
 def test_resolve_dependency_versions_returns_correct():
     dependencies = ["numpy", "pandas", "matplotlib"]
     multiple_versions = {"matplotlib": ["3.2.2", "3.3.0", "3.3.1"]}
-    expected_result = {"matplotlib=3.3.1", "numpy", "pandas"}
+    expected_result = {"matplotlib==3.3.1", "numpy", "pandas"}
     actual_result = merge_envs.resolve_dependency_versions(
         dependencies, multiple_versions
     )
@@ -47,7 +47,7 @@ def test_aggregate_env_dependencies_returns_correct(mock_get_env):
             "numpy=3.4.5",
             "pandas",
             "seaborn",
-            {"pip": ["pyyaml", "quarto"]},
+            {"pip": ["pyyaml", "quarto", "."]},
         ]
     }
     # Setting the return values of calling `get_environment_from_yml` two times
@@ -67,6 +67,6 @@ def test_aggregate_env_dependencies_returns_correct(mock_get_env):
         "seaborn",
     ]
 
-    expected_pip = ["pyyaml", "quarto"]
+    expected_pip = ["pyyaml", "quarto", "."]
     assert result == expected
     assert pip == expected_pip

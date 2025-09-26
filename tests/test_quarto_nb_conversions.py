@@ -49,7 +49,7 @@ def test_toc_conversion():
             - chapters/courses/microwave-remote-sensing/unit_01/02_in_class_exercise.qmd
         - part: chapters/courses/environmental-remote-sensing.qmd
           chapters:
-            - chapters/courses/environmental-remote-sensing/mozambique-droughts.qmd
+            - chapters/courses/environmental-remote-sensing/unit_01/01_handout_drought.qmd
       appendices:
         - part: chapters/templates/prereqs-templates.qmd
           chapters:
@@ -75,7 +75,7 @@ def test_toc_conversion():
           - file: notebooks/courses/microwave-remote-sensing/unit_01/02_in_class_exercise
       - file: notebooks/courses/environmental-remote-sensing
         sections:
-          - file: notebooks/courses/environmental-remote-sensing/mozambique-droughts
+          - file: notebooks/courses/environmental-remote-sensing/unit_01/01_handout_drought
     - caption: Templates
       chapters:
       - file: notebooks/templates/prereqs-templates
@@ -118,7 +118,7 @@ def test_toc_conversion():
                 "sections": [
                     {
                         "file": "notebooks/courses/environmental-remote-"
-                        + "sensing/mozambique-droughts"
+                        + "sensing/unit_01/01_handout_drought"
                     },
                 ],
             },
