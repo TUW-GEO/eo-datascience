@@ -1,8 +1,8 @@
 .ONESHELL:
 SHELL = /bin/bash
-.PHONY: help clean environment kernel teardown post-render dev
+.PHONY: help clean teardown convert
 
-YML = $(wildcard notebooks/**/*.yml)
+YML != find notebooks -type f \( -iname "*.yml" ! -iname "_*" \)
 REQ := $(basename $(notdir $(YML)))
 NB != find chapters -name "*.quarto_ipynb" -o  -name "*.ipynb" -not -path \
 	"*/.jupyter_cache/*"
@@ -55,27 +55,16 @@ post-render:
 	cp -r ./chapters/images ./notebooks
 
 convert:
-	$(foreach f, $(QN), \
-		quarto convert $(f); \
-		mv $(subst .ipynb,.qmd, $(f)) $(subst notebooks,chapters,$(subst .ipynb,.qmd,$(f))); )
-		pre-commit run --all-files
+	./convert-quarto.sh
 
-preview: $(CONDA_ENV_DIR) $(KERNEL_DIR)
-	- mkdir -p _preview/notebooks
+preview:
 	python -m pip install .
-	cp ./chapters/references.bib ./_preview/notebooks/
-	cp -r ./chapters/images ./_preview/notebooks
-	wget https://raw.githubusercontent.com/TUW-GEO/eo-datascience-cookbook/refs/heads/main/README.md -nc -P ./_preview
-	wget https://raw.githubusercontent.com/TUW-GEO/eo-datascience-cookbook/refs/heads/main/_config.yml -nc -P ./_preview
-	wget https://raw.githubusercontent.com/TUW-GEO/eo-datascience-cookbook/refs/heads/main/notebooks/how-to-cite.md -nc -P ./_preview/notebooks
-	render_sfinx_toc ./_preview
-	merge_envs --out ./_preview/environment.yml --name eo-datascience-dev
-	conda env create --file _preview/environment.yml --prefix $(PREFIX)/eo-datascience-cookbook-dev
-	$(CONDA_ACTIVATE) $(PREFIX)/eo-datascience-cookbook-dev
-# python -m ipykernel install --user
-	clean_nb ./notebooks ./_preview/notebooks
-	jupyter-book build ./_preview
-	jupyter-book build ./_preview
+	./preview-pythia.sh _preview
+	cd _preview && pre-commit run --all-files
+	conda env create --file environment.yml --prefix $(PREFIX)/eo-datascience-cookbook
+	$(CONDA_ACTIVATE) $(PREFIX)/eo-datascience-cookbook
+	jupyter-book build .
+	jupyter-book build .
 
 clean:
 	rm --force --recursive .ipynb_checkpoints/ **/.ipynb_checkpoints/ _book/ \
