@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../../../site_libs/bootstrap/bootstrap-d58359eb3ecc31d3bec1ed479c2cbb3a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../../site_libs/bootstrap/bootstrap-0dd2bd5de344125cf763a379ddc3eb04.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -432,7 +432,7 @@ window.Quarto = {
 </section>
 <section id="imports" class="level2" data-number="11.2">
 <h2 data-number="11.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">11.2</span> Imports</h2>
-<div id="13472a4b" class="cell" data-execution_count="1">
+<div id="13472a4b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> folium</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hvplot</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hvplot.pandas</span>
@@ -1028,7 +1028,7 @@ if (window.Jupyter !== undefined) {
 <section id="in-situ-soil-moisture-sensors" class="level2" data-number="11.3">
 <h2 data-number="11.3" class="anchored" data-anchor-id="in-situ-soil-moisture-sensors"><span class="header-section-number">11.3</span> In-situ Soil Moisture Sensors</h2>
 <p>During the DrySat project we have placed 5 in-situ measuring stations (METER™, see image at the top) at strategic locations in Mozambique (Buzi, Chokwé, Mabalane, Mabote and Muanza). The locations are plotted on the following <code>folium</code> map for reference.</p>
-<div id="52a044e7" class="cell" data-execution_count="2">
+<div id="52a044e7" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>locations <span class="op">=</span> {</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Muanza"</span>: {<span class="st">"latitude"</span>: <span class="op">-</span><span class="fl">18.9064758</span>, <span class="st">"longitude"</span>: <span class="fl">34.7738921</span>},</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Chokwé"</span>: {<span class="st">"latitude"</span>: <span class="op">-</span><span class="fl">24.5894393</span>, <span class="st">"longitude"</span>: <span class="fl">33.0262595</span>},</span>
@@ -1289,7 +1289,7 @@ if (window.Jupyter !== undefined) {
 <p>These 5 stations each have 4 in-situ soil moisture sensors (Campbell Scientific™ HydroSense II with CS659) installed at depth intervals of 5, 10, 15, and 30<span class="math inline">\(\,\)</span>cm. The deeper layers may not be directly pertinent to H SAF ASCAT SSM values, but they are important for another product derived from ASCAT data: the Soil Water Index, which assesses the moisture content of deeper layers. We will explore this further in a later notebook. The soil moisture content is measured every 15 minutes and directly stored in the cloud. Since their installation at the end of September 2023, these stations have continually gathered data. For this exercise, we have already cleaned and reformatted a portion of this dataset, which now includes only the measurements from the 5<span class="math inline">\(\,\)</span>cm depth interval. Please consult us if you need access to the entire raw dataset.</p>
 <p>It’s interesting to learn that the current in situ reference datasets are heavily focused on Europe and the USA (as seen on the <a href="https://ismn.earth/en/dataviewer/">ISMN MAP</a>) due to data availability, which likely introduces bias into satellite products. Consequently, reference data from regions outside Europe and the USA are particularly valuable.</p>
 <p>We load the data again as a <code>pandas.DataFrame</code>, like so:</p>
-<div id="48e53fbf" class="cell" data-execution_count="3">
+<div id="48e53fbf" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>RANGE <span class="op">=</span> (<span class="st">"2023-09-30"</span>, <span class="st">"2025-05-06"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_insitu <span class="op">=</span> pd.read_csv(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    make_url(<span class="st">"insitu_ssm_timeseries.csv"</span>),</span>
@@ -1366,7 +1366,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>Next, we will load the H SAF SSM 6.25<span class="math inline">\(\,\)</span>km data as we did in the previous notebook. This time, however, we will filter the data to include only dates for which both ASCAT and in situ measurements are available.</p>
-<div id="8bdf5c2d" class="cell" data-execution_count="4">
+<div id="8bdf5c2d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_ascat <span class="op">=</span> pd.read_csv(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    make_url(<span class="st">"ascat-6_25_ssm_timeseries.csv"</span>),</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    index_col<span class="op">=</span><span class="st">"time"</span>,</span>
@@ -1457,7 +1457,7 @@ if (window.Jupyter !== undefined) {
 \end{aligned}
 \]</span></p>
 <p>For your convenience, we have obtain the location-specific bulk density for our targeted areas in Mozambique from <a href="https://soilgrids.org/">SoilGrids</a>. The particle density is typically averaged at about 2.65 g/cm³<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
-<div id="130278cb" class="cell" data-execution_count="5">
+<div id="130278cb" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>density_df <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span>: [<span class="st">"Buzi"</span>, <span class="st">"Chokwé"</span>, <span class="st">"Mabalane"</span>, <span class="st">"Mabote"</span>, <span class="st">"Muanza"</span>],</span>
@@ -1508,7 +1508,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>We can now calculate the soil porosity from the bulk and particle density using the pandas <code>transform</code> method. After that, we will rename the column to “porosity”.</p>
-<div id="3ccc399d" class="cell" data-execution_count="6">
+<div id="3ccc399d" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calc_porosity(x: pd.Series) <span class="op">-&gt;</span> pd.Series:</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Calculate Porosity.</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1589,7 +1589,7 @@ if (window.Jupyter !== undefined) {
 </figure>
 </div>
 <p>In this case, we’ll use the merge method, joining the left dataset on its ‘name’ column with the right dataset using its index labeled ‘name’.</p>
-<div id="28aec638" class="cell" data-execution_count="7">
+<div id="28aec638" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_ascat_porosity <span class="op">=</span> df_ascat.merge(porosity_df, left_on<span class="op">=</span><span class="st">"name"</span>, right_index<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_ascat_porosity.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -1663,7 +1663,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>We can now use the pandas <code>apply</code> method to convert the units. This method takes the whole <code>DataFrame</code> as input allowing us to compute on two columns, while returning one column as output.</p>
-<div id="77cdc735" class="cell" data-execution_count="8">
+<div id="77cdc735" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> deg2vol(df: pd.DataFrame) <span class="op">-&gt;</span> pd.Series:</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Degree of Saturation to Volumetric Units.</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1752,7 +1752,7 @@ if (window.Jupyter !== undefined) {
 <h2 data-number="11.5" class="anchored" data-anchor-id="validation-by-visual-inspection"><span class="header-section-number">11.5</span> Validation by Visual Inspection</h2>
 <p>The first step is to visually compare the time series. Visual inspection is essential for ensuring the validity and reliability of your results. It helps identify patterns and trends that might not be evident from data tables. Additionally, it is crucial for detecting outliers, which could indicate sensor malfunctions or data entry errors. In our case, we aim to see if both the in-situ and H SAF ASCAT SSM accurately reflect the characteristic seasonal rains of Mozambique.</p>
 <p>To facilitate a clear overview, we will first concatenate the two datasets as follows:</p>
-<div id="2a5a4004" class="cell" data-execution_count="9">
+<div id="2a5a4004" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_combined <span class="op">=</span> pd.concat([df_insitu, df_ascat_vol])</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df_combined.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -1819,7 +1819,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>Next, we will use the <code>hvplot</code> extension for pandas to create interactive scatter plots for the time series.</p>
-<div id="77f745da" class="cell" data-execution_count="10">
+<div id="77f745da" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_combined.hvplot.scatter(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"time"</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"surface_soil_moisture"</span>,</span>
@@ -1911,7 +1911,7 @@ if (window.Jupyter !== undefined) {
 <h2 data-number="11.6" class="anchored" data-anchor-id="quantitative-validation-metrics"><span class="header-section-number">11.6</span> Quantitative Validation Metrics</h2>
 <p>We can now move to a more quantitative estimate. Correlation analysis is a valuable tool for validating meteorological records by comparing different datasets to ensure consistency and accuracy. It measures the strength and direction of the relationship between two variables. In the context of meteorological records, it helps assess how well different datasets align with each other in terms of temporal dynamics, serving as a quality assurance measure.</p>
 <p>Before applying correlation analysis, we need to reshape our <code>DataFrame</code> by pairing the data to the same timestamps for each of the five locations. For this, we will use the <code>groupby</code> method in combination with the <code>resample</code> method. The <code>resample</code> method will adjust the time index to a new frequency of 1 day, using the median value to down sample the frequencies from 15 minutes to daily for both ASCAT and in-situ sensor data.</p>
-<div id="d3438ced" class="cell" data-execution_count="11">
+<div id="d3438ced" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df_insitu_daily <span class="op">=</span> (</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    df_insitu.groupby(<span class="st">"name"</span>)[<span class="st">"surface_soil_moisture"</span>]</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    .resample(<span class="st">"D"</span>)</span>
@@ -1999,7 +1999,7 @@ x_i  \; \text{and} \; y_i &amp;\quad \text{: individual sample points} \\
 <li><span class="math inline">\(r = 0\)</span> indicates no linear relationship.</li>
 </ul>
 <p>We implement this with pandas, as follows:</p>
-<div id="ccb9a2db" class="cell" data-execution_count="12">
+<div id="ccb9a2db" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df_resampled.groupby(<span class="st">"name"</span>).corr(method<span class="op">=</span><span class="st">"pearson"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div>
@@ -2092,7 +2092,7 @@ d_i &amp;\quad \text{: difference between the ranks of corresponding values} \; 
 \end{aligned}
 \]</span></p>
 <p>The interpretation of <span class="math inline">\(\rho\)</span> is the same as for the Pearson’s correlation (<span class="math inline">\(r\)</span>) coefficient. Spearman is great for data where the ranking of values is important and is less affected by outliers and non-normal distributions. This makes it a robust choice for various types of data. It’s also easy to interpret because it focuses on the overall trend.</p>
-<div id="c609ecce" class="cell" data-execution_count="13">
+<div id="c609ecce" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df_resampled.groupby(<span class="st">"name"</span>).corr(method<span class="op">=</span><span class="st">"spearman"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div>
@@ -2186,7 +2186,7 @@ d_i &amp;\quad \text{: difference between the ranks of corresponding values} \; 
 \end{aligned}
 \]</span></p>
 <p>Which we can easily implement, like so:</p>
-<div id="eb82ed97" class="cell" data-execution_count="14">
+<div id="eb82ed97" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    df_resampled.groupby(<span class="st">"name"</span>)[<span class="st">"in-situ"</span>].mean()</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span> df_resampled.groupby(<span class="st">"name"</span>)[<span class="st">"ascat"</span>].mean()</span>
@@ -2221,7 +2221,7 @@ x_i &amp;\quad \text{: reference value (in situ SSM)}
 <p>The total error, as captured by RMSE, can be broken down as:</p>
 <p><span class="math display">\[ \text{Total Error (RMSE)} = \text{Bias}^2+\text{Variance}+\text{Irreducible Error} \]</span></p>
 <p>This can be implemented, as follows:</p>
-<div id="92a2dc55" class="cell" data-execution_count="15">
+<div id="92a2dc55" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rmse(df: pd.DataFrame) <span class="op">-&gt;</span> pd.Series:</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Root Mean Square Error.</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2250,7 +2250,7 @@ dtype: float64</code></pre>
 </div>
 </div>
 <p>Here, we see that the RMSE ranges between 0.06 and 0.08 [m<span class="math inline">\(^3\)</span> / m<span class="math inline">\(^3\)</span>], which is small compared to the total range of H SAF ASCAT SSM. As a final step, we can visualize the relation of target (remotely sensed SSM) and reference values (in situ soil moisture) using <code>hvplot</code>.</p>
-<div id="464190a1" class="cell" data-execution_count="16">
+<div id="464190a1" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>hvplot.scatter_matrix(df_resampled.reset_index(level<span class="op">=</span><span class="dv">0</span>), c<span class="op">=</span><span class="st">"name"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>).opts(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    plot_size<span class="op">=</span><span class="dv">300</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
