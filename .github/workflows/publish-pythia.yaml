@@ -4,6 +4,7 @@ on:
     tags: [v*]
     # When a tag like v2024.11.27 is created, the workflow will be triggered
     # Should follow https://calver.org/ for versioning
+  workflow_call:
 
 name: Pythia Publish
 
@@ -33,7 +34,7 @@ jobs:
           persist-credentials: true
 
       - name: Run Quarto Workflow
-        uses: tuw-geo/publish-quarto@v2025.06.22
+        uses: ./.github/workflows/publish-quarto.yaml
 
       - name: Commit Files Pythia Book
         run: |
