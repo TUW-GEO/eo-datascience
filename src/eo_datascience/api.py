@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from eo_datascience.render_sfinx_toc import render_toc
 from eo_datascience.clean_nb import clean_nb
 from eo_datascience.merge_envs import merge_envs
+from eo_datascience.render_sfinx_toc import render_toc
 
 
 def main():
