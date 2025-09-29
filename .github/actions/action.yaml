@@ -3,12 +3,6 @@ name: Quarto Build
 runs:
   using: "composite"
   steps:
-    - name: Checkout Quarto Book
-      uses: actions/checkout@v4
-      with:
-        submodules: "true"
-        fetch-depth: 0
-
     - name: Create .env file
       env:
         PREFIX: ./chapters/courses/environmental-remote-sensing/unit_01/

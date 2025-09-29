@@ -13,6 +13,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Quarto Book
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          fetch-depth: 0
+
       - name: Build Quarto Book
         uses: ./.github/actions/build-quarto
 
