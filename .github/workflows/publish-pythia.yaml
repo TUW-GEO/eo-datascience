@@ -4,37 +4,26 @@ on:
     tags: [v*]
     # When a tag like v2024.11.27 is created, the workflow will be triggered
     # Should follow https://calver.org/ for versioning
-  workflow_call:
 
 name: Pythia Publish
 
 permissions:
   contents: write
-  pages: write
 
 jobs:
-  build-deploy:
+  build:
+    uses: ./.github/workflows/build-quarto.yaml
+  publish:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout Quarto Book
-        uses: actions/checkout@v4
-        with:
-          submodules: "true"
-          fetch-depth: 0
-
       - name: Checkout Pythia Book
         uses: actions/checkout@v4
         with:
           repository: ProjectPythia/eo-datascience-cookbook
           path: pythia
           fetch-depth: 0
-          token: ${{ secrets.BOT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
-
-      - name: Run Quarto Workflow
-        uses: ./.github/workflows/publish-quarto.yaml
 
       - name: Commit Files Pythia Book
         run: |

@@ -1,0 +1,65 @@
+on:
+  workflow_call:
+
+name: Quarto Build
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Quarto Book
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+          fetch-depth: 0
+
+      - name: Create .env file
+        env:
+          PREFIX: ./chapters/courses/environmental-remote-sensing/unit_01/
+        run: |
+          touch $PREFIX.env
+          echo USER_HSAF = ${{ secrets.USER_HSAF }} >> $PREFIX.env
+          echo PASS_HSAF = ${{ secrets.PASS_HSAF }} >> $PREFIX.env
+          echo USER_WEKEO = ${{ secrets.USER_WEKEO }} >> $PREFIX.env
+          echo PASS_WEKEO = ${{ secrets.PASS_WEKEO }} >> $PREFIX.env
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Python and Jupyter
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install jupyter jupyter-cache
+
+      - name: Conda Cache Environment
+        uses: actions/cache@v4
+        with:
+          path: ./.conda_envs
+          key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
+          restore-keys: ${{ runner.os }}-env-
+
+      - name: Jupyter Cache Environment
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./chapters/.jupyter_cache
+            ./chapters/courses/.jupyter_cache
+            ./chapters/courses/environmental-remote-sensing/.jupyter_cache
+            ./chapters/courses/environmental-remote-sensing/unit_01/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/unit_01/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/unit_02/.jupyter_cache
+            ./chapters/courses/microwave-remote-sensing/unit_03/.jupyter_cache
+            ./chapters/templates/.jupyter_cache
+            ./chapters/tutorials/.jupyter_cache
+          key: ${{ runner.os }}-jupyter
+          restore-keys: ${{ runner.os }}-jupyter
+
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
