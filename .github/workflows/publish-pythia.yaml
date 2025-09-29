@@ -25,6 +25,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
 
+      - name: Build Quarto Book
+        uses: ./.github/actions/build-quarto
+
       - name: Commit Files Pythia Book
         run: |
           python -m pip install .

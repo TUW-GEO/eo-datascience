@@ -10,12 +10,12 @@ permissions:
   pages: write
 
 jobs:
-  build:
-    uses: ./.github/workflows/build-quarto.yaml
   publish:
-    needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Build Quarto Book
+        uses: ./.github/actions/build-quarto
+
       - name: Publish Quarto Book
         uses: quarto-dev/quarto-actions/publish@v2
         env:
