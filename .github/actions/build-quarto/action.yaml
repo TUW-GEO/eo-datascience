@@ -1,4 +1,13 @@
 name: Quarto Build
+secrets:
+  USER_HSAF:
+    default: "${{ secrets.USER_HSAF }}"
+  PASS_HSAF:
+    default: "${{ secrets.PASS_HSAF }}"
+  USER_WEKEO:
+    default: "${{ secrets.USER_WEKEO }}"
+  PASS_WEKEO:
+    default: "${{ secrets.PASS_WEKEO }}"
 
 runs:
   using: "composite"
