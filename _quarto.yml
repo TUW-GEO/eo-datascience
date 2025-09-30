@@ -2,8 +2,6 @@ project:
   type: book
   pre-render:
     - make kernel
-  post-render:
-    - make post-render
 
 book:
   title: "Earth Observation Datascience"
