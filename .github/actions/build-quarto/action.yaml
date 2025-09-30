@@ -28,12 +28,15 @@ runs:
     - name: Set up Quarto
       uses: quarto-dev/quarto-actions/setup@v2
 
-    - name: Install Python and Jupyter
+    - name: Install Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
         cache: "pip"
-    - run: pip install jupyter jupyter-cache
+
+    - name: Install Jupyter and Jupyter-cache
+      shell: bash
+      run: pip install jupyter jupyter-cache
 
     - name: Conda Cache Environment
       uses: actions/cache@v4
