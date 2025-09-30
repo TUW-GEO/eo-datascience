@@ -21,6 +21,12 @@ jobs:
 
       - name: Build Quarto Book
         uses: ./.github/actions/build-quarto
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USER_HSAF: ${{ secrets.USER_HSAF }}
+          PASS_HSAF: ${{ secrets.PASS_HSAF }}
+          USER_WEKEO: ${{ secrets.USER_WEKEO }}
+          PASS_WEKEO: ${{ secrets.PASS_WEKEO }}
 
       - name: Publish Quarto Book
         uses: quarto-dev/quarto-actions/publish@v2

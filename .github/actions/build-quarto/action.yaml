@@ -1,31 +1,27 @@
 name: Quarto Build
-secrets:
+inputs:
   USER_HSAF:
-    default: "${{ secrets.USER_HSAF }}"
   PASS_HSAF:
-    default: "${{ secrets.PASS_HSAF }}"
   USER_WEKEO:
-    default: "${{ secrets.USER_WEKEO }}"
   PASS_WEKEO:
-    default: "${{ secrets.PASS_WEKEO }}"
+  GITHUB_TOKEN:
 
 runs:
   using: "composite"
   steps:
     - name: Create .env file
+      shell: bash
       env:
         PREFIX: ./chapters/courses/environmental-remote-sensing/unit_01/
       run: |
         touch $PREFIX.env
-        echo USER_HSAF = ${{ secrets.USER_HSAF }} >> $PREFIX.env
-        echo PASS_HSAF = ${{ secrets.PASS_HSAF }} >> $PREFIX.env
-        echo USER_WEKEO = ${{ secrets.USER_WEKEO }} >> $PREFIX.env
-        echo PASS_WEKEO = ${{ secrets.PASS_WEKEO }} >> $PREFIX.env
+        echo USER_HSAF = ${{ inputs.USER_HSAF }} >> $PREFIX.env
+        echo PASS_HSAF = ${{ inputs.PASS_HSAF }} >> $PREFIX.env
+        echo USER_WEKEO = ${{ inputs.USER_WEKEO }} >> $PREFIX.env
+        echo PASS_WEKEO = ${{ inputs.PASS_WEKEO }} >> $PREFIX.env
 
     - name: Set up Quarto
       uses: quarto-dev/quarto-actions/setup@v2
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install Python and Jupyter
       uses: actions/setup-python@v5
@@ -61,4 +57,4 @@ runs:
     - name: Render Quarto Project
       uses: quarto-dev/quarto-actions/render@v2
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
