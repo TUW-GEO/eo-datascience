@@ -1,10 +1,15 @@
 name: Quarto Build
 inputs:
   USER_HSAF:
+    required: true
   PASS_HSAF:
+    required: true
   USER_WEKEO:
+    required: true
   PASS_WEKEO:
+    required: true
   GITHUB_TOKEN:
+    required: true
 
 runs:
   using: "composite"
