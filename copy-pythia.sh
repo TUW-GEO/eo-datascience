@@ -7,7 +7,7 @@ for dir in $COPY_DIRS; do
     cp -rf --parents $dir ./${1}
 done
 
-COPY_FILES=$(find notebooks -type f -name "references.bib" -o -name "pyproject.toml" -o -iname ".env")
+COPY_FILES=$(find notebooks -type f -name "references.bib" -o -name "pyproject.toml")
 
 for file in $COPY_FILES; do
     cp -rf --parents $file ./${1}
