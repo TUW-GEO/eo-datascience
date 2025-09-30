@@ -11,8 +11,6 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    uses: ./.github/workflows/build-quarto.yaml
   publish:
     runs-on: ubuntu-latest
     steps:
