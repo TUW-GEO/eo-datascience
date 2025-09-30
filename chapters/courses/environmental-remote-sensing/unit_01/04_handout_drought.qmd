@@ -5,7 +5,7 @@ jupyter: environmental-remote-sensing
 
 **Meteorological, Agricultural, and Hydrological Droughts**
 
-![Source: Laura Crocetti et al., 2020[^1]](https://www.researchgate.net/publication/344947662/figure/fig1/AS:951872072450048@1603955395551/Types-of-drought-meteorological-agricultural-hydrological-and-socio-economic-drought.png)
+![Source: Laura Crocetti et al., 2020[^1]](https://media.springernature.com/full/springer-static/image/art%3A10.1007%2Fs10113-020-01710-w/MediaObjects/10113_2020_1710_Fig1_HTML.png?as=webp)
 
 ## Overview
 
@@ -104,7 +104,7 @@ These relationships are intuitively important causal factors. To determine which
 
 We'll utilize `statsmodels`' formula interface, which allows specifying models with formula strings and directly using `pandas.DataFrames`. This interface employs a tilde (`~`) to separate the dependent variable from the independent variables. Interactions between variables can be specified using the `*` or `:` operators, enabling easy expansion to multiple regression. It also simplifies variable transformations and polynomial terms.
 
-To translate the OLS equation:
+To translate the equation:
 
 $$\text{NDVI} = \alpha + \beta \text{CHIRPS} + \epsilon $$
 
