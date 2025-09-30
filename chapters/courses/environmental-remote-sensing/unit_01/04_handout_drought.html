@@ -436,7 +436,7 @@ window.Quarto = {
 <li>Socioeconomic drought impacts society through crop loss, food insecurity, shortages of fresh-water resources</li>
 </ul>
 <p>The first three phenomena often follow in a cascading sequence, whereas all of them can have a direct impact on society.</p>
-<div id="3e5353bb" class="cell" data-execution_count="1">
+<div id="3e5353bb" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hvplot.pandas  <span class="co"># noqa</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
@@ -1088,7 +1088,7 @@ if (window.Jupyter !== undefined) {
 </table>
 <p>In summary, NDVI indicates plant health based on the assumption that plants lose their greenness when they wilt due to water deprivation. However, this signal is highly dependent on vegetation types, soil background, and atmospheric conditions. CHIRPS measures precipitation and is affected by the quality of the input data, which can be problematic if there is a scarcity or poor quality of meteorological stations in a region.</p>
 <p>Let’s load the data as prepared for the notebook.</p>
-<div id="2794451e" class="cell" data-execution_count="2">
+<div id="2794451e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> make_url(<span class="st">"drought_indices-6_25_dekadal.csv"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_dekadel <span class="op">=</span> (</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pd.read_csv(</span>
@@ -1192,7 +1192,7 @@ if (window.Jupyter !== undefined) {
 <p>For this analysis, the ASCAT H SAF surface soil moisture (SSM) data, originally at a 6.25 km resolution and expressed as a percentage of saturation, is converted to a unit scale ranging from 0 to 1. Additionally, the CHIRPS precipitation data, measured in millimeters, is min-max scaled for each location’s time series individually to also range between 0 and 1.</p>
 <p>Both NDVI and CHIRPS datasets are natively 10-daily products (or ‘dekadal’), while the SSM data is resampled to match this dekadal frequency.</p>
 <p>Let’s have a look at the data for each site individually with <code>hvplot</code> use the dropdown menu “name” to select the preferred site.</p>
-<div id="5602d4f1" class="cell" data-execution_count="3">
+<div id="5602d4f1" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_dekadel.hvplot.line(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"time"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span>[<span class="st">"precip"</span>, <span class="st">"surface_soil_moisture"</span>, <span class="st">"ndvi"</span>],</span>
@@ -1291,13 +1291,13 @@ if (window.Jupyter !== undefined) {
 <p>To translate the equation:</p>
 <p><span class="math display">\[\text{NDVI} = \alpha + \beta \text{CHIRPS} + \epsilon \]</span></p>
 <p>into an <code>statsmodels</code> formula, you use:</p>
-<div id="2c4159f4" class="cell" data-execution_count="4">
+<div id="2c4159f4" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df_buzi <span class="op">=</span> df_dekadel[df_dekadel.name <span class="op">==</span> <span class="st">"Buzi"</span>]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>mod_precip <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">"ndvi ~ precip"</span>, data<span class="op">=</span>df_buzi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>In this context, <code>ndvi</code> is the dependent variable, <code>precip</code> is the independent variable, and <code>df_buzi</code> is the data frame containing your data. We will focus on the Buzi region for the OLS regression and subsequent analysis.</p>
 <p>To fit the model, simply call the <code>fit</code> method on the generated object. We will then print the parameters and their estimated coefficients as well as the variation in NDVI explained by the <span class="math inline">\(R^2\)</span> value.</p>
-<div id="11108258" class="cell" data-execution_count="5">
+<div id="11108258" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res_precip <span class="op">=</span> mod_precip.fit()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Parameters: </span><span class="ch">\n</span><span class="st">"</span>, res_precip.params, sep<span class="op">=</span><span class="st">""</span>)</span>
@@ -1311,7 +1311,7 @@ R2:  0.08314849453004114</code></pre>
 </div>
 </div>
 <p>We can see that the model fit with CHIRPS precipitation as independent variable is limited. Now let’s do the same for the second predefined relationship, where we translate (<span class="math inline">\(\text{NDVI} = \alpha + \beta \text{SSM} + \epsilon\)</span>) into an <code>statsmodels</code> formula and asses it’s fit, like so:</p>
-<div id="841064ba" class="cell" data-execution_count="6">
+<div id="841064ba" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mod_ssm <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">"ndvi ~ surface_soil_moisture"</span>, data<span class="op">=</span>df_buzi)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>res_ssm <span class="op">=</span> mod_ssm.fit()</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1326,7 +1326,7 @@ R2:  0.5374351087887564</code></pre>
 </div>
 </div>
 <p>This approach provides better results, explaining nearly 50% of the variance in NDVI with H SAF ASCAT SSM. Additionally, we can visualize these results using an <span class="math inline">\(R^2\)</span> plot to perform a more detailed diagnostic analysis of the model’s performance. We have predefined and loaded this function at the top of the notebook for clarity.</p>
-<div id="c7c908cd" class="cell" data-execution_count="7">
+<div id="c7c908cd" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> {<span class="st">"precip"</span>: res_precip, <span class="st">"surface_soil_moisture"</span>: res_ssm}</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plot_predicted_values(</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    df_buzi,</span>
@@ -1347,7 +1347,7 @@ R2:  0.5374351087887564</code></pre>
 <p>At the beginning of the notebook, we highlighted that droughts are cascading events where a lack of rain leads to reduced soil moisture, which in turn affects plant health. To study the dynamics of these cascading droughts, we should first examine the effects of precipitation and soil moisture on vegetation under normal conditions. We need to consider both the lead and lag of the respective causes and effects in this system. Precipitation leads, soil moisture replenishment lags, and vegetation responds with a delay to rainfall events.</p>
 <p>Though the cyclical nature of NDVI, H SAF ASCAT SSM, and CHIRPS precipitation is evident, these cycles correspond to the dry and wet seasons experienced in Mozambique. To quantify the actual periodicity of these seasons, autocorrelation is a useful tool. Autocorrelation in time series refers to the correlation of a time series with a delayed copy of itself, measuring the extent to which a time series value is linearly related to its past and future values. The following animation visually demonstrates how a copy of the time series is shifted alongside itself, illustrating the corresponding correlation, known as autocorrelation. This can be expressed as:</p>
 <p><span class="math display">\[r_k = \frac{\sum_{t=1}^{N-k}{(x_t-\bar{x} )(x_{t+k} -\bar{x})}}{\sum_{t=1}^N{(x_t-\bar{x}})}\]</span></p>
-<div id="ce9edd28" class="cell" data-execution_count="8">
+<div id="ce9edd28" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>plot_step_corr(df_buzi, <span class="st">"ndvi"</span>, length<span class="op">=</span><span class="dv">72</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="8">
 <video width="1152" height="480" controls="" autoplay="" loop="">
@@ -12992,14 +12992,14 @@ AAAAJKl0b28AAAAcZGF0YQAAAAEAAAAATGF2ZjYyLjMuMTAw
 </div>
 </div>
 <p>As expected, it takes 18 lags (or 18 dekads, equivalent to approximately half a year) for the signal to become almost entirely anti-correlated. It then takes 36 lags (or 36 dekads, equivalent to approximately 1 year) for the cycle to complete and the signal to become almost perfectly correlated again. You can perform you own autocorrelation test with <code>statsmodels</code>, like so:</p>
-<div id="a195e392" class="cell" data-execution_count="9">
+<div id="a195e392" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>smt.acf(df_buzi.ndvi, nlags<span class="op">=</span><span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>array([1.        , 0.94896775, 0.88434477, 0.79925742, 0.69430392])</code></pre>
 </div>
 </div>
 <p>Similarly, we can compare the lagged time series of CHIRPS precipitation with NDVI and the lagged time series of H SAF ASCAT SSM with NDVI. This type of analysis is known as lagged cross-correlation analysis. The following two animations illustrate the cross-correlations of H SAF ASCAT SSM with NDVI and CHIRPS precipitation with NDVI respectively.</p>
-<div id="45650822" class="cell" data-execution_count="10">
+<div id="45650822" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>plot_step_corr(df_buzi, <span class="st">"ndvi"</span>, <span class="st">"precip"</span>, length<span class="op">=</span><span class="dv">72</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <video width="1152" height="480" controls="" autoplay="" loop="">
@@ -22128,7 +22128,7 @@ My4xMDA=
 </video>
 </div>
 </div>
-<div id="12167f3d" class="cell" data-execution_count="11">
+<div id="12167f3d" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plot_step_corr(df_buzi, <span class="st">"ndvi"</span>, <span class="st">"surface_soil_moisture"</span>, length<span class="op">=</span><span class="dv">72</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <video width="1152" height="480" controls="" autoplay="" loop="">
@@ -31552,7 +31552,7 @@ MDA=
 <li>NDVI lags H SAF SSM by 3 dekads (or approximately 1 month).</li>
 </ul>
 <p>You can again perform you own lagged cross-correlation test with <code>statsmodels</code>, like so:</p>
-<div id="10de3a0f" class="cell" data-execution_count="12">
+<div id="10de3a0f" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>smt.ccf(df_buzi.ndvi, df_buzi.surface_soil_moisture, nlags<span class="op">=</span><span class="dv">4</span>)  <span class="co"># for example</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <pre><code>array([0.73309966, 0.82333965, 0.86011595, 0.87138539])</code></pre>
@@ -31562,7 +31562,7 @@ MDA=
 <section id="lagged-variable-regression" class="level2" data-number="13.5">
 <h2 data-number="13.5" class="anchored" data-anchor-id="lagged-variable-regression"><span class="header-section-number">13.5</span> Lagged Variable Regression</h2>
 <p>Now that we’ve determined the appropriate lag, we can revisit the OLS regression. By using pandas’ <code>shift</code> function, we adjust <code>precip</code> and <code>surface_soil_moisture</code> accordingly and then apply the <code>statsmodels</code> OLS regression to the lagged dataset.</p>
-<div id="5754ae0d" class="cell" data-execution_count="13">
+<div id="5754ae0d" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df_buzi_shift <span class="op">=</span> df_buzi.assign(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    surface_soil_moisture<span class="op">=</span>df_buzi.loc[:, <span class="st">"surface_soil_moisture"</span>].shift(<span class="dv">3</span>),</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    precip<span class="op">=</span>df_buzi.loc[:, <span class="st">"precip"</span>].shift(<span class="dv">6</span>),</span>
@@ -31704,7 +31704,7 @@ MDA=
 <p>Thee lagged values of precipitation to account for the delayed impact of rainfall on vegetation health would look something like this:</p>
 <p><span class="math display">\[ \text{NDVI}_t = \alpha + \beta \text{CHIRPS}_{t-6} + \epsilon_t \]</span></p>
 <p>In this equation, <span class="math inline">\(\text{NDVI}_t\)</span>​ is the dependent variable at time <span class="math inline">\(t\)</span> and <span class="math inline">\(\text{CHIRPS}_{t-6}\)</span> is the 6 dekadal lagged independent variables with <span class="math inline">\(\beta\)</span> as the coefficient. This approach can provide insights into how past events influence current outcomes, making it a valuable tool for time series analysis. We implement this as follows:</p>
-<div id="e3408c8a" class="cell" data-execution_count="14">
+<div id="e3408c8a" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mod_precip_shift <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">"ndvi ~ precip"</span>, data<span class="op">=</span>df_buzi_shift)</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>res_precip_shift <span class="op">=</span> mod_precip_shift.fit()</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -31719,7 +31719,7 @@ R2:  0.3076670920100214</code></pre>
 </div>
 </div>
 <p>We observe that including lagged rainfall data improves the model fits compared to a model without this information. Next, we will apply the same approach to H SAF SSM, now using a time lag of 3 dekads:</p>
-<div id="ff3c6d06" class="cell" data-execution_count="15">
+<div id="ff3c6d06" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mod_ssm_shift <span class="op">=</span> smf.ols(formula<span class="op">=</span><span class="st">"ndvi ~ surface_soil_moisture"</span>, data<span class="op">=</span>df_buzi_shift)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>res_ssm_shift <span class="op">=</span> mod_ssm_shift.fit()</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -31734,7 +31734,7 @@ R2:  0.74824179183522</code></pre>
 </div>
 </div>
 <p>Here again the model fit improves over the model without lagged variables. We can perform a sanity check by plotting again the <span class="math inline">\(R^2\)</span> plots.</p>
-<div id="744dbae0" class="cell" data-execution_count="16">
+<div id="744dbae0" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>results_shift <span class="op">=</span> {<span class="st">"precip"</span>: res_precip_shift, <span class="st">"surface_soil_moisture"</span>: res_ssm_shift}</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plot_predicted_values(</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    df_buzi_shift,</span>

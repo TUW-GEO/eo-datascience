@@ -435,7 +435,7 @@ window.Quarto = {
 </section>
 <section id="imports" class="level2" data-number="12.2">
 <h2 data-number="12.2" class="anchored" data-anchor-id="imports"><span class="header-section-number">12.2</span> Imports</h2>
-<div id="d14fa797" class="cell" data-execution_count="1">
+<div id="d14fa797" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datashader <span class="im">as</span> ds</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> holoviews <span class="im">as</span> hv</span>
@@ -1080,7 +1080,7 @@ if (window.Jupyter !== undefined) {
 </tbody>
 </table>
 <p>We first load monthly aggregated SPEI data in the following code cell.</p>
-<div id="9448fdd8" class="cell" data-execution_count="2">
+<div id="9448fdd8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> make_url(<span class="st">"spei-6_25_monthly.csv"</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_spei <span class="op">=</span> pd.read_csv(</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    url,</span>
@@ -1190,7 +1190,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>Now let’s also load monthly aggregated H SAF ASCAT SSM Z scores which we already prepared for notebook 1. For this exercise we will filter the data to have a comparable time range (up to the end of 2021) as we have for the SPEI data.</p>
-<div id="31ad7be5" class="cell" data-execution_count="3">
+<div id="31ad7be5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> make_url(<span class="st">"ascat-6_25_ssm_monthly.csv"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df_ascat <span class="op">=</span> pd.read_csv(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    url,</span>
@@ -1278,7 +1278,7 @@ if (window.Jupyter !== undefined) {
 <section id="merging-drought-indicator-data" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="merging-drought-indicator-data"><span class="header-section-number">12.4</span> Merging Drought Indicator Data</h2>
 <p>Now we will have to combine both datasets. Fortunately, both datasets are already projected on the same grid, so this task does not involve any re-projection and resampling of the data. The join operation is made easy here as we have already defined the same indexes in both datasets when loading the data. We can, in this case, use the <code>join</code> method, which joins the data based on the index values of the left and right datasets.</p>
-<div id="8b928c6e" class="cell" data-execution_count="4">
+<div id="8b928c6e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_wide <span class="op">=</span> df_spei.join(df_ascat)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>df_wide</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -1398,13 +1398,13 @@ if (window.Jupyter !== undefined) {
 <h2 data-number="12.5" class="anchored" data-anchor-id="simplifying-drought-severity-with-data-binning"><span class="header-section-number">12.5</span> Simplifying Drought Severity with Data Binning</h2>
 <p>We will convert the numeric data of the drought indicators <code>"spei"</code> and <code>"zscore"</code> into discrete categories using the pandas <code>cut</code> method. In pandas, binning data—also known as discretization or quantization—involves dividing continuous numerical data into discrete bins or intervals. This process is beneficial for sharing quantitative data with other users who can easily interpret it, but also it manages outliers, helps creating histograms, and prepares data for machine learning algorithms that require categorical input. Additionally, we will label the binned data, thereby transforming the columns into <code>pandas</code> categorical data types. Pandas categorical data types are used to represent data that takes on a limited and usually fixed number of possible values (categories or classes). This type is particularly useful for categorical variables such as gender, days of the week, or survey responses. It offers efficient storage and operations for categorical data, including handling category ordering and missing values.</p>
 <p>The process of binning and labeling drought data based on intensity is somewhat subjective, as the bin thresholds are often arbitrarily assigned and subject to debate. Here, we adhere to the guidelines provided by the World Meteorological Organization and the definitions by McKee et al.&nbsp;(1993)<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> for standardized soil moisture based drought indices, where a “moderate” drought is defined as starting at -1 unit of standard deviations.</p>
-<div id="46ec89b7" class="cell" data-execution_count="5">
+<div id="46ec89b7" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>drought_labels <span class="op">=</span> np.array([<span class="st">"extreme"</span>, <span class="st">"severe"</span>, <span class="st">"moderate"</span>, <span class="st">"mild"</span>, <span class="st">"normal"</span>])</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>zscore_thresholds <span class="op">=</span> [df_wide[<span class="st">"zscore"</span>].<span class="bu">min</span>(), <span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="fl">1.5</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, df_wide[<span class="st">"zscore"</span>].<span class="bu">max</span>()]</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>spei_thresholds <span class="op">=</span> [df_wide[<span class="st">"spei"</span>].<span class="bu">min</span>(), <span class="op">-</span><span class="dv">2</span>, <span class="op">-</span><span class="fl">1.5</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">0</span>, df_wide[<span class="st">"spei"</span>].<span class="bu">max</span>()]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now we can use the labels and thresholds to bin the columns of the drought indicators. We make a copy of the original data so that we preserve the original dataset.</p>
-<div id="e80db346" class="cell" data-execution_count="6">
+<div id="e80db346" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_wide_cat <span class="op">=</span> df_wide.copy()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>df_wide_cat[<span class="st">"zscore"</span>] <span class="op">=</span> pd.cut(df_wide.zscore, zscore_thresholds, labels<span class="op">=</span>drought_labels)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>df_wide_cat[<span class="st">"spei"</span>] <span class="op">=</span> pd.cut(df_wide.spei, spei_thresholds, labels<span class="op">=</span>drought_labels)</span>
@@ -1528,7 +1528,7 @@ if (window.Jupyter !== undefined) {
 <figcaption><a href="https://pandas.pydata.org/docs/user_guide">Source: Pandas User Guide</a></figcaption>
 </figure>
 </div>
-<div id="d0889a68" class="cell" data-execution_count="7">
+<div id="d0889a68" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_long <span class="op">=</span> df_wide_cat.melt(id_vars<span class="op">=</span>[<span class="st">"latitude"</span>, <span class="st">"longitude"</span>], ignore_index<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>df_long</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
@@ -1643,7 +1643,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>Now we can plot the data, where we the <code>datashader</code> method <code>by</code> and <code>any</code> to deal with the new categorical data type when turning the data to a raster.</p>
-<div id="c7778f86" class="cell" data-execution_count="8">
+<div id="c7778f86" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>color_key <span class="op">=</span> {</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"extreme"</span>: <span class="st">"#bb0c0c"</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"severe"</span>: <span class="st">"#c57b19"</span>,</span>
@@ -1764,7 +1764,7 @@ if (window.Jupyter !== undefined) {
 <section id="spatial-drought-extent-through-time" class="level2" data-number="12.6">
 <h2 data-number="12.6" class="anchored" data-anchor-id="spatial-drought-extent-through-time"><span class="header-section-number">12.6</span> Spatial Drought Extent Through Time</h2>
 <p>Now that we have classified drought intensity into categories, let’s calculate the spatial extent of droughts over time. This will enable us to compare how the two standardized drought indices relate to each other. Conveniently, we can use the pandas <code>value_count</code> method on the new categorical columns <code>"spei"</code> and <code>"zscore"</code>, and also employ the <code>normalize</code> parameter to get relative frequencies. This provides an understanding of how many data points fall into each drought class relative to the total number of observations for a certain month.</p>
-<div id="aeb2a24b" class="cell" data-execution_count="9">
+<div id="aeb2a24b" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>col_spei <span class="op">=</span> (</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    df_wide_cat.groupby(level<span class="op">=</span><span class="dv">0</span>)[<span class="st">"spei"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).unstack()  <span class="co"># noqa: PD010</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1773,7 +1773,7 @@ if (window.Jupyter !== undefined) {
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We combine these relative frequencies results.</p>
-<div id="cedf60d2" class="cell" data-execution_count="10">
+<div id="cedf60d2" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>new_keys <span class="op">=</span> pd.Index([<span class="st">"spei"</span>, <span class="st">"zscore"</span>], name<span class="op">=</span><span class="st">"indicator"</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_drought_extend <span class="op">=</span> pd.concat(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    [col_spei, col_zscore],</span>
@@ -1905,7 +1905,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>As a final step we will plot the timeseries of the relative spatial extend of the upper three drought clases (“moderate”, “severe”, and “extreme”). We compare these results to recorded drought events that had a severe impact on food security and destabelized Mozambique.</p>
-<div id="5f89560e" class="cell" data-execution_count="11">
+<div id="5f89560e" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>mozambique_droughts <span class="op">=</span> [</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"time"</span>: <span class="st">"2008-01-01"</span>, <span class="st">"people_affected"</span>: <span class="fl">1.02</span>},</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"time"</span>: <span class="st">"2010-01-01"</span>, <span class="st">"people_affected"</span>: <span class="fl">0.46</span>},</span>
@@ -2056,7 +2056,7 @@ if (window.Jupyter !== undefined) {
 </tbody>
 </table>
 <p>We have already prepared a dataset that includes all these drought indicators, along with the previously introduced SPEI and ASCAT data (previously labeled <code>"zscore"</code>).</p>
-<div id="da36bdcc" class="cell" data-execution_count="12">
+<div id="da36bdcc" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> make_url(<span class="st">"drought_indices-6_25_monthly.csv"</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>df_drought_indices <span class="op">=</span> pd.read_csv(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    url,</span>
@@ -2218,7 +2218,7 @@ if (window.Jupyter !== undefined) {
 </div>
 </div>
 <p>To simplify the calculation of relative drought spatial extent, we will create two functions that loops over the different columns to perform the same analysis as before: 1) set the categorical drought type and 2) calculate relative drought extent.</p>
-<div id="a91ea18e" class="cell" data-execution_count="13">
+<div id="a91ea18e" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> set_drought_cat_type(df: pd.DataFrame) <span class="op">-&gt;</span> pd.DataFrame:</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Drought Severity Levels.</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -2365,7 +2365,7 @@ if (window.Jupyter !== undefined) {
 <h2 data-number="12.8" class="anchored" data-anchor-id="close-up-of-the-20152016-el-niño-drought-event"><span class="header-section-number">12.8</span> Close-up of the 2015–2016 (El Niño) Drought Event</h2>
 <p>Let’s now zoom in on one of the most significant drought disasters of recent history in Mozambique. The 2015-2016 drought event which has been related to El Niño significantly impacted agriculture, food security, and water resources. This drought was characterized by reduced rainfall and elevated temperatures, exacerbating conditions for farming and livestock. Estimated numbers for people affected by this events are ~2.3 million.</p>
 <p>We filter this event from the loaded dataset and plot as before with <code>hvplot</code>.</p>
-<div id="7df4814a" class="cell" data-execution_count="14">
+<div id="7df4814a" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df_long_2016 <span class="op">=</span> df_drought_indices_cat.loc[<span class="st">"2016-01-01"</span>].melt(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    id_vars<span class="op">=</span>[<span class="st">"latitude"</span>, <span class="st">"longitude"</span>], ignore_index<span class="op">=</span><span class="va">False</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>)</span>
