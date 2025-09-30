@@ -51,8 +51,6 @@ kernel: $(CONDA_ENV_DIR) $(KERNEL_DIR)
 post-render:
 	$(foreach f, $(NB), \
 		mv $(f) "$(subst chapters,notebooks,$(subst .quarto_ipynb,.ipynb,$(f)))"; )
-	cp ./Makefile ./notebooks/
-	cp -r ./chapters/images ./notebooks
 
 convert:
 	./convert-quarto.sh
