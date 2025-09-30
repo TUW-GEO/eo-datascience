@@ -2,10 +2,7 @@
 
 
 FILES_SUB=$(git submodule foreach --quiet '
-  for file in $(git diff --name-only --cached | grep "\.ipynb$"); do
-    echo "$name/$file"
-  done
-  for file in $(git diff --name-only | grep "\.ipynb$"); do
+  for file in $(git diff --name-only HEAD~1| grep "\.ipynb$"); do
     echo "$name/$file"
   done
 '|| true)

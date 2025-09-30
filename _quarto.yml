@@ -3,7 +3,6 @@ project:
   pre-render:
     - make kernel
   post-render:
-    - quarto convert chapters/references.qmd
     - make post-render
 
 book:
@@ -62,5 +61,4 @@ format:
 execute:
   freeze: auto
   cache: true
-  keep-ipynb: true
   eval: true

@@ -48,12 +48,8 @@ $(KERNEL_DIR):
 kernel: $(CONDA_ENV_DIR) $(KERNEL_DIR)
 	@echo -e "jupyter kernels are ready."
 
-post-render:
-	$(foreach f, $(NB), \
-		mv $(f) "$(subst chapters,notebooks,$(subst .quarto_ipynb,.ipynb,$(f)))"; )
-
 convert:
-	./convert-quarto.sh
+	./convert-quarto.sh && pre-commit run --all-files
 
 preview:
 	python -m pip install .
