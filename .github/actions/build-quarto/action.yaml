@@ -41,7 +41,9 @@ runs:
     - name: Conda Cache Environment
       uses: actions/cache@v4
       with:
-        path: ./.conda_envs
+        path: |
+          ./.conda_envs
+          /home/runner/.local/share/jupyter/kernels
         key: ${{ runner.os }}-env-${{ hashFiles('./notebooks/**/*.yml') }}
         restore-keys: ${{ runner.os }}-env-
 
