@@ -4,7 +4,6 @@ jupyter: microwave-remote-sensing
 ---
 
 
-
 In this notebook, we will investigate the varying backscatter values associated with different land surfaces like water bodies, forests, grasslands and urban areas. We will use backscatter data from the Sentinel-1 satellite and we will utilize the CORINE Land Cover dataset to classify and extrapolate these surfaces, enabling us to analyze how different land cover types influence backscatter responses.
 
 
@@ -76,7 +75,7 @@ present_landcover_codes = np.unique(cor_da.values[~np.isnan(cor_da.values)].asty
 
 # Get colors + text for legend
 handles = [
-    mpatches.Patch(color=info["color"], label=(f'{info["value"]} - ' + (info["label"])))
+    mpatches.Patch(color=info["color"], label=(f"{info['value']} - " + (info["label"])))
     for info in color_mapping.values()
     if info["value"] in present_landcover_codes
 ]
@@ -153,8 +152,7 @@ rangexy = RangeXY()
 
 
 def load_image(time, land_cover, x_range, y_range):
-    """
-    Callback Function Landcover.
+    """Callback Function Landcover.
 
     Parameters
     ----------
@@ -170,8 +168,8 @@ def load_image(time, land_cover, x_range, y_range):
     Returns
     -------
     holoviews.Image
-    """
 
+    """
     if land_cover == "\xa0\xa0\xa0 Complete Land Cover":
         sig0_selected_ds = var_ds.sig0.sel(time=time)
 

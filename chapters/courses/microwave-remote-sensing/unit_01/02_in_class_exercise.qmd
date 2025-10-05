@@ -4,7 +4,6 @@ jupyter: microwave-remote-sensing
 ---
 
 
-
 In this notebook, we are going to have a look at the conversion of units. Sentinel-1 data, and most other SAR data, is usually provided in decibels (dB). In this notebook, we will discover the advantages of displaying SAR data in decibels and why we need to convert the data to a linear scale in order to make meaningful calculations. Let's start with importing some libraries.
 
 $$
@@ -132,7 +131,7 @@ ax_lr.set_title(r"$\sigma^0$ [$m^2 \cdot m^{-2}$] distribution")
 
 title = (
     r"Sentinel-1 backscatter $\sigma^0$ comparison"
-    + r" in linear and logarithmic domain"
+    r" in linear and logarithmic domain"
 )
 fig.suptitle(title, horizontalalignment="center")
 plt.tight_layout()
@@ -163,9 +162,8 @@ You can find these formulas in the script for `Microwave Remote Sensing` on ``pa
 Now let's implement the conversion in Python.
 
 ```{python}
-def lin2db(val: float | int) -> float:
-    """
-    Converts value from linear to dB units.
+def lin2db(val: float) -> float:
+    """Converts value from linear to dB units.
 
     :param val: Value in linear units.
     :type val: float|int
@@ -175,9 +173,8 @@ def lin2db(val: float | int) -> float:
     return 10 * np.log10(val)
 
 
-def db2lin(val: float | int) -> float:
-    """
-    Converts value from dB to linear units.
+def db2lin(val: float) -> float:
+    """Converts value from dB to linear units.
 
     :param val: Value in dB.
     :type val: float|int

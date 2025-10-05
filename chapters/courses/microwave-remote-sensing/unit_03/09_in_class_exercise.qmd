@@ -4,7 +4,6 @@ jupyter: microwave-remote-sensing
 ---
 
 
-
 The goal of this notebook is to read an interferogram image (i.e., 2-D array of phase values) and unwrap it. Phase unwrapping is a critical process in interferometry, which involves recovering unambiguous phase data from the interferogram.
 
 A SAR interferogram represents the phase difference between two radar acquisitions (i.e., two SLC images). The phase difference is usually wrapped within a range of 0 to 2π, because the phase is inherently cyclical. When the true phase difference exceeds 2π, it gets "wrapped" into this range, creating a discontinuous phase signal. Phase unwrapping refers to the process of reconstructing the continuous phase field from the wrapped phase data.
@@ -24,12 +23,12 @@ import os
 
 import cmcrameri as cmc  # noqa: F401
 import intake
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import snaphu
 import xarray as xr
+from matplotlib import patches
 ```
 
 ```{python}
@@ -107,12 +106,10 @@ def unwrap_array(
     init="mcf",
     **kwargs,
 ) -> xr.DataArray:
-    """
-    Unwraps the phase data using the snaphu algorithm.
+    """Unwraps the phase data using the snaphu algorithm.
 
     Parameters
     ----------
-
     data: xarray DataArray with complex numbers
     complex_var: Name of the variable with the complex numbers
     ouput_var: Name of the variable with the unwrapped phase
@@ -123,8 +120,9 @@ def unwrap_array(
     coh_high_threshold: Higher threshold for the coherence values
 
     Returns
-    ----------
+    -------
     xarray DataArray with the unwrapped phase
+
     """
     # Get the complex data
     data_arr = data[complex_var]
@@ -322,12 +320,10 @@ This operation can be very useful for monitoring ground deformation.
 
 ```{python}
 def displacement(unw, lambda_val: float = 0.056) -> xr.DataArray:
-    """
-    Calculates the displacement from the unwrapped phase
+    """Calculates the displacement from the unwrapped phase
 
     Parameters
     ----------
-
     unw: xarray DataArray with the unwrapped phase
     unw: xr.DataArray
     lambda_val: Wavelength of the radar signal
@@ -336,6 +332,7 @@ def displacement(unw, lambda_val: float = 0.056) -> xr.DataArray:
     Returns
     -------
     xarray DataArray with the displacement
+
     """
     disp = unw * -lambda_val / (4 * np.pi)
     return disp
@@ -438,5 +435,5 @@ plt.tight_layout()
 
 In the following animation, we can capture the 3D displacement caused by the Ridgecrest quake by observing the after and before elevation model.
 
-![](../../images/ridgecrest.gif)
+![](../images/ridgecrest.gif)
 *Credits: NASA*

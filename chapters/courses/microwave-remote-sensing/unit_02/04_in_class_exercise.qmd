@@ -4,7 +4,6 @@ jupyter: microwave-remote-sensing
 ---
 
 
-
 In this notebook we discuss how we can easily compare images of two or more different time slices, satellites or other earth observation products. We limit our selves to products on a regular grid with an associated coordinate reference system (CRS), known as a raster. This means that each cell of the raster contains an attribute value and location coordinates. The process of combining such rasters to form datacubes is called raster stacking. We can have datacubes in many forms, such as the spatiotemporal datacube:
 
 $$Z = f(x,y,t) \quad \text{,}$$
@@ -108,8 +107,7 @@ The Sentinel-1 data is now stored on disk as separate two-dimensional GeoTIFF fi
 
 ```{python}
 def s1_preprocess(x, bbox, scale):
-    """
-    Preprocess file.
+    """Preprocess file.
 
     Parameters
     ----------
@@ -118,11 +116,12 @@ def s1_preprocess(x, bbox, scale):
       minimum longitude minimum latitude maximum longitude maximum latitude
     scale: float
       scaling factor
+
     Returns
     -------
     xarray.Dataset
-    """
 
+    """
     path = Path(urllib.parse.unquote_plus(x.encoding["source"]))
     filename = path.parent.name
     x = x.rio.clip_box(*bbox, crs="EPSG:4326")
@@ -162,8 +161,7 @@ To enable further stacking of ALOS-2 and Sentinel-1 data we need to know some mo
 
 ```{python}
 def print_raster(raster, name):
-    """
-    Print Raster Metadata
+    """Print Raster Metadata
 
     Parameters
     ----------
@@ -171,11 +169,11 @@ def print_raster(raster, name):
         raster to process
     y: string
         name of product
-    """
 
+    """
     print(
         f"{name} Raster: \n----------------\n"
-        f"resolution: {raster.rio.resolution()} {raster.rio.crs.units_factor}\n"  # noqa
+        f"resolution: {raster.rio.resolution()} {raster.rio.crs.units_factor}\n"
         f"bounds: {raster.rio.bounds()}\n"
         f"CRS: {raster.rio.crs}\n"
     )
@@ -194,19 +192,19 @@ to correctly convert the integers to $\gamma^0_T$ in the dB range.
 
 ```{python}
 def alos_preprocess(x, bbox):
-    """
-    Preprocess file.
+    """Preprocess file.
 
     Parameters
     ----------
     x : xarray.Dataset
     bbox: tuple
       minimum longitude minimum latitude maximum longitude maximum latitude
+
     Returns
     -------
     xarray.Dataset
-    """
 
+    """
     path = Path(urllib.parse.unquote_plus(x.encoding["source"]))
     filename = path.parent.name
     x = x.rio.clip_box(*bbox, crs="EPSG:4326")

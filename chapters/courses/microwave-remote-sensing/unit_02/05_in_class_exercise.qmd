@@ -4,7 +4,6 @@ jupyter: microwave-remote-sensing
 ---
 
 
-
 In this notebook, we aim to demonstrate how C-band (4–8 GHz, wavelengths of approximately 3.75–7.5 cm) and L-band (1–2 GHz, wavelengths of approximately 15–30 cm) radio frequencies differ for different land covers and times of the year. In addition, we'll look at co- and cross-polarized backscattering:
 
 + Sentinel-1 (C-band)
@@ -112,8 +111,7 @@ LAI_image = LAI_mean.hvplot.image(rasterize=True, cmap="viridis", clim=(0, 6)).o
 
 
 def get_timeseries(x, y):
-    """
-    Callback Function Holoviews
+    """Callback Function Holoviews
 
     Parameters
     ----------
@@ -121,8 +119,8 @@ def get_timeseries(x, y):
         numeric value for x selected on LAI map
     y: float
         numeric value for y selected on LAI map
-    """
 
+    """
     lai_value = LAI_mean.sel(x=x, y=y, method="nearest").values
 
     if np.isnan(lai_value):

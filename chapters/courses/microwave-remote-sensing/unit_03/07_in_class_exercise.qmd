@@ -8,7 +8,7 @@ This notebook will provide an empirical demonstration of speckle - how it origin
 
 Speckle is defined as a kind of noise that affects all radar images. Given the multiple scattering contributions originating from the various elementary objects present within a resolution cell, the resulting backscatter signal can be described as a random constructive and destructive interference of wavelets. As a consequence, speckle is the reason why a granular pattern normally affects SAR images, making it more challenging to interpret and analyze them.
 
-![](../../images/speckle_effect.png)
+![](../images/speckle_effect.png)
 
 *Credits: ESRI*
 
@@ -60,9 +60,9 @@ speckled_indices = np.random.choice(
 speckled_data_linear = ideal_data_linear.copy()
 
 speckle_noise = np.random.gumbel(scale=1.0, size=num_speckled_pixels)
-speckled_data_linear.ravel()[
-    speckled_indices
-] *= speckle_noise  # Add speckle to the selected pixels
+speckled_data_linear.ravel()[speckled_indices] *= (
+    speckle_noise  # Add speckle to the selected pixels
+)
 
 ideal_data_dB = 10 * np.log10(ideal_data_linear)
 speckled_data_dB = 10 * np.log10(speckled_data_linear)
@@ -143,8 +143,7 @@ present_landcover_codes = np.unique(
 
 
 def load_image(var_ds, time, land_cover, x_range, y_range, filter_fun_spatial=None):
-    """
-    Callback Function Landcover.
+    """Callback Function Landcover.
 
     Parameters
     ----------
@@ -160,8 +159,8 @@ def load_image(var_ds, time, land_cover, x_range, y_range, filter_fun_spatial=No
     Returns
     -------
     holoviews.Image
-    """
 
+    """
     if time is not None:
         var_ds = var_ds.sel(time=time)
 
@@ -189,7 +188,6 @@ def load_image(var_ds, time, land_cover, x_range, y_range, filter_fun_spatial=No
 
 
 def plot_variability(var_ds, filter_fun_spatial=None, filter_fun_temporal=None):
-
     robust_min = var_ds.sig0.quantile(0.02).item()
     robust_max = var_ds.sig0.quantile(0.98).item()
 
@@ -277,17 +275,17 @@ Let's build up a function for applying a Lee filter with a kernel window size of
 
 ```{python}
 def lee_filter(raster, size=7):
-    """
-    Parameters:
+    """Parameters
     raster: ndarray
         2D array representing the noisy image (e.g., radar image with speckle)
     size: int
         Size of the kernel window for the filter (must be odd, default is 7)
 
-    Returns:
+    Returns
+    -------
     filtered_image (ndarray): The filtered image with reduced speckle noise
-    """
 
+    """
     raster = np.nan_to_num(raster)
     raster = 10 ** (raster / 10)
 
@@ -317,16 +315,16 @@ Temporal filtering would involve taking the average of all previous (past) obser
 
 ```{python}
 def temporal_filter(raster):
-    """
-    Parameters:
+    """Parameters
     raster: ndarray
         3D array representing the noisy image over time
         (e.g., radar image with speckle)
 
-    Returns:
+    Returns
+    -------
     filtered_image (ndarray): The filtered image with reduced speckle noise
-    """
 
+    """
     return raster.mean("time")
 ```
 
