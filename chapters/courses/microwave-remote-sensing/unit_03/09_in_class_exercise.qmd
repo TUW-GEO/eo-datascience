@@ -19,6 +19,9 @@ In this notebook we will use the resulting wrapped interferogram from notebook "
 
 
 ```{python}
+import contextlib
+import os
+
 import cmcrameri as cmc  # noqa: F401
 import intake
 import matplotlib.patches as patches
@@ -27,7 +30,6 @@ import numpy as np
 import seaborn as sns
 import snaphu
 import xarray as xr
-from IPython.display import clear_output
 ```
 
 ```{python}
@@ -73,6 +75,24 @@ The actual unwrapping is essentially an addition of the phase values, such that 
 *Figure 1: Illustration of how the unwrapping of the phase works. (Source: ESA)*.
 
 ```{python}
+@contextlib.contextmanager
+def suppress_output():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = os.dup(1)
+        old_stderr = os.dup(2)
+
+        os.dup2(devnull.fileno(), 1)
+        os.dup2(devnull.fileno(), 2)
+
+        try:
+            yield
+        finally:
+            os.dup2(old_stdout, 1)
+            os.dup2(old_stderr, 2)
+            os.close(old_stdout)
+            os.close(old_stderr)
+
+
 def unwrap_array(
     data: xr.DataArray,
     complex_var: str = "cmplx",
@@ -129,18 +149,16 @@ def unwrap_array(
         coherence = np.ones_like(data_arr.real)
 
     # Unwrap the phase (already in complex form)
-    unw, _ = snaphu.unwrap(
-        data_arr,
-        coherence,
-        nlooks=nlooks,
-        cost=cost,
-        init=init,
-        mask=mask,
-        **kwargs,
-    )
-
-    # Clear the output to avoid printing the snaphu output
-    clear_output()
+    with suppress_output():
+        unw, _ = snaphu.unwrap(
+            data_arr,
+            coherence,
+            nlooks=nlooks,
+            cost=cost,
+            init=init,
+            mask=mask,
+            **kwargs,
+        )
 
     # Build xarray DataArray with the unwrapped phase
     # unw_da = xr.DataArray(unw, coords=data.coords, dims=data.dims)
