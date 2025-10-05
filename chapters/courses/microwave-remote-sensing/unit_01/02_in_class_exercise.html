@@ -423,7 +423,7 @@ window.Quarto = {
 \]</span> <span class="math display">\[
 [\text{dB}] \longleftrightarrow [\text{m}^2 \cdot \text{m}^{-2}]
 \]</span></p>
-<div id="4c7b8dac" class="cell" data-execution_count="2">
+<div id="bc56f268" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> odc.stac</span>
@@ -442,7 +442,7 @@ window.Quarto = {
 <section id="search-for-some-data" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="search-for-some-data"><span class="header-section-number">2.2</span> Search for some Data</h2>
 <p>Now, we start by loading data from Sentinel-1 from the EODC STAC Catalogue. We do this in the same way as in the previous notebook “Discover and Read SAR Data”.</p>
-<div id="1a6fdb6a" class="cell" data-execution_count="3">
+<div id="8a653116" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>latmin, latmax <span class="op">=</span> <span class="dv">48</span>, <span class="fl">48.5</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lonmin, lonmax <span class="op">=</span> <span class="dv">16</span>, <span class="dv">17</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>bounds <span class="op">=</span> (lonmin, latmin, lonmax, latmax)</span>
@@ -465,7 +465,7 @@ window.Quarto = {
 <pre><code>60 scenes found</code></pre>
 </div>
 </div>
-<div id="9815870e" class="cell" data-execution_count="4">
+<div id="daa7a4b3" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>bands <span class="op">=</span> <span class="st">"VV"</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>sig0_dc <span class="op">=</span> odc.stac.stac_load(</span>
@@ -496,9 +496,7 @@ window.Quarto = {
 </symbol>
 </defs>
 </svg>
-<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
- *
- */
+<style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
 :root {
   --xr-font-color0: var(
@@ -577,6 +575,7 @@ body.vscode-dark {
   display: block !important;
   min-width: 300px;
   max-width: 700px;
+  line-height: 1.6;
 }
 
 .xr-text-repr-fallback {
@@ -599,11 +598,18 @@ body.vscode-dark {
 }
 
 .xr-obj-type,
-.xr-array-name {
+.xr-obj-name,
+.xr-group-name {
   margin-left: 2px;
   margin-right: 10px;
 }
 
+.xr-group-name::before {
+  content: "📁";
+  padding-right: 0.3em;
+}
+
+.xr-group-name,
 .xr-obj-type {
   color: var(--xr-font-color2);
 }
@@ -612,6 +618,8 @@ body.vscode-dark {
   padding-left: 0 !important;
   display: grid;
   grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+  margin-block-start: 0;
+  margin-block-end: 0;
 }
 
 .xr-section-item {
@@ -622,6 +630,7 @@ body.vscode-dark {
   display: inline-block;
   opacity: 0;
   height: 0;
+  margin: 0;
 }
 
 .xr-section-item input + label {
@@ -680,7 +689,6 @@ body.vscode-dark {
 .xr-section-summary,
 .xr-section-inline-details {
   padding-top: 4px;
-  padding-bottom: 4px;
 }
 
 .xr-section-inline-details {
@@ -690,11 +698,38 @@ body.vscode-dark {
 .xr-section-details {
   display: none;
   grid-column: 1 / -1;
+  margin-top: 4px;
   margin-bottom: 5px;
 }
 
 .xr-section-summary-in:checked ~ .xr-section-details {
   display: contents;
+}
+
+.xr-group-box {
+  display: inline-grid;
+  grid-template-columns: 0px 20px auto;
+  width: 100%;
+}
+
+.xr-group-box-vline {
+  grid-column-start: 1;
+  border-right: 0.2em solid;
+  border-color: var(--xr-border-color);
+  width: 0px;
+}
+
+.xr-group-box-hline {
+  grid-column-start: 2;
+  grid-row-start: 1;
+  height: 1em;
+  width: 20px;
+  border-bottom: 0.2em solid;
+  border-color: var(--xr-border-color);
+}
+
+.xr-group-box-contents {
+  grid-column-start: 3;
 }
 
 .xr-array-wrap {
@@ -930,7 +965,7 @@ Coordinates:
   * y            (y) float64 25kB 1.653e+06 1.653e+06 ... 1.59e+06 1.59e+06
   * x            (x) float64 32kB 5.241e+06 5.241e+06 ... 5.32e+06 5.32e+06
     spatial_ref  int32 4B 27704
-  * time         (time) datetime64[ns] 480B 2022-07-02T05:18:03 ... 2022-07-3...</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-array-name">'VV'</div><ul class="xr-dim-list"><li><span class="xr-has-index">time</span>: 60</li><li><span class="xr-has-index">y</span>: 3150</li><li><span class="xr-has-index">x</span>: 3978</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input id="section-d77cffa3-4c99-46ab-a156-1370b07f453e" class="xr-array-in" type="checkbox" checked=""><label for="section-d77cffa3-4c99-46ab-a156-1370b07f453e" title="Show/hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>dask.array&lt;chunksize=(5, 1000, 1000), meta=np.ndarray&gt;</span></div><div class="xr-array-data">
+  * time         (time) datetime64[ns] 480B 2022-07-02T05:18:03 ... 2022-07-3...</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-obj-name">'VV'</div><ul class="xr-dim-list"><li><span class="xr-has-index">time</span>: 60</li><li><span class="xr-has-index">y</span>: 3150</li><li><span class="xr-has-index">x</span>: 3978</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input id="section-e1511828-1f1c-4d33-8c00-c667503fc3c4" class="xr-array-in" type="checkbox" checked=""><label for="section-e1511828-1f1c-4d33-8c00-c667503fc3c4" title="Show/hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>dask.array&lt;chunksize=(5, 1000, 1000), meta=np.ndarray&gt;</span></div><div class="xr-array-data">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
 <col style="width: 50%">
@@ -973,9 +1008,9 @@ Coordinates:
 </tr>
 </tbody>
 </table>
-</div></div></li><li class="xr-section-item"><input id="section-1fca1602-02dd-4603-96fc-966bdeffb61b" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-1fca1602-02dd-4603-96fc-966bdeffb61b" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">1.653e+06 1.653e+06 ... 1.59e+06</div><input id="attrs-92f69d74-ce6f-438f-91d4-257d5a72911d" class="xr-var-attrs-in" type="checkbox"><label for="attrs-92f69d74-ce6f-438f-91d4-257d5a72911d" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-b86da53c-d4be-4c99-ae64-8ebfd343a8e3" class="xr-var-data-in" type="checkbox"><label for="data-b86da53c-d4be-4c99-ae64-8ebfd343a8e3" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>-20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([1653150., 1653130., 1653110., ..., 1590210., 1590190., 1590170.],
-      shape=(3150,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">5.241e+06 5.241e+06 ... 5.32e+06</div><input id="attrs-4da87e90-a493-4a15-8316-79614428d64e" class="xr-var-attrs-in" type="checkbox"><label for="attrs-4da87e90-a493-4a15-8316-79614428d64e" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-64fadc32-c28c-4348-b5f7-891f2f9dea29" class="xr-var-data-in" type="checkbox"><label for="data-64fadc32-c28c-4348-b5f7-891f2f9dea29" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([5240690., 5240710., 5240730., ..., 5320190., 5320210., 5320230.],
-      shape=(3978,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">27704</div><input id="attrs-414393be-684a-40a6-88f2-61f2d64a3cc6" class="xr-var-attrs-in" type="checkbox"><label for="attrs-414393be-684a-40a6-88f2-61f2d64a3cc6" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-c7c4253f-3759-4f71-be29-c848d86aee6c" class="xr-var-data-in" type="checkbox"><label for="data-c7c4253f-3759-4f71-be29-c848d86aee6c" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>crs_wkt :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984</dd><dt><span>projected_crs_name :</span></dt><dd>Azimuthal_Equidistant</dd><dt><span>grid_mapping_name :</span></dt><dd>azimuthal_equidistant</dd><dt><span>latitude_of_projection_origin :</span></dt><dd>53.0</dd><dt><span>longitude_of_projection_origin :</span></dt><dd>24.0</dd><dt><span>false_easting :</span></dt><dd>5837287.81977</dd><dt><span>false_northing :</span></dt><dd>2121415.69617</dd><dt><span>GeoTransform :</span></dt><dd>5240680 20 0 1653160 0 -20</dd></dl></div><div class="xr-var-data"><pre>array(27704, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2022-07-02T05:18:03 ... 2022-07-...</div><input id="attrs-8710008e-0672-4d87-bf4e-7ac39f85deaa" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-8710008e-0672-4d87-bf4e-7ac39f85deaa" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-1a169d5d-4bdd-4391-b5c1-8b85627b5f0f" class="xr-var-data-in" type="checkbox"><label for="data-1a169d5d-4bdd-4391-b5c1-8b85627b5f0f" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2022-07-02T05:18:03.000000000', '2022-07-02T05:18:28.000000000',
+</div></div></li><li class="xr-section-item"><input id="section-aeef9841-13b9-480a-88ca-a9e760c52738" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-aeef9841-13b9-480a-88ca-a9e760c52738" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">1.653e+06 1.653e+06 ... 1.59e+06</div><input id="attrs-77d85b05-7608-4e39-a8f0-03472ebb66d0" class="xr-var-attrs-in" type="checkbox"><label for="attrs-77d85b05-7608-4e39-a8f0-03472ebb66d0" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-9e920ac9-8aec-41eb-ae40-59c2b6892cd7" class="xr-var-data-in" type="checkbox"><label for="data-9e920ac9-8aec-41eb-ae40-59c2b6892cd7" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>-20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([1653150., 1653130., 1653110., ..., 1590210., 1590190., 1590170.],
+      shape=(3150,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">5.241e+06 5.241e+06 ... 5.32e+06</div><input id="attrs-1f78aecc-efd2-4490-8627-760ac1057779" class="xr-var-attrs-in" type="checkbox"><label for="attrs-1f78aecc-efd2-4490-8627-760ac1057779" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-79d90b1f-17a4-4257-a44a-d2d0319ff579" class="xr-var-data-in" type="checkbox"><label for="data-79d90b1f-17a4-4257-a44a-d2d0319ff579" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([5240690., 5240710., 5240730., ..., 5320190., 5320210., 5320230.],
+      shape=(3978,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">27704</div><input id="attrs-8625d2d1-d966-4801-a66b-8d3b792d2938" class="xr-var-attrs-in" type="checkbox"><label for="attrs-8625d2d1-d966-4801-a66b-8d3b792d2938" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-5e6a50d5-3ca2-48da-8296-cd4f137e299c" class="xr-var-data-in" type="checkbox"><label for="data-5e6a50d5-3ca2-48da-8296-cd4f137e299c" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>crs_wkt :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984</dd><dt><span>projected_crs_name :</span></dt><dd>Azimuthal_Equidistant</dd><dt><span>grid_mapping_name :</span></dt><dd>azimuthal_equidistant</dd><dt><span>latitude_of_projection_origin :</span></dt><dd>53.0</dd><dt><span>longitude_of_projection_origin :</span></dt><dd>24.0</dd><dt><span>false_easting :</span></dt><dd>5837287.81977</dd><dt><span>false_northing :</span></dt><dd>2121415.69617</dd><dt><span>GeoTransform :</span></dt><dd>5240680 20 0 1653160 0 -20</dd></dl></div><div class="xr-var-data"><pre>array(27704, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2022-07-02T05:18:03 ... 2022-07-...</div><input id="attrs-ebdbb507-123d-4557-a1b6-436922b10ba2" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-ebdbb507-123d-4557-a1b6-436922b10ba2" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-9500f7ce-277d-4e7e-8efd-3b13f2d51901" class="xr-var-data-in" type="checkbox"><label for="data-9500f7ce-277d-4e7e-8efd-3b13f2d51901" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2022-07-02T05:18:03.000000000', '2022-07-02T05:18:28.000000000',
        '2022-07-02T05:18:53.000000000', '2022-07-04T05:01:44.000000000',
        '2022-07-04T05:02:09.000000000', '2022-07-04T05:02:34.000000000',
        '2022-07-05T16:50:50.000000000', '2022-07-05T16:51:15.000000000',
@@ -1005,59 +1040,19 @@ Coordinates:
        '2022-07-29T16:50:51.000000000', '2022-07-29T16:51:16.000000000',
        '2022-07-29T16:51:41.000000000', '2022-07-31T16:34:46.000000000',
        '2022-07-31T16:35:11.000000000', '2022-07-31T16:35:36.000000000'],
-      dtype='datetime64[ns]')</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-ed325ea7-f41d-4577-9d08-31a5badf3f06" class="xr-section-summary-in" type="checkbox"><label for="section-ed325ea7-f41d-4577-9d08-31a5badf3f06" class="xr-section-summary">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>y</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-ee5e3260-f254-4ccb-8b45-5a0810ae9d4e" class="xr-index-data-in" type="checkbox"><label for="index-ee5e3260-f254-4ccb-8b45-5a0810ae9d4e" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([1653150.0, 1653130.0, 1653110.0, 1653090.0, 1653070.0, 1653050.0,
-       1653030.0, 1653010.0, 1652990.0, 1652970.0,
-       ...
-       1590350.0, 1590330.0, 1590310.0, 1590290.0, 1590270.0, 1590250.0,
-       1590230.0, 1590210.0, 1590190.0, 1590170.0],
-      dtype='float64', name='y', length=3150))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>x</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-a935e5a7-ea2c-4011-9ea3-0b3ec1eb45b1" class="xr-index-data-in" type="checkbox"><label for="index-a935e5a7-ea2c-4011-9ea3-0b3ec1eb45b1" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([5240690.0, 5240710.0, 5240730.0, 5240750.0, 5240770.0, 5240790.0,
-       5240810.0, 5240830.0, 5240850.0, 5240870.0,
-       ...
-       5320050.0, 5320070.0, 5320090.0, 5320110.0, 5320130.0, 5320150.0,
-       5320170.0, 5320190.0, 5320210.0, 5320230.0],
-      dtype='float64', name='x', length=3978))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>time</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-fee9f139-46e8-41c6-b8c3-e502aa2c073b" class="xr-index-data-in" type="checkbox"><label for="index-fee9f139-46e8-41c6-b8c3-e502aa2c073b" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(DatetimeIndex(['2022-07-02 05:18:03', '2022-07-02 05:18:28',
-               '2022-07-02 05:18:53', '2022-07-04 05:01:44',
-               '2022-07-04 05:02:09', '2022-07-04 05:02:34',
-               '2022-07-05 16:50:50', '2022-07-05 16:51:15',
-               '2022-07-05 16:51:40', '2022-07-07 16:34:45',
-               '2022-07-07 16:35:10', '2022-07-07 16:35:35',
-               '2022-07-09 05:09:52', '2022-07-09 05:10:17',
-               '2022-07-09 05:10:42', '2022-07-10 16:59:00',
-               '2022-07-10 16:59:25', '2022-07-10 16:59:50',
-               '2022-07-11 04:53:33', '2022-07-11 04:53:58',
-               '2022-07-11 04:54:23', '2022-07-12 16:42:47',
-               '2022-07-12 16:43:12', '2022-07-12 16:43:37',
-               '2022-07-14 05:18:03', '2022-07-14 05:18:28',
-               '2022-07-14 05:18:53', '2022-07-16 05:01:45',
-               '2022-07-16 05:02:10', '2022-07-16 05:02:35',
-               '2022-07-17 16:50:51', '2022-07-17 16:51:16',
-               '2022-07-17 16:51:41', '2022-07-19 16:34:46',
-               '2022-07-19 16:35:11', '2022-07-19 16:35:36',
-               '2022-07-21 05:09:52', '2022-07-21 05:10:17',
-               '2022-07-21 05:10:42', '2022-07-22 16:59:01',
-               '2022-07-22 16:59:26', '2022-07-22 16:59:51',
-               '2022-07-23 04:53:34', '2022-07-23 04:53:59',
-               '2022-07-23 04:54:24', '2022-07-24 16:42:48',
-               '2022-07-24 16:43:13', '2022-07-24 16:43:38',
-               '2022-07-26 05:18:04', '2022-07-26 05:18:29',
-               '2022-07-26 05:18:54', '2022-07-28 05:01:45',
-               '2022-07-28 05:02:10', '2022-07-28 05:02:35',
-               '2022-07-29 16:50:51', '2022-07-29 16:51:16',
-               '2022-07-29 16:51:41', '2022-07-31 16:34:46',
-               '2022-07-31 16:35:11', '2022-07-31 16:35:36'],
-              dtype='datetime64[ns]', name='time', freq=None))</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-6031e394-1293-4d07-b4eb-76aa3df54409" class="xr-section-summary-in" type="checkbox" disabled=""><label for="section-6031e394-1293-4d07-b4eb-76aa3df54409" class="xr-section-summary" title="Expand/collapse section">Attributes: <span>(0)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"></dl></div></li></ul></div></div>
+      dtype='datetime64[ns]')</pre></div></li></ul></div></li></ul></div></div>
 </div>
 </div>
 </section>
 <section id="comparison-of-the-data-in-db-and-linear-scale" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="comparison-of-the-data-in-db-and-linear-scale"><span class="header-section-number">2.3</span> Comparison of the Data in dB and Linear Scale</h2>
 <p>In the next two cells we will select a subset of the data. This is done to reduce the amount of data we are working with. The precise workflow is not important for now, since the theory is explained after the cells. They are just here to show the data we are working with.</p>
-<div id="1feb09fb" class="cell" data-execution_count="5">
+<div id="f72c3fad" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> sig0_dc.sel(time<span class="op">=</span><span class="bu">slice</span>(<span class="st">"2022-07-01"</span>, <span class="st">"2022-07-07"</span>))</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> subset.dropna(<span class="st">"time"</span>, how<span class="op">=</span><span class="st">"all"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Now plot the data.</p>
-<div id="00b07cb0" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;jupyter&quot;,&quot;value&quot;:{&quot;source_hidden&quot;:true}}" data-execution_count="6">
+<div id="267694df" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;jupyter&quot;,&quot;value&quot;:{&quot;source_hidden&quot;:true}}" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>aoi <span class="op">=</span> subset.isel(time<span class="op">=</span><span class="dv">0</span>, x<span class="op">=</span><span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">500</span>), y<span class="op">=</span><span class="bu">slice</span>(<span class="dv">0</span>, <span class="dv">500</span>))</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>aoi_lin <span class="op">=</span> <span class="dv">10</span> <span class="op">**</span> (aoi <span class="op">/</span> <span class="dv">10</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1102,7 +1097,7 @@ Coordinates:
 <span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>title <span class="op">=</span> (</span>
 <span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r"Sentinel-1 backscatter </span><span class="dv">$\s</span><span class="vs">igma</span><span class="dv">^</span><span class="vs">0</span><span class="dv">$</span><span class="vs"> comparison"</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">+</span> <span class="vs">r" in linear and logarithmic domain"</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r" in linear and logarithmic domain"</span></span>
 <span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>fig.suptitle(title, horizontalalignment<span class="op">=</span><span class="st">"center"</span>)</span>
 <span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1127,32 +1122,30 @@ D =  10  \cdot \log_{10} (I) = 10 \cdot \log_{10} (e) \cdot \ln (I)\longrightarr
 I = e^{\frac{D}{10\cdot \log_{10}(e)}} = 10^{\frac{D}{10}} \longrightarrow [m^2m^{-2}]
 \]</span> You can find these formulas in the script for <code>Microwave Remote Sensing</code> on <code>page 136 (equation 6.40)</code>.</p>
 <p>Now let’s implement the conversion in Python.</p>
-<div id="160f1922" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lin2db(val: <span class="bu">float</span> <span class="op">|</span> <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Converts value from linear to dB units.</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">    :param val: Value in linear units.</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">    :type val: float|int</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">    :return: Value in dB.</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">    :rtype: float</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">10</span> <span class="op">*</span> np.log10(val)</span>
+<div id="1962af80" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lin2db(val: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Converts value from linear to dB units.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">    :param val: Value in linear units.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">    :type val: float|int</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">    :return: Value in dB.</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">    :rtype: float</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">10</span> <span class="op">*</span> np.log10(val)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> db2lin(val: <span class="bu">float</span> <span class="op">|</span> <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Converts value from dB to linear units.</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">    :param val: Value in dB.</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">    :type val: float|int</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">    :return: Value in linear units.</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">    :rtype: float</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">10</span> <span class="op">**</span> (val <span class="op">/</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> db2lin(val: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Converts value from dB to linear units.</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">    :param val: Value in dB.</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">    :type val: float|int</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">    :return: Value in linear units.</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">    :rtype: float</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">10</span> <span class="op">**</span> (val <span class="op">/</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>When performing mathematical operations with SAR data it is important to be aware, that adding values in the logarithmic scale doesn’t work in the same way as adding regular (linear) values. This is because in the logarithmic scale, each unit step represents an equal multiplication. This means that an addition of two values in the logarithmic scale equals a multiplication of the values in the linear scale. Vice versa, a subtraction in a logarithmic scale equals a division in a linear scale. Let’s have a look at an example, where we add two values, once without the conversion to linear scale and once with the conversion to linear scale.</p>
-<div id="26757cb8" class="cell" data-execution_count="8">
+<div id="0496a0de" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Logarithmic addition</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Values in linear and decibel units</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>val1_db, val2_db <span class="op">=</span> <span class="dv">10</span>, <span class="dv">12</span></span>
@@ -1191,7 +1184,7 @@ Linear sum:         10.0 +  15.85 =  25.85 [lin]
 <section id="creating-a-monthly-mosaic" class="level2" data-number="2.5">
 <h2 data-number="2.5" class="anchored" data-anchor-id="creating-a-monthly-mosaic"><span class="header-section-number">2.5</span> Creating a Monthly Mosaic</h2>
 <p>So in the beginning we have lazily loaded data for an area across a whole year. We therefore have around 700 images. We will now essentially compress the data of each month into one timestamp. This is done by using the <code>resampling</code> method together with an operation method like <code>mean</code> that includes summation. Since the data is in dB we need to convert it to linear scale first, then we can resample the data and convert it back to dB.</p>
-<div id="be25714a" class="cell" data-execution_count="9">
+<div id="d99852e4" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to linear scale and calculate monthly means</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Conversion by calculating with the xarray Object</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>sig0_lin <span class="op">=</span> <span class="dv">10</span> <span class="op">**</span> (sig0_dc <span class="op">/</span> <span class="dv">10</span>)</span>
@@ -1220,9 +1213,7 @@ Linear sum:         10.0 +  15.85 =  25.85 [lin]
 </symbol>
 </defs>
 </svg>
-<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
- *
- */
+<style>/* CSS stylesheet for displaying xarray objects in notebooks */
 
 :root {
   --xr-font-color0: var(
@@ -1301,6 +1292,7 @@ body.vscode-dark {
   display: block !important;
   min-width: 300px;
   max-width: 700px;
+  line-height: 1.6;
 }
 
 .xr-text-repr-fallback {
@@ -1323,11 +1315,18 @@ body.vscode-dark {
 }
 
 .xr-obj-type,
-.xr-array-name {
+.xr-obj-name,
+.xr-group-name {
   margin-left: 2px;
   margin-right: 10px;
 }
 
+.xr-group-name::before {
+  content: "📁";
+  padding-right: 0.3em;
+}
+
+.xr-group-name,
 .xr-obj-type {
   color: var(--xr-font-color2);
 }
@@ -1336,6 +1335,8 @@ body.vscode-dark {
   padding-left: 0 !important;
   display: grid;
   grid-template-columns: 150px auto auto 1fr 0 20px 0 20px;
+  margin-block-start: 0;
+  margin-block-end: 0;
 }
 
 .xr-section-item {
@@ -1346,6 +1347,7 @@ body.vscode-dark {
   display: inline-block;
   opacity: 0;
   height: 0;
+  margin: 0;
 }
 
 .xr-section-item input + label {
@@ -1404,7 +1406,6 @@ body.vscode-dark {
 .xr-section-summary,
 .xr-section-inline-details {
   padding-top: 4px;
-  padding-bottom: 4px;
 }
 
 .xr-section-inline-details {
@@ -1414,11 +1415,38 @@ body.vscode-dark {
 .xr-section-details {
   display: none;
   grid-column: 1 / -1;
+  margin-top: 4px;
   margin-bottom: 5px;
 }
 
 .xr-section-summary-in:checked ~ .xr-section-details {
   display: contents;
+}
+
+.xr-group-box {
+  display: inline-grid;
+  grid-template-columns: 0px 20px auto;
+  width: 100%;
+}
+
+.xr-group-box-vline {
+  grid-column-start: 1;
+  border-right: 0.2em solid;
+  border-color: var(--xr-border-color);
+  width: 0px;
+}
+
+.xr-group-box-hline {
+  grid-column-start: 2;
+  grid-row-start: 1;
+  height: 1em;
+  width: 20px;
+  border-bottom: 0.2em solid;
+  border-color: var(--xr-border-color);
+}
+
+.xr-group-box-contents {
+  grid-column-start: 3;
 }
 
 .xr-array-wrap {
@@ -1654,7 +1682,7 @@ Coordinates:
   * y            (y) float64 25kB 1.653e+06 1.653e+06 ... 1.59e+06 1.59e+06
   * x            (x) float64 32kB 5.241e+06 5.241e+06 ... 5.32e+06 5.32e+06
     spatial_ref  int32 4B 27704
-  * time         (time) datetime64[ns] 8B 2022-07-31</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-array-name">'VV'</div><ul class="xr-dim-list"><li><span class="xr-has-index">time</span>: 1</li><li><span class="xr-has-index">y</span>: 3150</li><li><span class="xr-has-index">x</span>: 3978</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input id="section-a31b3e9c-cba6-4784-886c-30aca6c52dc9" class="xr-array-in" type="checkbox" checked=""><label for="section-a31b3e9c-cba6-4784-886c-30aca6c52dc9" title="Show/hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>dask.array&lt;chunksize=(1, 1000, 1000), meta=np.ndarray&gt;</span></div><div class="xr-array-data">
+  * time         (time) datetime64[ns] 8B 2022-07-31</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-obj-name">'VV'</div><ul class="xr-dim-list"><li><span class="xr-has-index">time</span>: 1</li><li><span class="xr-has-index">y</span>: 3150</li><li><span class="xr-has-index">x</span>: 3978</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input id="section-e32fb2bc-4579-473c-a1a8-67373c674737" class="xr-array-in" type="checkbox" checked=""><label for="section-e32fb2bc-4579-473c-a1a8-67373c674737" title="Show/hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>dask.array&lt;chunksize=(1, 1000, 1000), meta=np.ndarray&gt;</span></div><div class="xr-array-data">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
 <col style="width: 50%">
@@ -1697,23 +1725,13 @@ Coordinates:
 </tr>
 </tbody>
 </table>
-</div></div></li><li class="xr-section-item"><input id="section-7740011f-9d73-4c17-a1ce-2e1dcf55ad67" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-7740011f-9d73-4c17-a1ce-2e1dcf55ad67" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">1.653e+06 1.653e+06 ... 1.59e+06</div><input id="attrs-7242ad1b-704f-4d5e-910c-389d0f44f143" class="xr-var-attrs-in" type="checkbox"><label for="attrs-7242ad1b-704f-4d5e-910c-389d0f44f143" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-5cdbc7ad-c976-40c5-a49b-30ffe82a1c5a" class="xr-var-data-in" type="checkbox"><label for="data-5cdbc7ad-c976-40c5-a49b-30ffe82a1c5a" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>-20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([1653150., 1653130., 1653110., ..., 1590210., 1590190., 1590170.],
-      shape=(3150,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">5.241e+06 5.241e+06 ... 5.32e+06</div><input id="attrs-03944f65-d209-4366-b7ca-862aa075ad1b" class="xr-var-attrs-in" type="checkbox"><label for="attrs-03944f65-d209-4366-b7ca-862aa075ad1b" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-c392d6f4-04e0-469c-95a6-b5b9b0ed3f8d" class="xr-var-data-in" type="checkbox"><label for="data-c392d6f4-04e0-469c-95a6-b5b9b0ed3f8d" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([5240690., 5240710., 5240730., ..., 5320190., 5320210., 5320230.],
-      shape=(3978,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">27704</div><input id="attrs-d10c6c7c-1c9b-45f0-99ce-67f6928066ab" class="xr-var-attrs-in" type="checkbox"><label for="attrs-d10c6c7c-1c9b-45f0-99ce-67f6928066ab" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-f2c2410f-61a3-46eb-ab3f-346bb0450edd" class="xr-var-data-in" type="checkbox"><label for="data-f2c2410f-61a3-46eb-ab3f-346bb0450edd" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>crs_wkt :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984</dd><dt><span>projected_crs_name :</span></dt><dd>Azimuthal_Equidistant</dd><dt><span>grid_mapping_name :</span></dt><dd>azimuthal_equidistant</dd><dt><span>latitude_of_projection_origin :</span></dt><dd>53.0</dd><dt><span>longitude_of_projection_origin :</span></dt><dd>24.0</dd><dt><span>false_easting :</span></dt><dd>5837287.81977</dd><dt><span>false_northing :</span></dt><dd>2121415.69617</dd><dt><span>GeoTransform :</span></dt><dd>5240680 20 0 1653160 0 -20</dd></dl></div><div class="xr-var-data"><pre>array(27704, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2022-07-31</div><input id="attrs-b632bbaa-16b1-4d89-b768-109921d6ba32" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-b632bbaa-16b1-4d89-b768-109921d6ba32" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-5a5e2a7e-62e1-4f15-a610-eb8efb7efa78" class="xr-var-data-in" type="checkbox"><label for="data-5a5e2a7e-62e1-4f15-a610-eb8efb7efa78" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2022-07-31T00:00:00.000000000'], dtype='datetime64[ns]')</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-45f2877b-0651-482f-9fec-cc532524b275" class="xr-section-summary-in" type="checkbox"><label for="section-45f2877b-0651-482f-9fec-cc532524b275" class="xr-section-summary">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>y</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-4d02ee06-66a4-490d-b6d8-2c618b7a71e3" class="xr-index-data-in" type="checkbox"><label for="index-4d02ee06-66a4-490d-b6d8-2c618b7a71e3" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([1653150.0, 1653130.0, 1653110.0, 1653090.0, 1653070.0, 1653050.0,
-       1653030.0, 1653010.0, 1652990.0, 1652970.0,
-       ...
-       1590350.0, 1590330.0, 1590310.0, 1590290.0, 1590270.0, 1590250.0,
-       1590230.0, 1590210.0, 1590190.0, 1590170.0],
-      dtype='float64', name='y', length=3150))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>x</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-4db4f6a9-5709-45fe-bf0d-971a8348f863" class="xr-index-data-in" type="checkbox"><label for="index-4db4f6a9-5709-45fe-bf0d-971a8348f863" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([5240690.0, 5240710.0, 5240730.0, 5240750.0, 5240770.0, 5240790.0,
-       5240810.0, 5240830.0, 5240850.0, 5240870.0,
-       ...
-       5320050.0, 5320070.0, 5320090.0, 5320110.0, 5320130.0, 5320150.0,
-       5320170.0, 5320190.0, 5320210.0, 5320230.0],
-      dtype='float64', name='x', length=3978))</pre></div></li><li class="xr-var-item"><div class="xr-index-name"><div>time</div></div><div class="xr-index-preview">PandasIndex</div><input type="checkbox" disabled=""><label></label><input id="index-91361083-6b04-4b16-b848-50712fe6eab8" class="xr-index-data-in" type="checkbox"><label for="index-91361083-6b04-4b16-b848-50712fe6eab8" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(DatetimeIndex(['2022-07-31'], dtype='datetime64[ns]', name='time', freq='ME'))</pre></div></li></ul></div></li><li class="xr-section-item"><input id="section-1ef295bc-945b-408b-84d6-200c53d4b085" class="xr-section-summary-in" type="checkbox" disabled=""><label for="section-1ef295bc-945b-408b-84d6-200c53d4b085" class="xr-section-summary" title="Expand/collapse section">Attributes: <span>(0)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"></dl></div></li></ul></div></div>
+</div></div></li><li class="xr-section-item"><input id="section-4f173806-bc60-4378-942b-e0a461a12d3c" class="xr-section-summary-in" type="checkbox" checked=""><label for="section-4f173806-bc60-4378-942b-e0a461a12d3c" class="xr-section-summary">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">1.653e+06 1.653e+06 ... 1.59e+06</div><input id="attrs-1d04b41d-ca48-4020-a75e-a0c0a3dae6cf" class="xr-var-attrs-in" type="checkbox"><label for="attrs-1d04b41d-ca48-4020-a75e-a0c0a3dae6cf" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-1e6a929d-0481-4723-be48-d919ffe1a1ec" class="xr-var-data-in" type="checkbox"><label for="data-1e6a929d-0481-4723-be48-d919ffe1a1ec" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>-20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([1653150., 1653130., 1653110., ..., 1590210., 1590190., 1590170.],
+      shape=(3150,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">5.241e+06 5.241e+06 ... 5.32e+06</div><input id="attrs-e8a4c4f2-f82a-47f3-947a-5f923a388b90" class="xr-var-attrs-in" type="checkbox"><label for="attrs-e8a4c4f2-f82a-47f3-947a-5f923a388b90" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-f3b09751-1db5-4a24-b650-4efa86ed2476" class="xr-var-data-in" type="checkbox"><label for="data-f3b09751-1db5-4a24-b650-4efa86ed2476" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>units :</span></dt><dd>metre</dd><dt><span>resolution :</span></dt><dd>20.0</dd><dt><span>crs :</span></dt><dd>PROJCS["Azimuthal_Equidistant",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433],AUTHORITY["EPSG","4326"]],PROJECTION["Azimuthal_Equidistant"],PARAMETER["latitude_of_center",53],PARAMETER["longitude_of_center",24],PARAMETER["false_easting",5837287.81977],PARAMETER["false_northing",2121415.69617],UNIT["metre",1,AUTHORITY["EPSG","9001"]]]</dd></dl></div><div class="xr-var-data"><pre>array([5240690., 5240710., 5240730., ..., 5320190., 5320210., 5320230.],
+      shape=(3978,))</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int32</div><div class="xr-var-preview xr-preview">27704</div><input id="attrs-efa01d91-1240-41ab-916d-47aac688b5f2" class="xr-var-attrs-in" type="checkbox"><label for="attrs-efa01d91-1240-41ab-916d-47aac688b5f2" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-d7ab029c-19b4-41bd-b49b-6c9071a41b5b" class="xr-var-data-in" type="checkbox"><label for="data-d7ab029c-19b4-41bd-b49b-6c9071a41b5b" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>spatial_ref :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>crs_wkt :</span></dt><dd>PROJCRS["Azimuthal_Equidistant",BASEGEOGCRS["WGS 84",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["unnamed",METHOD["Azimuthal Equidistant",ID["EPSG",1125]],PARAMETER["Latitude of natural origin",53,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",24,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",5837287.81977,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",2121415.69617,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["(E)",east,ORDER[1],LENGTHUNIT["metre",1,ID["EPSG",9001]]],AXIS["(N)",north,ORDER[2],LENGTHUNIT["metre",1,ID["EPSG",9001]]]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984</dd><dt><span>projected_crs_name :</span></dt><dd>Azimuthal_Equidistant</dd><dt><span>grid_mapping_name :</span></dt><dd>azimuthal_equidistant</dd><dt><span>latitude_of_projection_origin :</span></dt><dd>53.0</dd><dt><span>longitude_of_projection_origin :</span></dt><dd>24.0</dd><dt><span>false_easting :</span></dt><dd>5837287.81977</dd><dt><span>false_northing :</span></dt><dd>2121415.69617</dd><dt><span>GeoTransform :</span></dt><dd>5240680 20 0 1653160 0 -20</dd></dl></div><div class="xr-var-data"><pre>array(27704, dtype=int32)</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">time</span></div><div class="xr-var-dims">(time)</div><div class="xr-var-dtype">datetime64[ns]</div><div class="xr-var-preview xr-preview">2022-07-31</div><input id="attrs-b20e3856-d70e-48f4-934d-b0512ee35b9c" class="xr-var-attrs-in" type="checkbox" disabled=""><label for="attrs-b20e3856-d70e-48f4-934d-b0512ee35b9c" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use href="#icon-file-text2"></use></svg></label><input id="data-8bbe0893-e6c2-4eab-893f-661cf1e45a0e" class="xr-var-data-in" type="checkbox"><label for="data-8bbe0893-e6c2-4eab-893f-661cf1e45a0e" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array(['2022-07-31T00:00:00.000000000'], dtype='datetime64[ns]')</pre></div></li></ul></div></li></ul></div></div>
 </div>
 </div>
 <p>The dataset has now only 12 timestamps, one for each month. Next, we want to calculate the average <span class="math inline">\(\sigma^0\)</span> value across a subset of the scene for one month. We will do this again by converting the data to linear scale first and then calculating the average and converting it back to dB.</p>
-<div id="3e44d6d3" class="cell" data-execution_count="10">
+<div id="cb33a33a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lets take a data array with db values</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>db_array <span class="op">=</span> (</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    sig0_monthly.sel(time<span class="op">=</span><span class="st">"2022-07-30"</span>, method<span class="op">=</span><span class="st">"nearest"</span>)</span>
@@ -1724,7 +1742,7 @@ Coordinates:
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the linear values</span></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>lin_array <span class="op">=</span> db2lin(db_array)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="9b762701" class="cell" data-execution_count="11">
+<div id="55d14b61" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute the average backscatter value in linear units across the whole scene</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>lin_mean <span class="op">=</span> lin_array.mean()</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Average backscatter value in linear units: </span><span class="sc">{</span>lin_mean<span class="sc">.</span>values<span class="sc">: .3f}</span><span class="ss">"</span>)</span>
